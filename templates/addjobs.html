@@ -1,16 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>FairTaskAssigner v0.1</title>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+    {% include 'common_head.html' %}
     <script>
     $(function() {
         $('#btnRegisterJob').click(function() {
-
             $.ajax({
                 url: '/registerJob',
                 data: $('form').serialize(),
@@ -38,9 +32,7 @@
                   </li>
                   <li role="presentation"><a href="showSignUp">Sign Up Buddy</a>
                   </li>
-                  <li role="presentation"><a href="login">Current user {{ loggedUsernameEmail[0] }} / <b>{{loggedUsernameEmail[1]}}</b> </a>
-                  </li>
-
+                  {% include 'google_login.html' %}
               </ul>
           </nav>
           <h3 class="text-muted">Python FairTaskAssigner v0.1</h3>
@@ -65,7 +57,7 @@
             {% endfor %}
           </select>
         <br><br><br>
-        <button id="btnRegisterJob" class="btn btn-lg btn-primary btn-block" type="button">Register</button>
+        <button id="btnRegisterJob" class="btn btn-lg btn-danger btn-block" type="button">Register</button>
         </form>
       </div>
 
@@ -86,7 +78,7 @@
                       {% for lastEntry in todaysJobs %}
                           <tr >
                               <th scope="row">{{ lastEntry[0] }}</th>
-                              <td> {{lastEntry[1] }} </td>
+                              <td> {{ lastEntry[1] }} </td>
                               <td> {{ lastEntry[2] }} </td>
                               <td> {{ lastEntry[3] }} </td>
                           </tr>
@@ -98,7 +90,7 @@
       </div>
 
       <footer class="footer">
-        <p>&copy; Company 2019</p>
+      {% include 'footer.html' %}
       </footer>
 
     </div>

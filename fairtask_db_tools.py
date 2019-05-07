@@ -2,19 +2,20 @@ import sqlite3
 import cgi, cgitb
 from datetime import datetime, timedelta
 from fairtask_scoring import fairtask_scoring
+import os
 
-database_name = "db/CoffeTaskDB.db"
+# use db/dbScheme.sql to create an sqlite db
+DATABASE_NAME = os.environ.get("FN_DB_TO_USE", default=False)
 
 '''
 utility class for SQLite connection
 '''
-
 class fairtaskDB:
     def __init__(self):
         self.load_db()
 
     def load_db(self):
-        self.con = sqlite3.connect(database_name)
+        self.con = sqlite3.connect(DATABASE_NAME, check_same_thread=False)
         self.c = self.con.cursor()
 
     def add_user(self, name, email):
@@ -41,8 +42,9 @@ class fairtaskDB:
     def calculate_actal_scoring(self, commit=False):
         self.c.execute('select buyer, seller, product from contract')
         data = self.c.fetchall()
+        #TODO in next version -> preselection of contractors
         scoring = fairtask_scoring()
-        result = scoring.recalculate_scoring(data)
+        result = scoring.recalculate_scoring(data, presentContractors=[])
         for one in result.keys():
             self.c.execute('update user set rating=%f where id=%s'%(result[one], one))
         if commit:
@@ -52,9 +54,9 @@ class fairtaskDB:
         if id is None and email is None:
             raise ValueError('Need at least one parameter!')
         if id is None:
-            self.c.execute('select username,email from user where email=\'%s\''%email)
+            self.c.execute('select id,username,email from user where email=\'%s\''%email)
         if email is None:
-            self.c.execute('select username,email from user where id=\'%s\''%id)
+            self.c.execute('select id,username,email from user where id=\'%s\''%id)
         data = self.c.fetchall()
         return data
 

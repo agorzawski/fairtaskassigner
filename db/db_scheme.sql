@@ -1,0 +1,15 @@
+CREATE TABLE sqlite_sequence(name,seq)
+
+CREATE TABLE "user" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+  `email` TEXT NOT NULL, `username` TEXT NOT NULL, `rating` INTEGER NOT NULL )
+
+CREATE TABLE "product" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `name` TEXT NOT NULL, `price` REAL )
+
+CREATE TABLE "contract" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, `buyer`
+  INTEGER NOT NULL, `seller` INTEGER NOT NULL, `product` INTEGER NOT NULL, `date` INTEGER NOT NULL )
+
+CREATE VIEW all_list as select date, buyer, seller offer, name product, price, buyer_rating from
+(select date, buyer,buyer_rating, username seller, product from
+  (select date, username buyer, seller, product, rating buyer_rating from
+    contract join user on contract.buyer=user.id) buyer join user on buyer.seller = user.id) transactions
+    join product on transactions.product = product.id

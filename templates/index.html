@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <title>FairTaskAssigner v0.1</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+    {% include 'common_head.html' %}
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -21,8 +15,11 @@
                     </li>
                     <li role="presentation"><a href="showSignUp">Sign Up Buddy</a>
                     </li>
-                    <li role="presentation"><a href="login">Current user {{ loggedUsernameEmail[0] }} / <b>{{loggedUsernameEmail[1]}}</b> </a>
-                    </li>
+                  {% if not googleSession %}
+                   {% include 'no_login.html' %}
+                  {% else %}
+                   {% include 'google_login.html' %}
+                  {% endif %}
                 </ul>
             </nav>
             <h3 class="text-muted">Python FairTaskAssigner v0.1</h3>
@@ -32,7 +29,7 @@
             <h1>Coffee Bucket List App</h1>
 
             <div class="col-lg-6">
-              <h4>  Three next candidates: </h4>
+              <h4>  Three next candidates (all population): </h4>
               <div class="table-responsive alert alert-danger" role="alert">
                   <table class="table">
                       <thead>
@@ -114,7 +111,7 @@
         </div>
 
         <footer class="footer">
-            <p>&copy; Company 2019</p>
+        {% include 'footer.html' %}
         </footer>
 
     </div>
