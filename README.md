@@ -33,6 +33,6 @@ python app.py
 To start server `sh run.sh`, it will start server listening at `FN_LISTEN_HOST_IP:8040`.
 
 ## TO DO
-New user can add himself
-Add different scoring methods
-Add proposal based on preselected users
+- New user can add himself
+- Add different scoring methods
+- Add proposal based on preselected users
