@@ -19,38 +19,73 @@ class fairtaskDB:
         self.c = self.con.cursor()
 
     def add_user(self, name, email):
-        err = self.c.execute('insert into user (email, username, rating) values (\'%s\', \'%s\', 1.0)' %(email, name) )
-        self.con.commit()
-        if err:
-            print(err)
+        try:
+            self.c.execute('insert into user (email, username, rating) values (\'%s\', \'%s\', 1.0)' %(email, name) )
+            self.con.commit()
+            return True
+        except IntegrityError:
+            return False
 
     def add_product(self, name, price):
-        err = self.c.execute('insert into user vales (%s, %s) '%(name, price))
-        self.con.commit()
-        if err:
-            print(err)
+        try:
+            self.c.execute('insert into user vales (%s, %s) '%(name, price))
+            self.con.commit()
+            return True
+        except IntegrityError:
+            return False
 
-    def add_transaction(self, who, whom, what):
+    def add_transaction(self, who, whom, what,creator, commit=False):
         if who==-1 or whom==-1 or what==-1:
             raise ValueError('Cannot save transaction for an unspecified person or goods!')
         else:
-            sql = 'insert into  contract (buyer, seller, product, date) values (%s, %s, %s, CURRENT_TIMESTAMP)'%(who, whom, what)
-            self.c.execute(sql)
-            self.calculate_actal_scoring()
-            self.con.commit()
+            sql = 'insert into  contract (buyer, seller, product, date, creator) values (%s, %s, %s, CURRENT_TIMESTAMP, %s)'%(who, whom, what,creator)
+            try:
+                self.c.execute(sql)
+                self.calculate_actal_scoring()
+                if commit:
+                    self.con.commit()
+                return True
+            except IntegrityError:
+                return False
 
-    def calculate_actal_scoring(self, commit=False):
+    def add_to_bucket(self, whom, what):
+        sql = 'insert into  contract_temp (to_whom, product) values (%s, %s)'%(whom, what)
+        self.c.execute(sql)
+        self.calculate_actal_scoring()
+        self.con.commit()
+
+    def finalize_bucket_list(self, loggedUser, who):
+        self.c.execute('select * from contract_temp')
+        for whomWhat in self.c.fetchall():
+            if int(who) == int(whomWhat[0]):
+                continue
+            self.add_transaction(who, whomWhat[0], whomWhat[1], loggedUser)
+        self.clean_bucket()
+
+    def clean_bucket(self):
+        self.c.execute('delete from contract_temp')
+        self.con.commit()
+
+    def calculate_actal_scoring(self, commit=False, presentContractors=[]):
         self.c.execute('select buyer, seller, product from contract')
         data = self.c.fetchall()
-        #TODO in next version -> preselection of contractors
         scoring = fairtask_scoring()
-        result = scoring.recalculate_scoring(data, presentContractors=[])
+        result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
         for one in result.keys():
             self.c.execute('update user set rating=%f where id=%s'%(result[one], one))
         if commit:
-            self.con.commit()
+            try:
+                self.con.commit()
+                return True
+            except IntegrityError:
+                return False
 
-    def getUsernameAndEmail(self, id=None, email=None):
+    def get_bucket(self):
+        self.c.execute('select username, what, rating from (select to_whom whom, name what from contract_temp join product on product.id = product) join user on user.id=whom')
+        data = self.c.fetchall()
+        return data
+
+    def get_username_and_email(self, id=None, email=None):
         if id is None and email is None:
             raise ValueError('Need at least one parameter!')
         if id is None:

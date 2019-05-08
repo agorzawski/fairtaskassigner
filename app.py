@@ -23,6 +23,7 @@ ACCESS_TOKEN_URL='https://accounts.google.com/o/oauth2/token'
 USER_INFO_URL='https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token='
 
 HOUR_IN_SECONDS = 3600
+NON_EXISTING_ID = -666
 
 app = Flask(__name__)
 app.debug = DEBUG
@@ -50,7 +51,7 @@ def authorized(resp):
     return redirect(url_for('main'))
 
 @google.tokengetter
-def get_access_token():
+def getAccessToken():
     return session.get('access_token')
 
 def getUserInfo(access_token):
@@ -61,15 +62,19 @@ def getUserInfo(access_token):
     return userData
 
 def getLoggedUsernameEmailPicture():
-    access_token = get_access_token()[0]
+    access_token = getAccessToken()[0]
     userData = getUserInfo(access_token)
     email, picture  =  (userData['email'], userData['picture'])
-    id, username, emailLocal= storage.getUsernameAndEmail(email=email)[0]
-    if emailLocal == email:
-        return {'id':id, 'email':email, 'username':username, 'picture':picture}
+    localUserData = storage.get_username_and_email(email=email)
+    if len(localUserData):
+        id, username, emailLocal = localUserData[0]
+        if emailLocal == email:
+            return {'id':id, 'email':email, 'username':username, 'picture':picture}
+    else:
+        return {'id':NON_EXISTING_ID, 'email':email, 'username':'', 'picture':picture}
 
 def isLoginValid():
-    access_token = get_access_token()
+    access_token = getAccessToken()
     if access_token is not None:
         userDetails = getUserInfo(access_token[0])
         try:
@@ -90,6 +95,11 @@ def login():
         return google.authorize(callback=callback)
     else:
         return redirect(url_for('main'))
+
+@app.route('/logout')
+def logout():
+    session['access_token'] = 'LOGOUT', ''
+    return redirect(url_for('main'))
 
 @app.route("/")
 @app.route('/main')
@@ -114,15 +124,18 @@ def addJobs():
     if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    if loggedUsernameEmail['id'] == NON_EXISTING_ID:
+        return redirect(url_for('showSignUp'))
     users = storage.get_users()
     products = storage.get_products()
-    buffer = 5*HOUR_IN_SECONDS
-    summaryToday = storage.get_jobs_summary(today=True, buffer_seconds=buffer)
+    # buffer = 5*HOUR_IN_SECONDS
+    # summaryToday = storage.get_jobs_summary(today=True, buffer_seconds=buffer)
+    summaryToday = storage.get_bucket()
     return render_template('addjobs.html',
                            todaysJobs=summaryToday,
                            users=users,
                            products=products,
-                           hours=int(buffer/HOUR_IN_SECONDS),
+                           #hours=int(buffer/HOUR_IN_SECONDS),
                            loggedUsernameEmail=loggedUsernameEmail)
 
 @app.route('/showSignUp')
@@ -136,33 +149,56 @@ def showSignUp():
     return render_template('signup.html',
                            users=users,
                            products=products,
-                           loggedUsernameEmail=loggedUsernameEmail)
+                           loggedUsernameEmail=loggedUsernameEmail,
+                           invalidId=NON_EXISTING_ID)
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
     if not isLoginValid():
         return redirect(url_for('login'))
-
     _name = request.form['inputName']
     _email = request.form['inputEmail']
     if _name and _email:
-        storage.add_user(_name, _email)
-        return redirect(url_for('showSignUp'))
+        if storage.add_user(_name, _email):
+            return redirect(url_for('showSignUp'))
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
 @app.route('/registerJob', methods=['POST'])
-def registerJobs():
+def registerJob():
     if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    if loggedUsernameEmail['id'] == NON_EXISTING_ID:
+        return redirect(url_for('showSignUp'))
     _name = request.form['inputName']
     _product = request.form['inputProduct']
     if _name and _product:
-        storage.add_transaction(loggedUsernameEmail['id'], _name, _product)
+        storage.add_to_bucket(_name, _product)
         return redirect(url_for('addJobs'))
-    else:
-        return json.dumps({'html':'<span>Enter the required fields</span>'})
+
+@app.route('/emptyBucket', methods=['POST'])
+def emptyBucket():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    if loggedUsernameEmail['id'] == NON_EXISTING_ID:
+        return redirect(url_for('showSignUp'))
+    storage.clean_bucket()
+    return redirect(url_for('addJobs'))
+
+@app.route('/finalizeJob', methods=['POST'])
+def finalizeJob():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    if loggedUsernameEmail['id'] == NON_EXISTING_ID:
+        return redirect(url_for('showSignUp'))
+    _name = request.form['finalzeName']
+    if int(_name) < 0:
+        return redirect(url_for('addJobs'))
+    storage.finalize_bucket_list(loggedUsernameEmail['id'], _name)
+    return redirect(url_for('main'))
 
 if __name__ == "__main__":
     import logging

@@ -2,26 +2,7 @@
 <html lang="en">
   <head>
     {% include 'common_head.html' %}
-    <script>
-    $(function() {
-        $('#btnSignUp').click(function() {
-            $.ajax({
-                url: '/signUp',
-                data: $('form').serialize(),
-                type: 'POST',
-                success: function(response) {
-                    console.log(response);
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        });
-    }
-  );
-    </script>
   </head>
-
   <body>
     <div class="container">
       <div class="header">
@@ -36,19 +17,45 @@
                   {% include 'google_login.html' %}
               </ul>
           </nav>
-          <h3 class="text-muted">Python FairTaskAssigner v0.1</h3>
+          {% include 'common_head.html' %}
       </div>
 
       <div class="jumbotron">
         <h1>Add buddy</h1>
         <form class="form-signin">
         <label for="inputName" class="sr-only">Name</label>
-        <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Name" required autofocus>
+        <input type="name" name="inputName" id="inputName"
+          class="form-control" placeholder="Name" required autofocus>
         <br>
         <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+          {%if loggedUsernameEmail['id'] != invalidId %}
+            <input type="email" name="inputEmail" id="inputEmail"
+              class="form-control" placeholder= "Email address" required autofocus>
+          {% else %}
+            <input type="email" name="inputEmail" id="inputEmail" readonly
+              class="form-control" value="{{loggedUsernameEmail['email']}}" required autofocus>
+          {% endif %}
         <br><br>
         <button id="btnSignUp" class="btn btn-lg btn-success btn-block" type="button">Sign up</button>
+        <script>
+          $(function() {
+              $('#btnSignUp').click(function() {
+                  $.ajax({
+                      url: '/signUp',
+                      data: $('form').serialize(),
+                      type: 'POST',
+                      success: function(response) {
+                          location.reload();
+                          console.log(response);
+                      },
+                      error: function(error) {
+                          console.log(error);
+                      }
+                  });
+              });
+            }
+          );
+        </script>
       </form>
       </div>
 

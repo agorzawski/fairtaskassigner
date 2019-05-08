@@ -2,25 +2,7 @@
 <html lang="en">
   <head>
     {% include 'common_head.html' %}
-    <script>
-    $(function() {
-        $('#btnRegisterJob').click(function() {
-            $.ajax({
-                url: '/registerJob',
-                data: $('form').serialize(),
-                type: 'POST',
-                success: function(response) {
-                    console.log(response);
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        });
-    });
-    </script>
   </head>
-
   <body>
     <div class="container">
       <div class="header">
@@ -35,7 +17,7 @@
                   {% include 'google_login.html' %}
               </ul>
           </nav>
-          <h3 class="text-muted">Python FairTaskAssigner v0.1</h3>
+          {% include 'common_title.html' %}
       </div>
 
       <div class="jumbotron">
@@ -57,36 +39,100 @@
             {% endfor %}
           </select>
         <br><br><br>
-        <button id="btnRegisterJob" class="btn btn-lg btn-danger btn-block" type="button">Register</button>
+        <button id="btnRegisterJob" class="btn btn-lg btn-warning btn-block" type="button">Register</button>
+        <script>
+          $(function() {
+              $('#btnRegisterJob').click(function() {
+                  $.ajax({
+                      url: '/registerJob',
+                      data: $('form').serialize(),
+                      type: 'POST',
+                      success: function(response) {
+                          console.log(response);
+                          location.reload();
+                      },
+                      error: function(error) {
+                          console.log(error);
+                      }
+                  });
+              });
+          });
+        </script>
         </form>
-      </div>
 
-      <div class="row marketing">
-          <div class="col-lg-6 alert alert-primary" role="alert">
-              <h4>Orders within last {{hours}} hours:</h4>
-              <div class="table-responsive">
-                  <table class="table">
-                      <thead>
-                          <tr>
-                              <th scope="col">When</th>
-                              <th scope="col">Name</th>
-                              <th scope="col">To whom </th>
-                              <th scope="col">Type </th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                      {% for lastEntry in todaysJobs %}
-                          <tr >
-                              <th scope="row">{{ lastEntry[0] }}</th>
-                              <td> {{ lastEntry[1] }} </td>
-                              <td> {{ lastEntry[2] }} </td>
-                              <td> {{ lastEntry[3] }} </td>
-                          </tr>
-                      {% endfor %}
-                      </tbody>
-                  </table>
-              </div>
-          </div>
+        <h4>Bucket list</h4>
+        <form class="form-bucket">
+          <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty Bucket List</button>
+          <script>
+            $(function() {
+                $('#btnEmptyBucket').click(function() {
+                    $.ajax({
+                        url: '/emptyBucket',
+                        data: $('form').serialize(),
+                        type: 'POST',
+                        success: function(response) {
+                            console.log(response);
+                            location.reload();
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+                });
+            });
+          </script>
+        </form>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"> Whom </th>
+                        <th scope="col"> What </th>
+                        <th scope="col"> Rating </th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for lastEntry in todaysJobs %}
+                    <tr>
+                        <td> {{ lastEntry[0] }} </td>
+                        <td> {{ lastEntry[1] }} </td>
+                        <td> {{ lastEntry[2] }} </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+
+          <form class="form-final">
+            <label for="finalzeName" class="sr-only">Name</label>
+            <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus>
+              <option value=-1>"Who is byuing?"</option>
+              {% for username in users %}
+                <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+              {% endfor %}
+            </select>
+            <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" type="button">Register Bucket List</button>
+            <script>
+              $(function() {
+                  $('#btnCloseJob').click(function() {
+                      $.ajax({
+                          url: '/finalizeJob',
+                          data: $('form').serialize(),
+                          type: 'POST',
+                          success: function(response) {
+                              console.log(response);
+                              location.reload();
+                          },
+                          error: function(error) {
+                              console.log(error);
+                          }
+                      });
+                  });
+              });
+            </script>
+          </form>
       </div>
 
       <footer class="footer">

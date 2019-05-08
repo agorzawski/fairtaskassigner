@@ -5,8 +5,9 @@ CREATE TABLE "user" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 
 CREATE TABLE "product" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `name` TEXT NOT NULL, `price` REAL )
 
+CREATE TABLE "contract_temp" ( `to_whom` INTEGER NOT NULL, `product` INTEGER NOT NULL )
 CREATE TABLE "contract" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, `buyer`
-  INTEGER NOT NULL, `seller` INTEGER NOT NULL, `product` INTEGER NOT NULL, `date` INTEGER NOT NULL )
+  INTEGER NOT NULL, `seller` INTEGER NOT NULL, `product` INTEGER NOT NULL, `date` INTEGER NOT NULL, `creator` INTEGER NOT NULL )
 
 CREATE VIEW all_list as select date, buyer, seller offer, name product, price, buyer_rating from
 (select date, buyer,buyer_rating, username seller, product from

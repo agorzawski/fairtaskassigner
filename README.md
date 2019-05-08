@@ -4,10 +4,18 @@ IT is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*0.2*
+- preselected bucket is validated at later step
+
 *v0.1*
 - not logged user can see actual servings, top three candidates and top three servants
 - logged user can add new users
 - logged user can add serving (as him)
+- new user can login and add himself to the system
+
+### TODO
+- Add different scoring methods
+- Add proposal based on preselected users
 
 ## Installation
 Install all modules:
@@ -31,8 +39,3 @@ export FN_LISTEN_HOST_IP='any ip' # if not set default 127.0.0.1
 python app.py
 ```
 To start server `sh run.sh`, it will start server listening at `FN_LISTEN_HOST_IP:8040`.
-
-## TO DO
-- New user can add himself
-- Add different scoring methods
-- Add proposal based on preselected users
