@@ -5,11 +5,10 @@ Flask App for serving three pages web server based on templates and storage conn
 from fairtask_db_tools import fairtaskDB
 from flask import Flask, render_template, request, json, redirect, url_for, session
 from flask_oauth import OAuth
-import functools
 import os
 
-DEBUG = True
-HOUR_IN_SECONDS = 3600
+DEBUG = os.environ.get("FN_DEBUG", default=False)
+LISTEN_HOST_IP = os.environ.get("FN_LISTEN_HOST_IP", default='127.0.0.1')
 
 # You must configure these 3 first values from Google APIs console
 # https://code.google.com/apis/console
@@ -22,6 +21,8 @@ AUTHORIZE_URL='https://accounts.google.com/o/oauth2/auth'
 SCOPE_URL='https://www.googleapis.com/auth/userinfo.email'
 ACCESS_TOKEN_URL='https://accounts.google.com/o/oauth2/token'
 USER_INFO_URL='https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token='
+
+HOUR_IN_SECONDS = 3600
 
 app = Flask(__name__)
 app.debug = DEBUG
@@ -52,30 +53,39 @@ def authorized(resp):
 def get_access_token():
     return session.get('access_token')
 
-def getEmailPictureFromGoogleAuthenticateIfNeeded():
-    access_token = session.get('access_token')[0]
+def getUserInfo(access_token):
     import urllib3, json
     http = urllib3.PoolManager()
     res = http.request('GET',USER_INFO_URL+access_token)
-
     userData=json.loads(res.data.decode('utf-8'))
-    #TODO add userData['error']
-
-    return (userData['email'], userData['picture'])
+    return userData
 
 def getLoggedUsernameEmailPicture():
-    email, picture  = getEmailPictureFromGoogleAuthenticateIfNeeded()
+    access_token = get_access_token()[0]
+    userData = getUserInfo(access_token)
+    email, picture  =  (userData['email'], userData['picture'])
     id, username, emailLocal= storage.getUsernameAndEmail(email=email)[0]
     if emailLocal == email:
         return {'id':id, 'email':email, 'username':username, 'picture':picture}
+
+def isLoginValid():
+    access_token = get_access_token()
+    if access_token is not None:
+        userDetails = getUserInfo(access_token[0])
+        try:
+            userDetails['error'] ## 99% cases when some cookie/session problem
+            return False
+        except KeyError:
+            #TODO Handle some error cases here
+            return True
+    return False
 
 ###############
 #######   MAIN PAGES and actions
 ##############
 @app.route('/login')
 def login():
-    access_token = session.get('access_token')
-    if access_token is None:
+    if not isLoginValid():
         callback=url_for('authorized', _external=True)
         return google.authorize(callback=callback)
     else:
@@ -86,8 +96,7 @@ def login():
 def main():
     googleSession=False
     loggedUsernameEmail=()
-    access_token = session.get('access_token')
-    if access_token is not None:
+    if isLoginValid():
         googleSession=True
         loggedUsernameEmail=getLoggedUsernameEmailPicture()
     top3 = storage.get_top_buyers()
@@ -102,11 +111,9 @@ def main():
 
 @app.route('/addJobs')
 def addJobs():
-    access_token = session.get('access_token')
-    if access_token is None:
+    if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
-    top3 = storage.get_top_buyers()
     users = storage.get_users()
     products = storage.get_products()
     buffer = 5*HOUR_IN_SECONDS
@@ -120,8 +127,7 @@ def addJobs():
 
 @app.route('/showSignUp')
 def showSignUp():
-    access_token = session.get('access_token')
-    if access_token is None:
+    if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     users = storage.get_users()
@@ -134,6 +140,9 @@ def showSignUp():
 
 @app.route('/signUp', methods=['POST'])
 def signUp():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+
     _name = request.form['inputName']
     _email = request.form['inputEmail']
     if _name and _email:
@@ -144,8 +153,7 @@ def signUp():
 
 @app.route('/registerJob', methods=['POST'])
 def registerJobs():
-    access_token = session.get('access_token')
-    if access_token is None:
+    if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     _name = request.form['inputName']
@@ -157,4 +165,6 @@ def registerJobs():
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
 if __name__ == "__main__":
-    app.run(port=8040)
+    import logging
+    logging.basicConfig(filename='error.log',level=logging.DEBUG)
+    app.run(host=LISTEN_HOST_IP, port=8040)

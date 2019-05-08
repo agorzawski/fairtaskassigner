@@ -1,2 +1,6 @@
 *.db
 *.sh
+*.pyc
+*.log
+*test.py
+*temp*.*

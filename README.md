@@ -25,12 +25,14 @@ export FN_FLASK_SECRET_KEY='whatever_key'
 export FN_REDIRECT_URI='REDIRECT_URL_YOU_SPECIFY_IN_GOOGLE'
 export FN_DB_TO_USE='db/YOUR_SQLite_PATH'
 
+export FN_DEBUG=True              # if not set default False
+export FN_LISTEN_HOST_IP='any ip' # if not set default 127.0.0.1
+
 python app.py
 ```
-To start server `sh run.sh`, it will start it at `localhost:8040`.
+To start server `sh run.sh`, it will start server listening at `FN_LISTEN_HOST_IP:8040`.
 
 ## TO DO
-
 New user can add himself
 Add different scoring methods
 Add proposal based on preselected users

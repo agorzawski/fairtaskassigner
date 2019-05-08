@@ -21,8 +21,8 @@ class fairtask_scoring:
 
         for one in served.keys():
             try:
-                served[one] = round(served[one]/offered[one], 1)
+                served[one] = round(served[one]-offered[one], 1)
             except KeyError:
-                served[one] = round(served[one]/1, 1)
+                served[one] = round(served[one], 1)
 
         return served
