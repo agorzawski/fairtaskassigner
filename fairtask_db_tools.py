@@ -1,5 +1,4 @@
 import sqlite3
-import cgi, cgitb
 from datetime import datetime, timedelta
 from fairtask_scoring import fairtask_scoring
 import os
@@ -10,6 +9,8 @@ DATABASE_NAME = os.environ.get("FN_DB_TO_USE", default=False)
 '''
 utility class for SQLite connection
 '''
+
+
 class fairtaskDB:
     def __init__(self):
         self.load_db()
@@ -18,24 +19,28 @@ class fairtaskDB:
         self.con = sqlite3.connect(DATABASE_NAME, check_same_thread=False)
         self.c = self.con.cursor()
 
-    def add_user(self, name, email, creator):
+    def execute_sql(self, sql, commit=False):
         try:
-            self.c.execute('insert into user (email, username, rating, creator) values (\'%s\', \'%s\', 1.0, %s)' %(email, name, creator) )
-            self.con.commit()
+            errors = []  # TODO add SQL injection check
+            if len(errors) > 0:
+                return False
+            self.c.execute(sql)
+            if commit:
+                self.con.commit()
             return True
-        except IntegrityError:
+        except sqlite3.IntegrityError:
             return False
+
+    def add_user(self, name, email, creator):
+        sql = 'insert into user (email, username, rating, creator) values (\'%s\', \'%s\', 1.0, %s)' % (email, name, creator)
+        self.execute_sql(sql, commit=True)
 
     def add_product(self, name, price):
-        try:
-            self.c.execute('insert into user vales (%s, %s) '%(name, price))
-            self.con.commit()
-            return True
-        except IntegrityError:
-            return False
+        sql = 'insert into user vales (%s, %s) ' % (name, price)
+        self.execute_sql(sql, commit=True)
 
-    def add_transaction(self, who, whom, what,creator, commit=False):
-        if who==-1 or whom==-1 or what==-1:
+    def add_transaction(self, who, whom, what, creator, commit=False):
+        if who == -1 or whom == -1 or what == -1:
             raise ValueError('Cannot save transaction for an unspecified person or goods!')
         else:
             sql = 'insert into  contract (buyer, seller, product, date, creator) values (%s, %s, %s, CURRENT_TIMESTAMP, %s)'%(who, whom, what,creator)
@@ -45,13 +50,13 @@ class fairtaskDB:
                 if commit:
                     self.con.commit()
                 return True
-            except IntegrityError:
+            except sqlite3.IntegrityError:
                 return False
 
     def add_to_bucket(self, whom, what):
-        if int(whom)>0 and int(what)>0:
-            sql = 'insert into  contract_temp (to_whom, product) values (%s, %s)'%(whom, what)
-            self.c.execute(sql)
+        if int(whom) > 0 and int(what) > 0:
+            sql = 'insert into  contract_temp (to_whom, product) values (%s, %s)' % (whom, what)
+            self.execute_sql(sql)
             self.calculate_actal_scoring()
             self.con.commit()
 
@@ -64,8 +69,8 @@ class fairtaskDB:
         self.clean_bucket()
 
     def clean_bucket(self):
-        self.c.execute('delete from contract_temp')
-        self.con.commit()
+        sql = 'delete from contract_temp'
+        self.execute_sql(sql)
 
     def calculate_actal_scoring(self, commit=False, presentContractors=[]):
         self.c.execute('select buyer, seller, product from contract')
@@ -73,12 +78,12 @@ class fairtaskDB:
         scoring = fairtask_scoring()
         result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
         for one in result.keys():
-            self.c.execute('update user set rating=%f where id=%s'%(result[one], one))
+            self.c.execute('update user set rating=%f where id=%s' % (result[one], one))
         if commit:
             try:
                 self.con.commit()
                 return True
-            except IntegrityError:
+            except sqlite3.IntegrityError:
                 return False
 
     def get_bucket(self):
@@ -90,9 +95,9 @@ class fairtaskDB:
         if id is None and email is None:
             raise ValueError('Need at least one parameter!')
         if id is None:
-            self.c.execute('select id,username,email from user where email=\'%s\''%email)
+            self.c.execute('select id,username,email from user where email=\'%s\'' % email)
         if email is None:
-            self.c.execute('select id,username,email from user where id=\'%s\''%id)
+            self.c.execute('select id,username,email from user where id=\'%s\'' % id)
         data = self.c.fetchall()
         return data
 
@@ -109,7 +114,7 @@ class fairtaskDB:
     def get_jobs_summary(self, today=False, buffer_seconds=3*3600):
         if today:
             now = datetime.now() - timedelta(seconds=buffer_seconds)
-            self.c.execute('select * from all_list where date > \'%s\' order by date desc'%now.strftime("%Y-%m-%d %H:%M:%S"))
+            self.c.execute('select * from all_list where date > \'%s\' order by date desc' % now.strftime("%Y-%m-%d %H:%M:%S"))
         else:
             self.c.execute('select * from all_list order by date desc')
         data = self.c.fetchall()
