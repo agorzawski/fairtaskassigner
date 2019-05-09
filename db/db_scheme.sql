@@ -1,7 +1,7 @@
 CREATE TABLE sqlite_sequence(name,seq)
 
 CREATE TABLE "user" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-  `email` TEXT NOT NULL, `username` TEXT NOT NULL, `rating` INTEGER NOT NULL )
+   `email` TEXT NOT NULL, `username` TEXT NOT NULL, `rating` INTEGER NOT NULL, `creator` INTEGER NOT NULL )
 
 CREATE TABLE "product" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `name` TEXT NOT NULL, `price` REAL )
 

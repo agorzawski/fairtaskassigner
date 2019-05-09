@@ -18,9 +18,9 @@ class fairtaskDB:
         self.con = sqlite3.connect(DATABASE_NAME, check_same_thread=False)
         self.c = self.con.cursor()
 
-    def add_user(self, name, email):
+    def add_user(self, name, email, creator):
         try:
-            self.c.execute('insert into user (email, username, rating) values (\'%s\', \'%s\', 1.0)' %(email, name) )
+            self.c.execute('insert into user (email, username, rating, creator) values (\'%s\', \'%s\', 1.0, %s)' %(email, name, creator) )
             self.con.commit()
             return True
         except IntegrityError:
@@ -49,10 +49,11 @@ class fairtaskDB:
                 return False
 
     def add_to_bucket(self, whom, what):
-        sql = 'insert into  contract_temp (to_whom, product) values (%s, %s)'%(whom, what)
-        self.c.execute(sql)
-        self.calculate_actal_scoring()
-        self.con.commit()
+        if int(whom)>0 and int(what)>0:
+            sql = 'insert into  contract_temp (to_whom, product) values (%s, %s)'%(whom, what)
+            self.c.execute(sql)
+            self.calculate_actal_scoring()
+            self.con.commit()
 
     def finalize_bucket_list(self, loggedUser, who):
         self.c.execute('select * from contract_temp')

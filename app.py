@@ -8,6 +8,7 @@ from flask_oauth import OAuth
 import os
 
 DEBUG = os.environ.get("FN_DEBUG", default=False)
+HOST_PORT = os.environ.get("FN_HOST_PORT", default='8040')
 LISTEN_HOST_IP = os.environ.get("FN_LISTEN_HOST_IP", default='127.0.0.1')
 
 # You must configure these 3 first values from Google APIs console
@@ -158,8 +159,9 @@ def signUp():
         return redirect(url_for('login'))
     _name = request.form['inputName']
     _email = request.form['inputEmail']
+    loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if _name and _email:
-        if storage.add_user(_name, _email):
+        if storage.add_user(_name, _email, loggedUsernameEmail['id']):
             return redirect(url_for('showSignUp'))
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
@@ -203,4 +205,4 @@ def finalizeJob():
 if __name__ == "__main__":
     import logging
     logging.basicConfig(filename='error.log',level=logging.DEBUG)
-    app.run(host=LISTEN_HOST_IP, port=8040)
+    app.run(host=LISTEN_HOST_IP, port=HOST_PORT)

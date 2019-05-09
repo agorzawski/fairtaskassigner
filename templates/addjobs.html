@@ -39,7 +39,7 @@
             {% endfor %}
           </select>
         <br><br><br>
-        <button id="btnRegisterJob" class="btn btn-lg btn-warning btn-block" type="button">Register</button>
+        <button id="btnRegisterJob" class="btn btn-lg btn-warning btn-block" type="button">Add to wish list</button>
         <script>
           $(function() {
               $('#btnRegisterJob').click(function() {
@@ -62,7 +62,7 @@
 
         <h4>Bucket list</h4>
         <form class="form-bucket">
-          <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty Bucket List</button>
+          <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty wish list</button>
           <script>
             $(function() {
                 $('#btnEmptyBucket').click(function() {
@@ -113,7 +113,7 @@
                 <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
               {% endfor %}
             </select>
-            <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" type="button">Register Bucket List</button>
+            <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" type="button">Save ordering</button>
             <script>
               $(function() {
                   $('#btnCloseJob').click(function() {
