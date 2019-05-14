@@ -25,16 +25,24 @@
         <form class="form-signin">
         <label for="inputName" class="sr-only">Name</label>
         <input type="name" name="inputName" id="inputName"
-          class="form-control" placeholder="Name" required autofocus>
+          class="form-control" placeholder="What name to use" required autofocus>
+          {%if loggedUsernameEmail['id'] == invalidId %}
+          <select type="name" name="assignedNameId" id="assignedNameId" class="form-control" required autofocus>
+            <option value=-1>"Or to whom assign this email..."</option>
+              {% for username in notValidatedUsers %}
+              <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+              {% endfor %}
+          </select>
+          {% endif %}
         <br>
         <label for="inputEmail" class="sr-only">Email address</label>
-          {%if loggedUsernameEmail['id'] != invalidId %}
-            <input type="email" name="inputEmail" id="inputEmail"
-              class="form-control" placeholder= "Email address" required autofocus>
-          {% else %}
-            <input type="email" name="inputEmail" id="inputEmail" readonly
-              class="form-control" value="{{loggedUsernameEmail['email']}}" required autofocus>
-          {% endif %}
+            {%if loggedUsernameEmail['id'] != invalidId %}
+              <input type="email" name="inputEmail" id="inputEmail"
+                class="form-control" placeholder= "Email address" required autofocus>
+            {% else %}
+              <input type="email" name="inputEmail" id="inputEmail" readonly
+                class="form-control" value="{{loggedUsernameEmail['email']}}" required autofocus>
+            {% endif %}
         <br><br>
         <button id="btnSignUp" class="btn btn-lg btn-success btn-block" type="button">Sign up</button>
         <script>

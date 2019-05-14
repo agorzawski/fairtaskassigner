@@ -27,6 +27,7 @@ USER_INFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_t
 
 HOUR_IN_SECONDS = 3600
 NON_EXISTING_ID = -666
+NON_SELECTED_VALUE = -1
 
 app = Flask(__name__)
 app.debug = DEBUG
@@ -86,7 +87,7 @@ def getLoggedUsernameEmailPicture():
     else:
         return {'id': NON_EXISTING_ID, 'email': email,
                 'username': '', 'picture': picture,
-                    'idProduct':-1,
+                    'idProduct':NON_SELECTED_VALUE,
                     'productName': 'NONE'}
 
 
@@ -161,11 +162,14 @@ def showSignUp():
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     users = storage.get_users()
     products = storage.get_products()
+    notValidatedUsers = storage.get_users(onlyNotValidated=True)
     return render_template('signup.html',
                            users=users,
+                           notValidatedUsers=notValidatedUsers,
                            products=products,
                            loggedUsernameEmail=loggedUsernameEmail,
-                           invalidId=NON_EXISTING_ID)
+                           invalidId=NON_EXISTING_ID,
+                           nonSelectedId=NON_SELECTED_VALUE)
 
 
 @app.route('/signUp', methods=['POST'])
@@ -174,10 +178,24 @@ def signUp():
         return redirect(url_for('login'))
     _name = request.form['inputName']
     _email = request.form['inputEmail']
+    try:
+        _assignedNameId = int(request.form['assignedNameId'])
+    except KeyError:
+        _assignedNameId = NON_SELECTED_VALUE
+    validated = 0
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
-    if _name and _email:
-        if storage.add_user(_name, _email, loggedUsernameEmail['id']):
-            return redirect(url_for('showSignUp'))
+    if _email and (_name or _assignedNameId != NON_SELECTED_VALUE):
+        if loggedUsernameEmail['id'] == NON_EXISTING_ID:
+            validated = 1
+        if _assignedNameId == NON_SELECTED_VALUE:
+            storage.add_user(_name, _email,
+                             loggedUsernameEmail['id'],
+                             validated=validated)
+        else:
+            storage.update_user(_assignedNameId, _email,
+                                loggedUsernameEmail['id'],
+                                validated=validated)
+        return redirect(url_for('showSignUp'))
     else:
         return json.dumps({'html': '<span>Enter the required fields</span>'})
 

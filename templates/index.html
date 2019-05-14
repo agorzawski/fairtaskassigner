@@ -29,8 +29,8 @@
 
             {% if googleSession and loggedUsernameEmail['idProduct'] > 0 %}
             <form action="" method="post">
-              <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" hidden/>
-              <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" hidden />
+              <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" readonly hidden/>
+              <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" readonly hidden />
               <button id='addQuick' class="btn btn-lg btn-primary btn-block"
                 type="button">QuickAdd: {{loggedUsernameEmail['productName']}} for {{loggedUsernameEmail['username']}}
                 <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle" />
@@ -54,6 +54,13 @@
                 });
               </script>
             </form>
+            {% endif %}
+
+            {% if googleSession and loggedUsernameEmail['idProduct'] == -1 %}
+            <button id='addQuick' class="btn btn-lg btn-primary btn-block"
+              type="button" disabled> You will see here your favorite option after first order
+              <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle"  />
+            </button>
             {% endif %}
             <hr class="my-3">
             <div class="col-lg-6">

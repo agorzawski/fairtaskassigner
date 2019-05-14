@@ -5,7 +5,7 @@ import os
 
 # use db/dbScheme.sql to create an sqlite db
 DATABASE_NAME = os.environ.get("FN_DB_TO_USE", default=False)
-
+NON_SELECTED_VALUE = -1
 '''
 utility class for SQLite connection
 '''
@@ -31,8 +31,13 @@ class fairtaskDB:
         except sqlite3.IntegrityError:
             return False
 
-    def add_user(self, name, email, creator):
-        sql = 'insert into user (email, username, rating, creator) values (\'%s\', \'%s\', 1.0, %s)' % (email, name, creator)
+    def add_user(self, name, email, creator, validated=0):
+        sql = 'insert into user (email, username, rating, creator, validated) values (\'%s\', \'%s\', 1.0, %s, %s)' % (email, name, creator, validated)
+        print(sql)
+        self.execute_sql(sql, commit=True)
+
+    def update_user(self, existingId, email, creator, validated=0):
+        sql = 'update user set email=\'%s\', creator=%s, validated=%s where id=%s'%(email, creator, validated, existingId)
         self.execute_sql(sql, commit=True)
 
     def add_product(self, name, price):
@@ -40,7 +45,7 @@ class fairtaskDB:
         self.execute_sql(sql, commit=True)
 
     def add_transaction(self, who, whom, what, creator, commit=False):
-        if who == -1 or whom == -1 or what == -1:
+        if who == NON_SELECTED_VALUE or whom == NON_SELECTED_VALUE or what == NON_SELECTED_VALUE:
             raise ValueError('Cannot save transaction for an unspecified person or goods!')
         else:
             sql = 'insert into  contract (buyer, seller, product, date, creator) values (%s, %s, %s, CURRENT_TIMESTAMP, %s)'%(who, whom, what,creator)
@@ -67,7 +72,7 @@ class fairtaskDB:
         if len(result)>0:
             return self.get_product_details(result[0][0])
         else:
-            return (-1,'NOT FOUND')
+            return (NON_SELECTED_VALUE,'NOT FOUND')
 
     def finalize_bucket_list(self, loggedUser, who):
         self.c.execute('select * from contract_temp')
@@ -79,8 +84,7 @@ class fairtaskDB:
 
     def clean_bucket(self):
         sql = 'delete from contract_temp'
-        self.execute_sql(sql)
-        self.con.commit()
+        self.execute_sql(sql, commit=True)
 
     def calculate_actal_scoring(self, commit=False, presentContractors=[]):
         self.c.execute('select buyer, seller, product from contract')
@@ -131,8 +135,11 @@ class fairtaskDB:
         else:
             raise ValueError('No Product with that ID ', id)
 
-    def get_users(self):
-        self.c.execute('select * from user order by username')
+    def get_users(self, onlyNotValidated=False):
+        sql = 'select * from user order by username'
+        if onlyNotValidated:
+            sql = 'select * from user where validated=0 order by username'
+        self.c.execute(sql)
         data = self.c.fetchall()
         return data
 
