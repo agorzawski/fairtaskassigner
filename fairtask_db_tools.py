@@ -60,6 +60,15 @@ class fairtaskDB:
             self.calculate_actal_scoring()
             self.con.commit()
 
+    def get_favorite_product(self, userId):
+        sql = 'SELECT product, COUNT(product) AS vo FROM contract where seller=%d GROUP BY product ORDER BY vo DESC LIMIT 1'%userId
+        self.c.execute(sql)
+        result =  self.c.fetchall()
+        if len(result)>0:
+            return self.get_product_details(result[0][0])
+        else:
+            return (-1,'NOT FOUND')
+
     def finalize_bucket_list(self, loggedUser, who):
         self.c.execute('select * from contract_temp')
         for whomWhat in self.c.fetchall():
@@ -71,6 +80,7 @@ class fairtaskDB:
     def clean_bucket(self):
         sql = 'delete from contract_temp'
         self.execute_sql(sql)
+        self.con.commit()
 
     def calculate_actal_scoring(self, commit=False, presentContractors=[]):
         self.c.execute('select buyer, seller, product from contract')
@@ -87,7 +97,42 @@ class fairtaskDB:
                 return False
 
     def get_bucket(self):
-        self.c.execute('select username, what, rating from (select to_whom whom, name what from contract_temp join product on product.id = product) join user on user.id=whom')
+        self.c.execute('select username, what, rating, user.id from (select to_whom whom, name what from contract_temp join product on product.id = product) join user on user.id=whom')
+        dataBucket = self.c.fetchall() # (whom, what, rating) with origanl scorings
+        if len(dataBucket):
+            self.c.execute('select to_whom from contract_temp')
+            dataBucketSimple = self.c.fetchall()
+            self.c.execute('select buyer, seller, product from contract')
+            data = self.c.fetchall()
+            scoring = fairtask_scoring()
+            presentContractors = []
+            for one in dataBucketSimple:
+                presentContractors.append(one[0])
+            resultForOrdering = scoring.recalculate_scoring(data,
+                                                 presentContractors=presentContractors)
+            toReturn = []
+            for data in dataBucket:
+                toReturn.append((data[0],
+                                 data[1],
+                                 resultForOrdering.get(data[3], 0),))
+            return toReturn
+        return dataBucket
+
+    def get_products(self):
+        self.c.execute('select * from product order by price, name')
+        data = self.c.fetchall()
+        return data
+
+    def get_product_details(self, productId):
+        self.c.execute('select * from product where id=%s'%str(productId))
+        data = self.c.fetchall()
+        if len(data)>0:
+            return data[0]
+        else:
+            raise ValueError('No Product with that ID ', id)
+
+    def get_users(self):
+        self.c.execute('select * from user order by username')
         data = self.c.fetchall()
         return data
 
@@ -98,16 +143,6 @@ class fairtaskDB:
             self.c.execute('select id,username,email from user where email=\'%s\'' % email)
         if email is None:
             self.c.execute('select id,username,email from user where id=\'%s\'' % id)
-        data = self.c.fetchall()
-        return data
-
-    def get_products(self):
-        self.c.execute('select * from product order by price, name')
-        data = self.c.fetchall()
-        return data
-
-    def get_users(self):
-        self.c.execute('select * from user order by username')
         data = self.c.fetchall()
         return data
 
@@ -126,12 +161,12 @@ class fairtaskDB:
         return data
 
     def get_top_buyers(self):
-        self.c.execute('select buyer, count(buyer) count, sum(price) total_spent, max(buyer_rating) from all_list group by buyer order by count desc limit 3')
+        self.c.execute('select buyer, count(buyer) count, sum(price) total_spent, max(buyer_rating) from all_list group by buyer order by count desc limit 5')
         data = self.c.fetchall()
         return data
 
     def get_top_candidates(self):
-        self.c.execute('select username, rating from user order by rating limit 3')
+        self.c.execute('select username, rating from user order by rating limit 5')
         data = self.c.fetchall()
         return data
 

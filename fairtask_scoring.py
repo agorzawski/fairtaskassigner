@@ -1,31 +1,46 @@
 class fairtask_scoring:
     '''
-    Translates the allContracts list of pairs (buyer [0] -> whom [1])
+    Translates the allContracts list of three (buyer [0] -> whom [1] -> what [2])
     into dict of buyer : (rating, fav product)
     allContracts is the all time contracts history of (whom->to who-> what)
     presentContractors is the list of active order makers
-     to narrow down the 'winner'
+     to narrow down the 'winner' within the present order makers
     '''
 
     def recalculate_scoring(self, allContracts, presentContractors=[]):
-        # TODO Add favorite product finder/exposure
+        if len(presentContractors):
+            allContracts = self.filterContracts(allContracts, presentContractors)
 
-        served = {}
-        offered = {}
-        for one in allContracts:
-            try:
-                served[one[0]] += 1
-            except KeyError:
-                served[one[0]] = 1
-            try:
-                offered[one[1]] += 1
-            except KeyError:
-                offered[one[1]] = 1
+        served = self.getCount(allContracts, i=0)
+        offered = self.getCount(allContracts, i=1)
+        resultScoring = {}
+        for one in sorted(set(served.keys()) | set(offered.keys())):
+            servedPerOne = served.get(one, 0)
+            offeredPerOne = offered.get(one, 0)
+            if len(presentContractors):
+                if one in presentContractors:
+                    resultScoring[one] = self.getScoringFor(servedPerOne, offeredPerOne)
+                else:
+                    continue
+            else:
+                resultScoring[one] = self.getScoringFor(servedPerOne, offeredPerOne)
+        return resultScoring
 
-        for one in served.keys():
-            try:
-                served[one] = round(served[one]-offered[one], 1)
-            except KeyError:
-                served[one] = round(served[one], 1)
+    def getScoringFor(self, servedPerOne,offeredPerOne):
+        return (servedPerOne - offeredPerOne)
 
-        return served
+    def filterContracts(self, list, elementsLookFor, i=1):
+        toReturn = []
+        for one in list:
+            if one[i] in elementsLookFor:
+                toReturn.append(one)
+        return toReturn
+
+    def getCount(self, list, i=0):
+        result = {}
+        for one in list:
+            try:
+                result[one[i]] += 1
+            except KeyError:
+                result[one[i]] = 1
+        return result

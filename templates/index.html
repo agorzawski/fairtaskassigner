@@ -28,7 +28,7 @@
             <h1>Coffee Bucket List App</h1>
             <hr class="my-3">
             <div class="col-lg-6">
-              <h4>  Three next candidates (all population): </h4>
+              <h4>  Next candidates (all population): </h4>
               <div class="table-responsive alert alert-danger" role="alert">
                   <table class="table">
                       <thead>
@@ -50,7 +50,7 @@
             </div>
 
             <div class="col-lg-6">
-              <h4> Top three servants: </h4>
+              <h4> Top servants: </h4>
               <div class="table-responsive alert alert-dark" role="alert">
                   <table class="table">
                       <thead>
@@ -75,38 +75,44 @@
               </div>
             </div>
 
-            <hr class="my-4">
-            <p class="lead"></p>
-            <p><a class="btn btn-lg btn-success" href="addJobs" role="button">Prepare Task</a>
-            </p>
-        </div>
+            <div class="card" >
+              <div class="card-header">
+                &nbsp;&nbsp;
+              </div>
 
+              <div class="card-body">
+               <p class="lead"></p>
+               <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare order list</a></p>
 
-        <div class="row marketing">
-            <div class="col-lg-6">
-                <h4> All time (last 50 servings) </h4>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">When</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">To whom </th>
-                                <th scope="col">Type </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for lastEntry in summaryJobs %}
-                            <tr >
-                                <th scope="row">{{ lastEntry[0] }}</th>
-                                <td> {{ lastEntry[1] }} </td>
-                                <td> {{ lastEntry[2] }} </td>
-                                <td> {{ lastEntry[3] }} </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+              {% if googleSession and loggedUsernameEmail['idProduct'] > 0 %}
+              <form action="" method="post">
+                <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" hidden/>
+                <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" hidden />
+                <button id='addQuick' class="btn btn-lg btn-primary btn-block"
+                  type="button">Quick add: {{loggedUsernameEmail['username']}}
+                  <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle" />
+                  for {{loggedUsernameEmail['productName']}}</button>
+                <script>
+                  $(function() {
+                      $('#addQuick').click(function() {
+                          $.ajax({
+                              url: '/registerJob',
+                              data: $('form').serialize(),
+                              type: 'POST',
+                              success: function(response) {
+                                  console.log(response);
+                                  location.reload();
+                              },
+                              error: function(error) {
+                                  console.log(error);
+                              }
+                          });
+                      });
+                  });
+                </script>
+              </form>
+              {% endif %}
+              </div>
             </div>
         </div>
 

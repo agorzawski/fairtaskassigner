@@ -4,18 +4,20 @@ IT is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*0.3*
+- The temporary rating is calculated within the preselected bucket only among the current waiting list users.
+- For a logged user a predefined order button (adding to the current wish list) is available for the most often ordered product. No button is visible when never made an order.
+- Moved the order history to the 'AddTask' tab accessible only for the logged users
+- Disabled 'Register Job' and 'who is buying' for an empty Wish list.
+
 *0.2*
-- preselected bucket is validated at later step
+- Preselected bucket is validated at later step
 
 *v0.1*
-- not logged user can see actual servings, top three candidates and top three servants
-- logged user can add new users
-- logged user can add serving (as him)
-- new user can login and add himself to the system
-
-### TODO
-- Add different scoring methods
-- Add proposal based on preselected users
+- Not logged user can see actual servings, top three candidates and top three servants
+- Logged user can add new users
+- Logged user can add serving (as him)
+- New user can login and add himself to the system
 
 ## Installation
 Install all modules:

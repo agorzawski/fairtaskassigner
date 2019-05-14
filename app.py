@@ -76,11 +76,18 @@ def getLoggedUsernameEmailPicture():
     if len(localUserData):
         id, username, emailLocal = localUserData[0]
         if emailLocal == email:
+            favProduct = storage.get_favorite_product(id)
+
             return {'id': id, 'email': email,
-                    'username': username, 'picture': picture}
+                    'username': username,
+                    'picture': picture,
+                    'idProduct':favProduct[0],
+                    'productName': favProduct[1].upper()}
     else:
         return {'id': NON_EXISTING_ID, 'email': email,
-                'username': '', 'picture': picture}
+                'username': '', 'picture': picture,
+                    'idProduct':-1,
+                    'productName': 'NONE'}
 
 
 def isLoginValid():
@@ -120,11 +127,9 @@ def main():
         googleSession = True
         loggedUsernameEmail = getLoggedUsernameEmailPicture()
     top3 = storage.get_top_buyers()
-    allJobs = storage.get_jobs_summary()
     candidates = storage.get_top_candidates()
     return render_template('index.html',
                            top3=top3,
-                           summaryJobs=allJobs,
                            candidates=candidates,
                            googleSession=googleSession,
                            loggedUsernameEmail=loggedUsernameEmail)
@@ -139,9 +144,11 @@ def addJobs():
         return redirect(url_for('showSignUp'))
     users = storage.get_users()
     products = storage.get_products()
+    allJobs = storage.get_jobs_summary()
     summaryToday = storage.get_bucket()
     return render_template('addjobs.html',
                            todaysJobs=summaryToday,
+                           summaryJobs=allJobs,
                            users=users,
                            products=products,
                            loggedUsernameEmail=loggedUsernameEmail)

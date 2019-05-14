@@ -62,7 +62,11 @@
 
         <h4>Bucket list</h4>
         <form class="form-bucket">
+          {% if todaysJobs|length > 0 %}
           <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty wish list</button>
+          {% else %}
+          <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button" disabled>Empty wish list</button>
+          {% endif %}
           <script>
             $(function() {
                 $('#btnEmptyBucket').click(function() {
@@ -107,13 +111,21 @@
 
           <form class="form-final">
             <label for="finalzeName" class="sr-only">Name</label>
+            {% if todaysJobs|length > 0 %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus>
+            {% else %}
+            <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus disabled>
+            {% endif %}
               <option value=-1>"Who is byuing?"</option>
               {% for username in users %}
                 <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
               {% endfor %}
             </select>
-            <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" type="button">Save ordering</button>
+            {% if todaysJobs|length > 0 %}
+               <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" type="button">Save ordering</button>
+              {% else %}
+               <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" disabled type="button">Save ordering</button>
+           {% endif %}
             <script>
               $(function() {
                   $('#btnCloseJob').click(function() {
@@ -133,6 +145,34 @@
               });
             </script>
           </form>
+      </div>
+
+      <div class="row marketing">
+          <div class="col-lg-6">
+              <h4> All time (last 50 servings) </h4>
+              <div class="table-responsive">
+                  <table class="table">
+                      <thead>
+                          <tr>
+                              <th scope="col">When</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">To whom </th>
+                              <th scope="col">Type </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      {% for lastEntry in summaryJobs %}
+                          <tr >
+                              <th scope="row">{{ lastEntry[0] }}</th>
+                              <td> {{ lastEntry[1] }} </td>
+                              <td> {{ lastEntry[2] }} </td>
+                              <td> {{ lastEntry[3] }} </td>
+                          </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
       </div>
 
       <footer class="footer">
