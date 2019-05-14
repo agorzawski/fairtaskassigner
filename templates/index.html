@@ -26,6 +26,35 @@
 
         <div class="jumbotron">
             <h1>Coffee Bucket List App</h1>
+
+            {% if googleSession and loggedUsernameEmail['idProduct'] > 0 %}
+            <form action="" method="post">
+              <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" hidden/>
+              <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" hidden />
+              <button id='addQuick' class="btn btn-lg btn-primary btn-block"
+                type="button">QuickAdd: {{loggedUsernameEmail['productName']}} for {{loggedUsernameEmail['username']}}
+                <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle" />
+                </button>
+              <script>
+                $(function() {
+                    $('#addQuick').click(function() {
+                        $.ajax({
+                            url: '/registerJob',
+                            data: $('form').serialize(),
+                            type: 'POST',
+                            success: function(response) {
+                                console.log(response);
+                                location.reload();
+                            },
+                            error: function(error) {
+                                console.log(error);
+                            }
+                        });
+                    });
+                });
+              </script>
+            </form>
+            {% endif %}
             <hr class="my-3">
             <div class="col-lg-6">
               <h4>  Next candidates (all population): </h4>
@@ -79,39 +108,9 @@
               <div class="card-header">
                 &nbsp;&nbsp;
               </div>
-
               <div class="card-body">
                <p class="lead"></p>
                <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare order list</a></p>
-
-              {% if googleSession and loggedUsernameEmail['idProduct'] > 0 %}
-              <form action="" method="post">
-                <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" hidden/>
-                <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" hidden />
-                <button id='addQuick' class="btn btn-lg btn-primary btn-block"
-                  type="button">Quick add: {{loggedUsernameEmail['username']}}
-                  <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle" />
-                  for {{loggedUsernameEmail['productName']}}</button>
-                <script>
-                  $(function() {
-                      $('#addQuick').click(function() {
-                          $.ajax({
-                              url: '/registerJob',
-                              data: $('form').serialize(),
-                              type: 'POST',
-                              success: function(response) {
-                                  console.log(response);
-                                  location.reload();
-                              },
-                              error: function(error) {
-                                  console.log(error);
-                              }
-                          });
-                      });
-                  });
-                </script>
-              </form>
-              {% endif %}
               </div>
             </div>
         </div>
