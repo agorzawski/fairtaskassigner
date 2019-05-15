@@ -124,16 +124,19 @@ def logout():
 def main():
     googleSession = False
     loggedUsernameEmail = ()
+    inBucket = False
     if isLoginValid():
         googleSession = True
         loggedUsernameEmail = getLoggedUsernameEmailPicture()
+        inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
     return render_template('index.html',
                            top3=top3,
                            candidates=candidates,
                            googleSession=googleSession,
-                           loggedUsernameEmail=loggedUsernameEmail)
+                           loggedUsernameEmail=loggedUsernameEmail,
+                           inBucket=inBucket)
 
 
 @app.route('/addJobs')

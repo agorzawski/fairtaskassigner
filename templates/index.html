@@ -32,8 +32,13 @@
               <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" readonly hidden/>
               <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" readonly hidden />
               <button id='addQuick' class="btn btn-lg btn-primary btn-block"
-                type="button">QuickAdd: {{loggedUsernameEmail['productName']}} for {{loggedUsernameEmail['username']}}
-                <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle" />
+                type="button"
+                {% if inBucket %}
+                  disabled> ALREADY registered
+                {% else %}
+                  >QuickAdd: {{loggedUsernameEmail['productName']}} for {{loggedUsernameEmail['username']}}
+                {% endif %}
+                <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle"/>
                 </button>
               <script>
                 $(function() {
