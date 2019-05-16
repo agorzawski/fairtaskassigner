@@ -10,9 +10,9 @@
               <ul class="nav nav-pills pull-right">
                   <li role="presentation" ><a href="main">Home</a>
                   </li>
-                  <li role="presentation" class="active"><a href="addJobs">Add Task</a>
+                  <li role="presentation" class="active"><a href="addJobs">Orders</a>
                   </li>
-                  <li role="presentation"><a href="showSignUp">Sign Up Buddy</a>
+                  <li role="presentation"><a href="showSignUp">Settings</a>
                   </li>
                   {% include 'google_login.html' %}
               </ul>
@@ -21,11 +21,15 @@
       </div>
 
       <div class="jumbotron">
-        <h1>Coffee Bucket List Task: </h1>
+        <h1>Coffee Bucket List</h1>
+        <p>Select choices, preview the whish list with individual choices and register the job.</p>
+
+        <div class="well">
+        <h4>Add someone to the whish list</h4>
         <form class="form-signin">
           <label for="inputName" class="sr-only">Name</label>
           <select type="name" name="inputName" id="inputName" class="form-control" placeholder="To whom (name)" required autofocus>
-            <option value=-1>"To whom (name)"</option>
+            <option value=-1>To whom (name)</option>
             {% for username in users %}
               <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
             {% endfor %}
@@ -33,13 +37,13 @@
           <br>
           <label for="inputProduct" class="sr-only">Product</label>
           <select type="name" name="inputProduct" id="inputProduct" class="form-control" placeholder="To whom (name)" required autofocus>
-            <option value=-1>"What to buy (product)"</option>
+            <option value=-1>What to buy (product)</option>
             {% for product in products %}
               <option value={{product[0]}}>{{product[1]}} ({{product[2]}} CHF)</option>
             {% endfor %}
           </select>
-        <br><br><br>
-        <button id="btnRegisterJob" class="btn btn-lg btn-warning btn-block" type="button">Add to wish list</button>
+        <br>
+        <button id="btnRegisterJob" class="btn btn-lg btn-primary btn-block" type="button">Add to the wish list</button>
         <script>
           $(function() {
               $('#btnRegisterJob').click(function() {
@@ -60,71 +64,83 @@
         </script>
         </form>
 
-        <h4>Bucket list</h4>
-        <form class="form-bucket">
-          {% if todaysJobs|length > 0 %}
-          <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty wish list</button>
-          {% else %}
-          <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button" disabled>Empty wish list</button>
-          {% endif %}
-          <script>
-            $(function() {
-                $('#btnEmptyBucket').click(function() {
-                    $.ajax({
-                        url: '/emptyBucket',
-                        data: $('form').serialize(),
-                        type: 'POST',
-                        success: function(response) {
-                            console.log(response);
-                            location.reload();
-                        },
-                        error: function(error) {
-                            console.log(error);
-                        }
-                    });
-                });
-            });
-          </script>
-        </form>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col"> Whom </th>
-                        <th scope="col"> What </th>
-                        <th scope="col"> Rating </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for lastEntry in todaysJobs %}
-                    <tr>
-                        <td> {{ lastEntry[0] }} </td>
-                        <td> {{ lastEntry[1] }} </td>
-                        <td> {{ lastEntry[2] }} </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+      </div>
 
 
+        <div class="well">
+          <h4>Bucket list</h4>
+          <form class="form-bucket">
+            {% if todaysJobs|length > 0 %}
+            <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty wish list</button>
+            {% else %}
+            <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button" disabled>Empty wish list</button>
+            {% endif %}
+            <script>
+              $(function() {
+                  $('#btnEmptyBucket').click(function() {
+                      $.ajax({
+                          url: '/emptyBucket',
+                          data: $('form').serialize(),
+                          type: 'POST',
+                          success: function(response) {
+                              console.log(response);
+                              location.reload();
+                          },
+                          error: function(error) {
+                              console.log(error);
+                          }
+                      });
+                  });
+              });
+            </script>
+          </form>
 
+
+          <div class="table-responsive">
+              <table class="table">
+                  <thead>
+                      <tr>
+                          <th scope="col"> Whom </th>
+                          <th scope="col"> What </th>
+                          <th scope="col"> Local <br>rating </th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                  {% for lastEntry in todaysJobs %}
+                      <tr>
+                          <td> {{ lastEntry[0] }} </td>
+                          <td> {{ lastEntry[1] }} </td>
+                          <td> {{ lastEntry[2] }} </td>
+                      </tr>
+                  {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+         </div>
+
+          <div class="well">
           <form class="form-final">
+
+            <h4>Register the job</h4>
+              <p>Who is byuing? (default is the actual logged user)</p>
             <label for="finalzeName" class="sr-only">Name</label>
             {% if todaysJobs|length > 0 %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus>
             {% else %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus disabled>
             {% endif %}
-              <option value=-1>"Who is byuing?"</option>
-              {% for username in users %}
-                <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+              {% for userIdEmailName in users %}
+                {% if userIdEmailName[0] == loggedUsernameEmail['id'] %}
+                  <option value={{userIdEmailName[0]}} selected>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
+                {% else %}
+                  <option value={{userIdEmailName[0]}}>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
+                {% endif %}
               {% endfor %}
             </select>
             {% if todaysJobs|length > 0 %}
-               <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" type="button">Save ordering</button>
+               <button id="btnCloseJob" class="btn btn-lg btn-success btn-block" type="button">Save ordering</button>
               {% else %}
-               <button id="btnCloseJob" class="btn btn-lg btn-danger btn-block" disabled type="button">Save ordering</button>
+               <button id="btnCloseJob" class="btn btn-lg btn-success btn-block" disabled type="button">Save ordering</button>
            {% endif %}
             <script>
               $(function() {
@@ -145,11 +161,12 @@
               });
             </script>
           </form>
+        </div>
       </div>
 
       <div class="row marketing">
-          <div class="col-lg-6">
-              <h4> All time (last 50 servings) </h4>
+          <div class="well">
+              <h4> All time </h4>
               <div class="table-responsive">
                   <table class="table">
                       <thead>

@@ -146,6 +146,8 @@ def addJobs():
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
+    inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
+    googleSession = True
     users = storage.get_users()
     products = storage.get_products()
     allJobs = storage.get_jobs_summary()
@@ -155,6 +157,8 @@ def addJobs():
                            summaryJobs=allJobs,
                            users=users,
                            products=products,
+                           googleSession=googleSession,
+                           inBucket=inBucket,
                            loggedUsernameEmail=loggedUsernameEmail)
 
 

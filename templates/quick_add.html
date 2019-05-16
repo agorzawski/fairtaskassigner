@@ -1,0 +1,33 @@
+{% if googleSession and loggedUsernameEmail['idProduct'] > 0 %}
+<form action="" method="post">
+  <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" readonly hidden/>
+  <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" readonly hidden />
+  <button id='addQuick' class="btn btn-lg btn-primary btn-block"
+    type="button"
+    {% if inBucket %}
+      disabled> ALREADY registered for next order!
+    {% else %}
+      >{{loggedUsernameEmail['productName']}} for {{loggedUsernameEmail['username']}}
+      <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle"/>
+    {% endif %}
+    </button>
+  <script>
+    $(function() {
+        $('#addQuick').click(function() {
+            $.ajax({
+                url: '/registerJob',
+                data: $('form').serialize(),
+                type: 'POST',
+                success: function(response) {
+                    console.log(response);
+                    location.reload();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+  </script>
+</form>
+{% endif %}

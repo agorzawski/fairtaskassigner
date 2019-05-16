@@ -10,9 +10,9 @@
                 <ul class="nav nav-pills pull-right">
                     <li role="presentation" class="active"><a href="#">Home</a>
                     </li>
-                    <li role="presentation"><a href="addJobs">Add Task</a>
+                    <li role="presentation"><a href="addJobs">Orders</a>
                     </li>
-                    <li role="presentation"><a href="showSignUp">Sign Up Buddy</a>
+                    <li role="presentation"><a href="showSignUp">Settings</a>
                     </li>
                     {% if not googleSession %}
                      {% include 'no_login.html' %}
@@ -25,41 +25,12 @@
         </div>
 
         <div class="jumbotron">
-            <h1>Coffee Bucket List App</h1>
+            <h1>Coffee Bucket List</h1>
+            <p> Browse the actual status or place an order (login required!).</p>
+            {% include 'quick_add.html' %}
+            <br>
+            <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare the order</a></p>
 
-            {% if googleSession and loggedUsernameEmail['idProduct'] > 0 %}
-            <form action="" method="post">
-              <input type="name" name="inputName" value="{{loggedUsernameEmail['id']}}" readonly hidden/>
-              <input type="name" name="inputProduct"value="{{loggedUsernameEmail['idProduct']}}" readonly hidden />
-              <button id='addQuick' class="btn btn-lg btn-primary btn-block"
-                type="button"
-                {% if inBucket %}
-                  disabled> ALREADY registered
-                {% else %}
-                  >QuickAdd: {{loggedUsernameEmail['productName']}} for {{loggedUsernameEmail['username']}}
-                {% endif %}
-                <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle"/>
-                </button>
-              <script>
-                $(function() {
-                    $('#addQuick').click(function() {
-                        $.ajax({
-                            url: '/registerJob',
-                            data: $('form').serialize(),
-                            type: 'POST',
-                            success: function(response) {
-                                console.log(response);
-                                location.reload();
-                            },
-                            error: function(error) {
-                                console.log(error);
-                            }
-                        });
-                    });
-                });
-              </script>
-            </form>
-            {% endif %}
 
             {% if googleSession and loggedUsernameEmail['idProduct'] == -1 %}
             <button id='addQuick' class="btn btn-lg btn-primary btn-block"
@@ -75,7 +46,7 @@
                       <thead>
                           <tr>
                               <th scope="col">Name</th>
-                              <th scope="col">Actual rating</th>
+                              <th scope="col">Global <br>rating</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -97,9 +68,9 @@
                       <thead>
                           <tr>
                               <th scope="col">Name</th>
-                              <th scope="col">Jobs served</th>
-                              <th scope="col">Total spent [CHF]</th>
-                              <th scope="col">Actual rating</th>
+                              <th scope="col">Served</th>
+                              <th scope="col">Spent <br>[CHF]</th>
+                              <th scope="col">Global <br> rating</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -122,7 +93,7 @@
               </div>
               <div class="card-body">
                <p class="lead"></p>
-               <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare order list</a></p>
+               <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare the order</a></p>
               </div>
             </div>
         </div>
