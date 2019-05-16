@@ -11,6 +11,7 @@ import os
 DEBUG = os.environ.get("FN_DEBUG", default=False)
 HOST_PORT = os.environ.get("FN_HOST_PORT", default='8040')
 LISTEN_HOST_IP = os.environ.get("FN_LISTEN_HOST_IP", default='127.0.0.1')
+ADMIN_EMAIL = os.environ.get("FN_ADMIN_EMAIL", default=False)
 
 # You must configure these 3 first values from Google APIs console
 # https://code.google.com/apis/console
@@ -242,7 +243,10 @@ def finalizeJob():
     _name = request.form['finalzeName']
     if int(_name) < 0:
         return redirect(url_for('addJobs'))
-    storage.finalize_bucket_list(loggedUsernameEmail['id'], _name)
+    for whomWhat in storage.get_bucket_raw():
+        storage.add_transaction(_name, whomWhat[0], whomWhat[1],
+                                loggedUsernameEmail['id'])
+    storage.clean_bucket()
     return redirect(url_for('main'))
 
 

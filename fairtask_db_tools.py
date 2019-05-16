@@ -77,16 +77,6 @@ class fairtaskDB:
         else:
             return (NON_SELECTED_VALUE,'NOT FOUND')
 
-    def finalize_bucket_list(self, loggedUser, who):
-        for whomWhat in self.execute_get_sql('select * from contract_temp'):
-            if int(who) == int(whomWhat[0]):
-                continue
-            self.add_transaction(who, whomWhat[0], whomWhat[1], loggedUser)
-        self.clean_bucket()
-
-    def clean_bucket(self):
-        self.execute_sql('delete from contract_temp', commit=True)
-
     def calculate_actal_scoring(self, commit=False, presentContractors=[]):
         data = self.execute_get_sql('select buyer, seller, product from contract')
         scoring = fairtask_scoring()
@@ -99,6 +89,12 @@ class fairtaskDB:
                 return True
             except sqlite3.IntegrityError:
                 return False
+
+    def clean_bucket(self):
+        self.execute_sql('delete from contract_temp', commit=True)
+
+    def get_bucket_raw(self):
+        return self.execute_get_sql('select * from contract_temp')
 
     def get_bucket(self):
         dataBucket = self.execute_get_sql('select username, what, rating, user.id from (select to_whom whom, name what from contract_temp join product on product.id = product) join user on user.id=whom')

@@ -10,6 +10,7 @@ class fairtask_scoring:
     def recalculate_scoring(self, allContracts, presentContractors=[]):
         if len(presentContractors):
             allContracts = self.filterContracts(allContracts, presentContractors)
+        allContracts = self.remove_self_contracts(allContracts)
 
         served = self.getCount(allContracts, i=0)
         offered = self.getCount(allContracts, i=1)
@@ -26,13 +27,20 @@ class fairtask_scoring:
                 resultScoring[one] = self.getScoringFor(servedPerOne, offeredPerOne)
         return resultScoring
 
-    def getScoringFor(self, servedPerOne,offeredPerOne):
+    def getScoringFor(self, servedPerOne, offeredPerOne):
         return (servedPerOne - offeredPerOne)
 
     def filterContracts(self, list, elementsLookFor, i=1):
         toReturn = []
         for one in list:
             if one[i] in elementsLookFor:
+                toReturn.append(one)
+        return toReturn
+
+    def remove_self_contracts(self, list):
+        toReturn = []
+        for one in list:
+            if one[0] != one[1]:
                 toReturn.append(one)
         return toReturn
 
