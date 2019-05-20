@@ -8,12 +8,14 @@
       <div class="header">
           <nav>
               <ul class="nav nav-pills pull-right">
-                  <li role="presentation" ><a href="main">Home</a>
-                  </li>
-                  <li role="presentation" class="active"><a href="addJobs">Orders</a>
-                  </li>
-                  <li role="presentation"><a href="showSignUp">Settings</a>
-                  </li>
+                <li role="presentation"><a href="main">Home</a>
+                </li>
+                <li role="presentation" class="active"><a href="#">Orders</a>
+                </li>
+                <li role="presentation"><a href="showSignUp">Add User</a>
+                </li>
+                <li role="presentation"><a href="stats">SystemStats</a>
+                </li>
                   {% include 'google_login.html' %}
               </ul>
           </nav>
@@ -122,7 +124,7 @@
           <form class="form-final">
 
             <h4>Register the job</h4>
-              <p>Who is byuing? (default is the actual logged user)</p>
+              <p>Who is buying? (default is the actual logged user)</p>
             <label for="finalzeName" class="sr-only">Name</label>
             {% if todaysJobs|length > 0 %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus>

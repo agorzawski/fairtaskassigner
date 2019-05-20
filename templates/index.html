@@ -12,7 +12,9 @@
                     </li>
                     <li role="presentation"><a href="addJobs">Orders</a>
                     </li>
-                    <li role="presentation"><a href="showSignUp">Settings</a>
+                    <li role="presentation"><a href="showSignUp">Add User</a>
+                    </li>
+                    <li role="presentation"><a href="stats">SystemStats</a>
                     </li>
                     {% if not googleSession %}
                      {% include 'no_login.html' %}
@@ -52,8 +54,15 @@
                       <tbody>
                       {% for topper in candidates %}
                           <tr>
-                              <th scope="row">{{ topper[0] }}</th>
-                              <td> {{'%0.1f'| format(topper[1]|float)}}</td>
+                              <th scope="row">{{ topper[1] }}
+                                {%for badge in assignedBadges %}
+                                  {%if  badge[0] == topper[0] %}
+                                    <img src="{{ badge[5] }}"
+                                    width="25" height="25" title="{{ badge[4] }}({{ badge[1] }})"/>
+                                  {% endif %}
+                                {% endfor %}
+                              </th>
+                              <td> {{'%0.1f'| format(topper[2]|float)}}</td>
                           </tr>
                       {% endfor %}
                       </tbody>
@@ -76,7 +85,9 @@
                       <tbody>
                       {% for topper in top3 %}
                           <tr id={{ topper[0] }}>
-                              <th scope="row">{{ topper[0] }}</th>
+                              <th scope="row">{{ topper[0] }}
+
+                              </th>
                               <td> {{'%0.0f'| format(topper[1]|float)}} </td>
                               <td> {{'%0.1f'| format(topper[2]|float)}} </td>
                               <td> {{'%0.1f'| format(topper[3]|float)}}</td>

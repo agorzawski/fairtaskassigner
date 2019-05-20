@@ -125,19 +125,24 @@ def logout():
 def main():
     googleSession = False
     loggedUsernameEmail = ()
+    getLoggedUserBadges = ()
     inBucket = False
     if isLoginValid():
         googleSession = True
         loggedUsernameEmail = getLoggedUsernameEmailPicture()
         inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
+        getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
+    getAssignedBadges = storage.get_users_badges()
     return render_template('index.html',
                            top3=top3,
                            candidates=candidates,
                            googleSession=googleSession,
                            loggedUsernameEmail=loggedUsernameEmail,
-                           inBucket=inBucket)
+                           inBucket=inBucket,
+                           assignedBadges=getAssignedBadges,
+                           loggedUserBadges=getLoggedUserBadges)
 
 
 @app.route('/addJobs')
@@ -153,15 +158,41 @@ def addJobs():
     products = storage.get_products()
     allJobs = storage.get_jobs_summary()
     summaryToday = storage.get_bucket()
+    getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     return render_template('addjobs.html',
                            todaysJobs=summaryToday,
                            summaryJobs=allJobs,
+                           loggedUserBadges=getLoggedUserBadges,
                            users=users,
                            products=products,
                            googleSession=googleSession,
                            inBucket=inBucket,
                            loggedUsernameEmail=loggedUsernameEmail)
-
+@app.route('/stats')
+def showStats():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    users = storage.get_users()
+    products = storage.get_products()
+    notValidatedUsers = storage.get_users(onlyNotValidated=True)
+    getUsersStats = storage.get_users_stats()
+    getAllBadges = storage.get_all_badges()
+    getAssignedBadges = storage.get_users_badges()
+    grantedBadges = storage.get_badge_grant_history()
+    getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    return render_template('stats.html',
+                           users=users,
+                           notValidatedUsers=notValidatedUsers,
+                           products=products,
+                           allBadges=getAllBadges,
+                           usersStats=getUsersStats,
+                           assignedBadges=getAssignedBadges,
+                           loggedUserBadges=getLoggedUserBadges,
+                           grantedBadges=grantedBadges,
+                           loggedUsernameEmail=loggedUsernameEmail,
+                           invalidId=NON_EXISTING_ID,
+                           nonSelectedId=NON_SELECTED_VALUE)
 
 @app.route('/showSignUp')
 def showSignUp():
@@ -169,12 +200,12 @@ def showSignUp():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     users = storage.get_users()
-    products = storage.get_products()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
+    getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     return render_template('signup.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,
-                           products=products,
+                           loggedUserBadges=getLoggedUserBadges,
                            loggedUsernameEmail=loggedUsernameEmail,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
@@ -247,7 +278,17 @@ def finalizeJob():
         storage.add_transaction(_name, whomWhat[0], whomWhat[1],
                                 loggedUsernameEmail['id'])
     storage.clean_bucket()
+    storage.recompute_badges()
+    # calculateScoring()
     return redirect(url_for('main'))
+
+
+@app.route('/calculateScoring')
+def calculateScoring():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    storage.calculate_actal_scoring()
+    return redirect(url_for('showSignUp'))
 
 
 if __name__ == "__main__":

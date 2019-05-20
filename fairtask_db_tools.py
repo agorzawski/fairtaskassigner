@@ -81,6 +81,7 @@ class fairtaskDB:
         data = self.execute_get_sql('select buyer, seller, product from contract')
         scoring = fairtask_scoring()
         result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
+
         for one in result.keys():
             self.c.execute('update user set rating=%f where id=%s' % (result[one], one))
         if commit:
@@ -116,6 +117,26 @@ class fairtaskDB:
             return toReturn
         return dataBucket
 
+    def get_all_badges(self):
+        return self.execute_get_sql('select * from badges order by effect, name')
+
+    def get_badge_grant_history(self):
+        sql = "select username, name, img, date from  (select user.id userId, date, badgeId, username from user join user_badges on user.id=user_badges.userId) a join badges on badges.id=a.badgeId order by date desc"
+        return self.execute_get_sql(sql)
+
+    def get_users_badges(self, userId=None):
+        where = ''
+        if userId != None:
+            where = ' where user.id=%d ' % userId
+        sql = 'select * from (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId %s) a join badges on badges.id=a.badgeId' % where
+        # TODO return as dict
+        return self.execute_get_sql(sql)
+
+    def recompute_badges(self):
+        users = self.get_users()
+        
+
+
     def get_products(self):
         return self.execute_get_sql('select * from product order by price, name')
 
@@ -131,6 +152,13 @@ class fairtaskDB:
         if onlyNotValidated:
             sql = 'select * from user where validated=0 order by username'
         return self.execute_get_sql(sql)
+
+    def get_users_stats(self):
+        sql = 'select  buyer, count(buyer) from all_list group by buyer'
+        toReturn = {}
+        for one in self.execute_get_sql(sql):
+            toReturn[one[0]] = {'consumed': 0, 'served': one[1], 'offered': 0}
+        return toReturn
 
     def get_username_and_email(self, id=None, email=None):
         if id is None and email is None:
@@ -156,7 +184,7 @@ class fairtaskDB:
         return self.execute_get_sql('select buyer, count(buyer) count, sum(price) total_spent, max(buyer_rating) from all_list group by buyer order by count desc limit 5')
 
     def get_top_candidates(self):
-        return self.execute_get_sql('select username, rating from user order by rating limit 5')
+        return self.execute_get_sql('select id, username, rating from user order by rating limit 5')
 
     def close_db(self):
         self.con.close()
