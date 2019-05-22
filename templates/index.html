@@ -29,10 +29,10 @@
         <div class="jumbotron">
             <h1>Coffee Bucket List</h1>
             <p> Browse the actual status or place an order (login required!).</p>
+
             {% include 'quick_add.html' %}
             <br>
-            <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare the order</a></p>
-
+            <p><a class="btn btn-lg btn-success btn-block" href="addJobs#addorder" role="button">Prepare the order</a></p>
 
             {% if googleSession and loggedUsernameEmail['idProduct'] == -1 %}
             <button id='addQuick' class="btn btn-lg btn-primary btn-block"
@@ -40,6 +40,21 @@
               <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle"  />
             </button>
             {% endif %}
+            <hr class="my-3">
+            <p>
+              The principles of the game:
+              <lu>
+              <li> The pool of users is formed.</li>
+              <li> To sign-up, go to <a href='showSignUp'> Add User section </a> and add a new member (if adding someone) or assign your id with an already created member (google login required)</li>
+              <li> Coffee servings within the group should be <a href="addJobs">noted down</a> so all transactions are kept. </li>
+              <li> So called <b>global rating</b> and list <i>NEXT CANDIDATES</i> (see below) is computed within the pool (<a href='addJobs#ordershistory'>of all time orderds history</a>) excluding self buying actions. </li>
+              <li> <a href="stats#Achievements"> Achievements </a> and penalties are granted for balancing too far from neutral rating. </li>
+              <li> <a href="stats#Achievements"> Achievements </a> are granted for serving/consuming - community gifts. </li>
+              <li> So called <b>local rating</b> that is visible when creating an order indicate rating <b>only among involved ordering persons</b>. </li>
+              <li> <i>TOP SERVANTS </i> is an idicative table with some little statistics, for more go to <a href="stats#statistics">SystemStats</a>. </li>
+              <li> After one order is place, system finds the most often ordred product and uses it for a <b> quick add </b> (see above).</li>
+            </lu>
+            </p>
             <hr class="my-3">
             <div class="col-lg-6">
               <h4>  Next candidates (all population): </h4>
@@ -104,7 +119,7 @@
               </div>
               <div class="card-body">
                <p class="lead"></p>
-               <p><a class="btn btn-lg btn-success btn-block" href="addJobs" role="button">Prepare the order</a></p>
+               <p><a class="btn btn-lg btn-success btn-block" href="addJobs#addorder" role="button">Prepare the order</a></p>
               </div>
             </div>
         </div>
