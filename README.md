@@ -4,6 +4,12 @@ IT is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*1.0*
+- new tab - statistics
+- new badge and achievements system triggered at every ordering event
+- prepared for role based modifications (admin, badge admins, users)
+- prepared for a events timeline
+
 *0.3*
 - The temporary rating is calculated within the preselected bucket only among the current waiting list users.
 - For a logged user a predefined order button (adding to the current wish list) is available for the most often ordered product. No button is visible when never made an order.
@@ -13,7 +19,7 @@ It works based on google authentication token (uses only login and identity pict
 *0.2*
 - Preselected bucket is validated at later step
 
-*v0.1*
+*0.1*
 - Not logged user can see actual servings, top three candidates and top three servants
 - Logged user can add new users
 - Logged user can add serving (as him)

@@ -4,6 +4,8 @@ and storage connector.
 '''
 
 from fairtask_db_tools import fairtaskDB
+import fairtask_badges as badges
+import fairtask_utils
 from flask import Flask, render_template, request, json, redirect, url_for, session
 from flask_oauth import OAuth
 import os
@@ -33,7 +35,7 @@ NON_SELECTED_VALUE = -1
 app = Flask(__name__)
 app.debug = DEBUG
 app.secret_key = 'development key'
-storage = fairtaskDB()
+storage = fairtaskDB(allowCommit=True)
 oauth = OAuth()
 google = oauth.remote_app('google',
                           base_url=BASE_URL,
@@ -132,11 +134,13 @@ def main():
         loggedUsernameEmail = getLoggedUsernameEmailPicture()
         inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
         getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    lastDate = storage.get_last_transaction(n=1)[0]
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
     getAssignedBadges = storage.get_users_badges()
     return render_template('index.html',
                            top3=top3,
+                           lastDate=lastDate,
                            candidates=candidates,
                            googleSession=googleSession,
                            loggedUsernameEmail=loggedUsernameEmail,
@@ -157,11 +161,13 @@ def addJobs():
     users = storage.get_users()
     products = storage.get_products()
     allJobs = storage.get_jobs_summary()
+    badgesTimeline = storage.get_badge_grant_history()
+    eventsTimeLine = fairtask_utils.combineEvents(allJobs, badgesTimeline)
     summaryToday = storage.get_bucket()
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     return render_template('addjobs.html',
                            todaysJobs=summaryToday,
-                           summaryJobs=allJobs,
+                           eventsTimeLine=eventsTimeLine,
                            loggedUserBadges=getLoggedUserBadges,
                            users=users,
                            products=products,
@@ -278,8 +284,15 @@ def finalizeJob():
         storage.add_transaction(_name, whomWhat[0], whomWhat[1],
                                 loggedUsernameEmail['id'])
     storage.clean_bucket()
-    storage.recompute_badges()
-    # calculateScoring()
+
+    dates = storage.get_last_transaction(n=1)
+    for date in dates:
+        actualbadges = badges.get_current_badges(date[0], storage=storage)
+        print('CHECKING Badges for  %s ' % date)
+        for oneBadge in actualbadges:
+            storage.insert_user_badges(oneBadge[0], oneBadge[1], oneBadge[2])
+    print('...ALL DONE!')
+    storage.calculate_actal_scoring(commit=True)
     return redirect(url_for('main'))
 
 
@@ -287,8 +300,8 @@ def finalizeJob():
 def calculateScoring():
     if not isLoginValid():
         return redirect(url_for('login'))
-    storage.calculate_actal_scoring()
-    return redirect(url_for('showSignUp'))
+    storage.calculate_actal_scoring(commit=True)
+    return redirect(url_for('/stats'))
 
 
 if __name__ == "__main__":

@@ -168,7 +168,7 @@
 
       <div class="row marketing">
           <div class="well">
-              <h4 id='ordershistory'> All time orders </h4>
+              <h4 id='ordershistory'> Timeline </h4>
               <div class="table-responsive">
                   <table class="table">
                       <thead>
@@ -180,12 +180,12 @@
                           </tr>
                       </thead>
                       <tbody>
-                      {% for lastEntry in summaryJobs %}
+                      {% for lastEntry in eventsTimeLine %}
                           <tr >
                               <th scope="row">{{ lastEntry[0] }}</th>
                               <td> {{ lastEntry[1] }} </td>
                               <td> {{ lastEntry[2] }} </td>
-                              <td> {{ lastEntry[3] }} </td>
+                              <td> {{ lastEntry[3]|safe }} </td>
                           </tr>
                       {% endfor %}
                       </tbody>

@@ -24,11 +24,16 @@
 
       <div class="jumbotron">
         <h1>Some statistics</h1>
+        <hr class="my-3">
+        {% include 'game_desc.html' %}
       </div>
 
       <div class="well">
         <div class="row marketing">
               <h4 id='statistics'>Users and statistics: </h4>
+              <p>
+                <li>All statistics caluclated exluding user->user serving unless specified otherwise. </i>
+              </p>
               <div class="table-responsive">
                   <table class="table table-striped">
                       <thead>
@@ -36,11 +41,9 @@
                               <th scope="col">Id</th>
                               <th scope="col">Name</th>
                               <th scope="col">Email </th>
-
-                              <th scope="col">Actual Score </th>
-                              <th scope="col">Consumed </th>
-                              <th scope="col">Offered </th>
-                              <th scope="col">Served </th>
+                              <th scope="col"><badge title="Value WITH THE badge modificators, raw is offered - consumed">Actual Score (raw)*</badge> </th>
+                              <th scope="col"><badge title="Coffee offered withing # servings"> Offered** (#servings) </badge> </th>
+                              <th scope="col"><badge title="Value WITHOUT SELF BUYINGS (and including SELFBUYINGS = times coffe was served)">Consumed*** (total) </badge> </th>
                           </tr>
                       </thead>
                       <tbody>
@@ -51,15 +54,14 @@
                                 {%for badge in assignedBadges %}
                                   {%if  badge[0] == user[0] %}
                                     <img src="{{ badge[5] }}"
-                                    width="25" height="25" title="{{ badge[4] }}({{ badge[1] }})"/>
+                                    width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
                                   {% endif %}
                                 {% endfor %}
                                 </td>
                               <td> {{ user[1] }} </td>
-                              <td> {{'%0.1f'| format(user[3]|float)}}</td>
-                              <td> {{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} </td>
-                              <td> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} </td>
-                              <td> {{ usersStats.get(user[2], {False:0}).get('served', 0) }} </td>
+                              <td> {{'%0.1f'| format(user[3]|float)}} ({{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}) </td>
+                              <td> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} ({{ usersStats.get(user[2], {False:0}).get('served', 0) }}) </td>
+                              <td> {{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} ({{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }})</td>
                           </tr>
                       {% endfor %}
                       </tbody>

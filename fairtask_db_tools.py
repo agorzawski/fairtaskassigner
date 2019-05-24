@@ -12,8 +12,12 @@ utility class for SQLite connection
 
 
 class fairtaskDB:
-    def __init__(self):
+
+    ALLOW_COMMIT = False
+
+    def __init__(self, allowCommit=False):
         self.load_db()
+        self.ALLOW_COMMIT = allowCommit
 
     def load_db(self):
         self.con = sqlite3.connect(DATABASE_NAME, check_same_thread=False)
@@ -21,11 +25,11 @@ class fairtaskDB:
 
     def execute_sql(self, sql, commit=False):
         try:
-            errors = []  # TODO add SQL injection check
+            errors = []  # TODO add SQL injection check on sql
             if len(errors) > 0:
                 return False
             self.c.execute(sql)
-            if commit:
+            if commit and self.ALLOW_COMMIT:
                 self.con.commit()
             return True
         except sqlite3.IntegrityError:
@@ -36,8 +40,10 @@ class fairtaskDB:
         data = self.c.fetchall()
         return data
 
+    # ####################
+    # Customized calls
     def add_user(self, name, email, creator, validated=0):
-        sql = 'insert into user (email, username, rating, creator, validated) values (\'%s\', \'%s\', 1.0, %s, %s)' % (email, name, creator, validated)
+        sql = 'insert into user (email, username, rating, creator, validated) values (\'%s\', \'%s\', 0.0, %s, %s)' % (email, name, creator, validated)
         self.execute_sql(sql, commit=True)
 
     def update_user(self, existingId, email, creator, validated=0):
@@ -52,7 +58,7 @@ class fairtaskDB:
         if who == NON_SELECTED_VALUE or whom == NON_SELECTED_VALUE or what == NON_SELECTED_VALUE:
             raise ValueError('Cannot save transaction for an unspecified person or goods!')
         else:
-            sql = 'insert into contract (buyer, seller, product, date, creator) values (%s, %s, %s, CURRENT_TIMESTAMP, %s)' % (who, whom, what,creator)
+            sql = 'insert into contract (buyer, to_whom, product, date, creator) values (%s, %s, %s, CURRENT_TIMESTAMP, %s)' % (who, whom, what,creator)
             self.execute_sql(sql, commit=commit)
             self.calculate_actal_scoring(commit=commit)
             return True
@@ -70,21 +76,29 @@ class fairtaskDB:
         return False
 
     def get_favorite_product(self, userId):
-        sql = 'SELECT product, COUNT(product) AS vo FROM contract where seller=%d GROUP BY product ORDER BY vo DESC LIMIT 1'%userId
-        result =  self.execute_get_sql(sql)
-        if len(result)>0:
+        sql = 'SELECT product, COUNT(product) AS vo FROM contract where to_whom=%d GROUP BY product ORDER BY vo DESC LIMIT 1'%userId
+        result = self.execute_get_sql(sql)
+        if len(result) > 0:
             return self.get_product_details(result[0][0])
         else:
-            return (NON_SELECTED_VALUE,'NOT FOUND')
+            return (NON_SELECTED_VALUE, 'NOT FOUND')
+
+    def get_scoring_from_badges(self):
+        scoringFromBadgesData = self.execute_get_sql('select userId, sum(effect) from user_badges join badges on user_badges.badgeId = badges.id group by userId')
+        scoringFromBadges = {}
+        for one in scoringFromBadgesData:
+            scoringFromBadges[one[0]] = one[1]
+        return scoringFromBadges
 
     def calculate_actal_scoring(self, commit=False, presentContractors=[]):
-        data = self.execute_get_sql('select buyer, seller, product from contract')
+        data = self.execute_get_sql('select buyer, to_whom, product from contract')
         scoring = fairtask_scoring()
+        scoring.setScoringFromBadges(self.get_scoring_from_badges())
         result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
 
         for one in result.keys():
             self.c.execute('update user set rating=%f where id=%s' % (result[one], one))
-        if commit:
+        if commit and self.ALLOW_COMMIT:
             try:
                 self.con.commit()
                 return True
@@ -102,8 +116,9 @@ class fairtaskDB:
         # (whom, what, rating) with origanl scorings
         if len(dataBucket):
             dataBucketSimple = self.execute_get_sql('select to_whom from contract_temp')
-            data = self.execute_get_sql('select buyer, seller, product from contract')
+            data = self.execute_get_sql('select buyer, to_whom, product from contract')
             scoring = fairtask_scoring()
+            scoring.setScoringFromBadges(self.get_scoring_from_badges())
             presentContractors = []
             for one in dataBucketSimple:
                 presentContractors.append(one[0])
@@ -117,25 +132,36 @@ class fairtaskDB:
             return toReturn
         return dataBucket
 
+    def get_granted_badges(self, date=None):
+        sqlAdd = ""
+        if date is not None:
+            sqlAdd = " where date <=\'%s\'" % date
+        sql = "select * from user_badges %s" % sqlAdd
+        return self.execute_get_sql(sql)
+
     def get_all_badges(self):
         return self.execute_get_sql('select * from badges order by effect, name')
 
     def get_badge_grant_history(self):
         sql = "select username, name, img, date from  (select user.id userId, date, badgeId, username from user join user_badges on user.id=user_badges.userId) a join badges on badges.id=a.badgeId order by date desc"
+        sql = 'select username, badgeName, img, date from badges_granted_timeline'
+        return self.execute_get_sql(sql)
+
+    def get_users_badges_timeline(self):
+        sql = 'select * from badges_granted_timeline'
         return self.execute_get_sql(sql)
 
     def get_users_badges(self, userId=None):
         where = ''
-        if userId != None:
+        if userId is not None:
             where = ' where user.id=%d ' % userId
         sql = 'select * from (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId %s) a join badges on badges.id=a.badgeId' % where
         # TODO return as dict
         return self.execute_get_sql(sql)
 
-    def recompute_badges(self):
-        users = self.get_users()
-        
-
+    def insert_user_badges(self, badgeId, userId, date):
+        sql='insert into user_badges (userId, badgeId, date) values (\'%d\', \'%d\',\'%s\')'  % (badgeId, userId, date)
+        self.execute_sql(sql, commit=True)
 
     def get_products(self):
         return self.execute_get_sql('select * from product order by price, name')
@@ -154,11 +180,34 @@ class fairtaskDB:
         return self.execute_get_sql(sql)
 
     def get_users_stats(self):
-        sql = 'select  buyer, count(buyer) from all_list group by buyer'
         toReturn = {}
+        sql = 'select  buyer, count(buyer) from all_list where buyer!=to_whom group by buyer'
         for one in self.execute_get_sql(sql):
-            toReturn[one[0]] = {'consumed': 0, 'served': one[1], 'offered': 0}
+            toReturn[one[0]] = {'consumed': 0, 'served': 0, 'offered': one[1]}
+
+        sql = 'select  to_whom, count(to_whom) from all_list where buyer!=to_whom group by to_whom'
+        #sql = 'select  to_whom, count(to_whom) from all_list group by to_whom'
+        for one in self.execute_get_sql(sql):
+            try:
+                toReturn[one[0]]['consumed'] = one[1]
+            except KeyError:
+                toReturn[one[0]] = {'consumed': one[1], 'served': 0, 'offered': 0}
+
+        sql = 'select buyer, count(buyer) from (select buyer from all_list where buyer!=to_whom group by date) group by buyer'
+        for one in self.execute_get_sql(sql):
+            try:
+                toReturn[one[0]]['served'] = one[1]
+            except KeyError:
+                toReturn[one[0]] = {'served': one[1], 'consumed': 0, 'offered': 0}
+
         return toReturn
+
+    def get_last_transaction(self, n=None):
+        extra = ''
+        if n is not None:
+            extra = ' desc limit %d' % n
+        sql = 'select date from contract group by date order by date %s' % extra
+        return self.execute_get_sql(sql)
 
     def get_username_and_email(self, id=None, email=None):
         if id is None and email is None:
