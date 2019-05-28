@@ -8,7 +8,7 @@
       <div class="header">
           <nav>
               <ul class="nav nav-pills pull-right">
-                <li role="presentation" ><a href="#">Home</a>
+                <li role="presentation" ><a href="main">Home</a>
                 </li>
                 <li role="presentation"><a href="addJobs">Orders</a>
                 </li>
@@ -68,6 +68,102 @@
         </script>
       </form>
       </div>
+
+      {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+      <div class="well">
+         <div class="row marketing">
+               <h4> GrantBadges</h4>
+               <p>  {% include 'visible_badges.html' %} </p>
+               <form class="form-signin">
+
+               <label for="inputNameForBadge" class="sr-only">Name</label>
+
+                 <select type="name" name="nameIdToGrant" id="nameIdToGrant" class="form-control" required autofocus>
+                   <option value=-1>Who should be granted"</option>
+                     {% for username in users %}
+                     <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+                     {% endfor %}
+                 </select>
+
+               <br>
+               <label for="inputBadge" class="sr-only">Email address</label>
+
+                 <select type="name" name="badgeId" id="badgeId" class="form-control" required autofocus>
+                   <option value=-1>With the following badge</option>
+                     {% for badge in badgesToGrant %}
+                     <option value={{badge[0]}}> <img src='{{badge[2]}}' width="10" height="10" /> {{badge[1]}} (effect={{badge[4]}})  </option>
+                     {% endfor %}
+                 </select>
+
+               <br><br>
+               <button id="grantBadge" class="btn btn-lg btn-success btn-block" type="button">Award with badge</button>
+               <script>
+                 $(function() {
+                     $('#grantBadge').click(function() {
+                         $.ajax({
+                             url: '/grantBadge',
+                             data: $('form').serialize(),
+                             type: 'POST',
+                             success: function(response) {
+                                 location.reload();
+                                 console.log(response);
+                             },
+                             error: function(error) {
+                                 console.log(error);
+                             }
+                         });
+                     });
+                   }
+                 );
+               </script>
+               </form>
+
+           </div>
+       </div>
+       {% endif %}
+
+
+       {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
+       <div class="well">
+          <div class="row marketing">
+                <h4> Add product </h4>
+                <p>  {% include 'visible_badges.html' %} </p>
+
+                <form class="form-signin">
+                <label for="productName" class="sr-only">name:</label>
+                <input type="name" name="productName" id="productName"
+                  class="form-control" placeholder="What name to use" required autofocus>
+                <br>
+                <label for="productPrice" class="sr-only">price:</label>
+                  <input type="name" name="productPrice" id="productPrice"
+                    class="form-control" placeholder= "Email address" required autofocus>
+                <br><br>
+                <button id="addProduct" class="btn btn-lg btn-success btn-block" type="button">Add product</button>
+                <script>
+                  $(function() {
+                      $('#addProduct').click(function() {
+                          $.ajax({
+                              url: '/signUp',
+                              data: $('form').serialize(),
+                              type: 'POST',
+                              success: function(response) {
+                                  location.reload();
+                                  console.log(response);
+                              },
+                              error: function(error) {
+                                  console.log(error);
+                              }
+                          });
+                      });
+                    }
+                  );
+                </script>
+                </form>
+
+
+            </div>
+        </div>
+        {% endif %}
 
       <footer class="footer">
       {% include 'footer.html' %}

@@ -1,10 +1,10 @@
 CREATE TABLE sqlite_sequence(name,seq)
 
-CREATE TABLE `user_badges` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-  `userId` INTEGER NOT NULL, `badgeId` INTEGER NOT NULL, `date` TEXT NOT NULL )
+CREATE TABLE "user_badges" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+  `userId` INTEGER NOT NULL, `badgeId` INTEGER NOT NULL, `date` TEXT NOT NULL, `valid` INTEGER )
 
 CREATE TABLE "badges" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-  `name` TEXT NOT NULL, `img` TEXT, `desc` TEXT NOT NULL, `effect` INTEGER NOT NULL, `unique` INTEGER NOT NULL )
+  `name` TEXT NOT NULL, `img` TEXT, `desc` TEXT NOT NULL, `effect` INTEGER NOT NULL, `adminawarded` INTEGER NOT NULL )
 
 CREATE TABLE "user" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
   `email` TEXT NOT NULL, `username` TEXT NOT NULL, `rating` INTEGER NOT NULL,
@@ -22,9 +22,8 @@ CREATE VIEW all_list as select date, buyer, to_whom, name product, price, buyer_
     contract join user on contract.buyer=user.id) buyer join user on buyer.to_whom = user.id) transactions
     join product on transactions.product = product.id
 
-  CREATE VIEW badges_granted_timeline AS
-  select user.id, username, date, img, badgeName, badgeId from
-  (select userId, badgeId, date, img, badges.name badgeName from
-    (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId) a
-    join badges on badges.id=a.badgeId)
-  join user on user.id=userId order by date desc
+CREATE VIEW badges_granted_timeline AS
+select grantId, user.id, username, date, img, badgeName, badgeId from
+(select grantId, userId, badgeId, date, img, badges.name badgeName from
+  (select user_badges.id grantId, user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId where user_badges.valid=1) a
+  join badges on badges.id=a.badgeId) join user on user.id=userId order by date desc

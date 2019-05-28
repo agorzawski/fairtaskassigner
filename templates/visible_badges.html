@@ -1,0 +1,8 @@
+{% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+Visible thanks to:
+{% for badge in loggedUserBadges %}
+{% if badge[2] == 7 or badge[2]== 8 %}
+<img src="{{badge[5]}}" width=25 height=25 />
+{% endif %}
+{% endfor %}
+{% endif %}

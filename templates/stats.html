@@ -53,8 +53,7 @@
                               <td> {{ user[2] }}
                                 {%for badge in assignedBadges %}
                                   {%if  badge[0] == user[0] %}
-                                    <img src="{{ badge[5] }}"
-                                    width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
+                                    <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
                                   {% endif %}
                                 {% endfor %}
                                 </td>
@@ -82,15 +81,21 @@
                                      <th scope="col">Name</th>
                                      <th scope="col">Badge</th>
                                      <th scope="col">Badge name</th>
+                                     {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                                     <th scope="col">ACTION</th>
+                                     {% endif%}
                                  </tr>
                              </thead>
                              <tbody>
                              {% for lastEntry in grantedBadges %}
                                  <tr >
-                                     <th scope="row">{{ lastEntry[3] }}</th>
-                                     <td> {{ lastEntry[0] }} </td>
-                                     <td> <img src="{{ lastEntry[2] }}" width="25" height="25" /> </td>
+                                     <th scope="row">{{ lastEntry[4] }}</th>
                                      <td> {{ lastEntry[1] }} </td>
+                                     <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /> </td>
+                                     <td> {{ lastEntry[2] }} </td>
+                                     {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                                      <td>  <a href="removeBadge?grantId={{lastEntry[0]}}"> <img src="http://chittagongit.com/download/133528"  width="25" height="25" /> </a> </td>
+                                     {% endif %}
                                  </tr>
                              {% endfor %}
                              </tbody>
@@ -116,7 +121,11 @@
                       </thead>
                       <tbody>
                       {% for lastEntry in allBadges %}
+                        {% if lastEntry[5] == 1 %}
+                          <tr class="table-warning">
+                        {% else %}
                           <tr >
+                        {% endif %}
                               <th scope="row">{{ lastEntry[0] }}</th>
                               <td> <img src="{{ lastEntry[2] }}" width="50" height="50" /> </td>
                               <td> {{ lastEntry[1] }} </td>

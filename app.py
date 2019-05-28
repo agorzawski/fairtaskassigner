@@ -6,7 +6,7 @@ and storage connector.
 from fairtask_db_tools import fairtaskDB
 import fairtask_badges as badges
 import fairtask_utils
-from flask import Flask, render_template, request, json, redirect, url_for, session
+from flask import Flask, render_template, request, json, redirect, url_for, session, flash
 from flask_oauth import OAuth
 import os
 
@@ -107,6 +107,16 @@ def isLoginValid():
     return False
 
 
+def isAnAdmin():
+    localId = getLoggedUsernameEmailPicture()
+    adminsList = storage.get_admins()
+    if localId['id'] in adminsList['admin'].keys() \
+        or localId['id'] in adminsList['badgeadmin'].keys():
+        return True
+    return True
+
+
+
 @app.route('/login')
 def login():
     if not isLoginValid():
@@ -182,6 +192,7 @@ def showStats():
     users = storage.get_users()
     products = storage.get_products()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
+    adminsList = storage.get_admins()
     getUsersStats = storage.get_users_stats()
     getAllBadges = storage.get_all_badges()
     getAssignedBadges = storage.get_users_badges()
@@ -192,6 +203,7 @@ def showStats():
                            notValidatedUsers=notValidatedUsers,
                            products=products,
                            allBadges=getAllBadges,
+                           adminsList=adminsList,
                            usersStats=getUsersStats,
                            assignedBadges=getAssignedBadges,
                            loggedUserBadges=getLoggedUserBadges,
@@ -208,11 +220,15 @@ def showSignUp():
     users = storage.get_users()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    adminsList = storage.get_admins()
+    badgesToGrant = storage.get_all_badges(badgeUniqe=True)
     return render_template('signup.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,
                            loggedUserBadges=getLoggedUserBadges,
                            loggedUsernameEmail=loggedUsernameEmail,
+                           adminsList=adminsList,
+                           badgesToGrant=badgesToGrant,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -227,6 +243,7 @@ def signUp():
         _assignedNameId = int(request.form['assignedNameId'])
     except KeyError:
         _assignedNameId = NON_SELECTED_VALUE
+
     validated = 0
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if _email and (_name or _assignedNameId != NON_SELECTED_VALUE):
@@ -240,6 +257,7 @@ def signUp():
             storage.update_user(_assignedNameId, _email,
                                 loggedUsernameEmail['id'],
                                 validated=validated)
+        flash('User %s/%s successfuly added!' % (_name, _email))
         return redirect(url_for('showSignUp'))
     else:
         return json.dumps({'html': '<span>Enter the required fields</span>'})
@@ -267,6 +285,7 @@ def emptyBucket():
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     storage.clean_bucket()
+    flash('Wishlist cleared!')
     return redirect(url_for('addJobs'))
 
 
@@ -288,20 +307,77 @@ def finalizeJob():
     dates = storage.get_last_transaction(n=1)
     for date in dates:
         actualbadges = badges.get_current_badges(date[0], storage=storage)
-        print('CHECKING Badges for  %s ' % date)
         for oneBadge in actualbadges:
-            storage.insert_user_badges(oneBadge[0], oneBadge[1], oneBadge[2])
-    print('...ALL DONE!')
+            storage.insert_user_badges(*oneBadge)
+        if len(actualbadges):
+            flash('New badges awarded!')
     storage.calculate_actal_scoring(commit=True)
+    flash('Order registered!')
     return redirect(url_for('main'))
 
 
-@app.route('/calculateScoring')
+@app.route('/grantBadge', methods=['POST'])
+def grantBadge():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    try:
+        _name = int(request.form['nameIdToGrant'])
+        _badge = int(request.form['badgeId'])
+    except ValueError:
+        redirect(url_for('showSignUp'))
+
+    if _name > 0 and _badge > 0:
+        storage.insert_user_badges(_name, _badge, None)
+        storage.calculate_actal_scoring(commit=True)
+    return redirect(url_for('showSignUp'))
+
+
+@app.route('/removeBadge', methods=['GET'])
+def removeBadge():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    try:
+        badgeId = int(request.args.get('grantId', -1))
+    except ValueError:
+        redirect(url_for('main'))
+    if badgeId > 0:
+        storage.remove_user_bagde(badgeId)
+    return redirect(url_for('stats'))
+
+
+@app.route('/addProduct', methods=['POST'])
+def addProduct():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    _name = request.form['productName']
+    try:
+        _price = float(request.form['productPrice'])
+    except ValueError:
+        return redirect(url_for('showSignUp'))
+    storage.add_product(_name, _price)
+    return redirect(url_for('stats'))
+
+
+@app.route('/calculateScoring', methods=['POST'])
 def calculateScoring():
     if not isLoginValid():
         return redirect(url_for('login'))
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+
     storage.calculate_actal_scoring(commit=True)
-    return redirect(url_for('/stats'))
+    flash('Scoring recalculated!')
+    return redirect(url_for('stats'))
 
 
 if __name__ == "__main__":

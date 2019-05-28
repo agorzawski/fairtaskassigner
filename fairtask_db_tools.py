@@ -139,12 +139,16 @@ class fairtaskDB:
         sql = "select * from user_badges %s" % sqlAdd
         return self.execute_get_sql(sql)
 
-    def get_all_badges(self):
-        return self.execute_get_sql('select * from badges order by effect, name')
+    def get_all_badges(self, badgeUniqe=None):
+        whereBadge = ''
+        if badgeUniqe is not None:
+            whereBadge = ' where adminawarded=1 '
+
+        sql = 'select * from badges %s order by effect, name' % whereBadge
+        return self.execute_get_sql(sql)
 
     def get_badge_grant_history(self):
-        sql = "select username, name, img, date from  (select user.id userId, date, badgeId, username from user join user_badges on user.id=user_badges.userId) a join badges on badges.id=a.badgeId order by date desc"
-        sql = 'select username, badgeName, img, date from badges_granted_timeline'
+        sql = 'select grantId, username, badgeName, img, date from badges_granted_timeline'
         return self.execute_get_sql(sql)
 
     def get_users_badges_timeline(self):
@@ -152,15 +156,21 @@ class fairtaskDB:
         return self.execute_get_sql(sql)
 
     def get_users_badges(self, userId=None):
-        where = ''
+        where = ' where user_badges.valid=1 '
         if userId is not None:
-            where = ' where user.id=%d ' % userId
-        sql = 'select * from (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId %s) a join badges on badges.id=a.badgeId' % where
+            where = ' where user_badges.valid=1 and user.id=%d ' % userId
+        sql = 'select * from (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId %s ) a join badges on badges.id=a.badgeId' % (where)
         # TODO return as dict
         return self.execute_get_sql(sql)
 
     def insert_user_badges(self, badgeId, userId, date):
-        sql='insert into user_badges (userId, badgeId, date) values (\'%d\', \'%d\',\'%s\')'  % (badgeId, userId, date)
+        if date is None:
+            date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        sql='insert into user_badges (userId, badgeId, date, valid) values (\'%d\', \'%d\',\'%s\', 1)'  % (badgeId, userId, date)
+        self.execute_sql(sql, commit=True)
+
+    def remove_user_bagde(self, badgeGrantId):
+        sql='update user_badges set valid=0 where id=%d' % badgeGrantId
         self.execute_sql(sql, commit=True)
 
     def get_products(self):
@@ -208,6 +218,18 @@ class fairtaskDB:
             extra = ' desc limit %d' % n
         sql = 'select date from contract group by date order by date %s' % extra
         return self.execute_get_sql(sql)
+
+    def get_admins(self):
+        #badges 7(admin) and 8(badgeadmin)
+        sql = 'select userId, email, username, badgeId from user_badges join user on user_badges.userId=user.id where user_badges.badgeId=7 or user_badges.badgeId=8'
+        toReturn = {}
+        for one in self.execute_get_sql(sql):
+            if one[3] == 7:
+                toReturn['admin'] = {one[1]: (one[0], one[2])}
+            if one[3] == 8:
+                toReturn['badgeadmin'] = {one[1]: (one[0], one[2])}
+
+        return toReturn
 
     def get_username_and_email(self, id=None, email=None):
         if id is None and email is None:

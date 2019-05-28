@@ -1,7 +1,7 @@
 <li role="presentation"><a href="logout"> {{ loggedUsernameEmail['username'] }}
   {% for badge in loggedUserBadges %}
-    <img src="{{badge[5]}}" width=25 height=25 class="rounded-circle" />
+    <img src="{{badge[5]}}" width=25 height=25 />
   {% endfor %}
    (<b>{{loggedUsernameEmail['email']}}</b>)
-  <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="rounded-circle" /> <b>LOGOUT</b> </a>
+  <img src="{{loggedUsernameEmail['picture']}}" width=25 height=25 class="img-circle" /> <b>LOGOUT</b> </a>
 </li>
