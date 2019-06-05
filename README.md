@@ -4,6 +4,14 @@ IT is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*1.2*
+- job can be saved only when at least three orders are in the bucket
+- remove an item in the wish list
+- fix the bug for the stats view when not an admin nor the badge admin
+
+*1.1*
+- admins can grant remove badges
+
 *1.0*
 - new tab - statistics
 - new badge and achievements system triggered at every ordering event

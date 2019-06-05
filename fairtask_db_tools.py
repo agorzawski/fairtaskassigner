@@ -111,8 +111,13 @@ class fairtaskDB:
     def get_bucket_raw(self):
         return self.execute_get_sql('select * from contract_temp')
 
+    def remove_item_in_bucket(self, towhom, what):
+        sql = 'delete from contract_temp where product=%d and to_whom=%d' % \
+            (what, towhom)
+        self.execute_sql(sql, commit=True)
+
     def get_bucket(self):
-        dataBucket = self.execute_get_sql('select username, what, rating, user.id from (select to_whom whom, name what from contract_temp join product on product.id = product) join user on user.id=whom')
+        dataBucket = self.execute_get_sql('select username, what, rating, user.id, whatId from (select to_whom whom, name what, product.id whatId from contract_temp join product on product.id = product) join user on user.id=whom')
         # (whom, what, rating) with origanl scorings
         if len(dataBucket):
             dataBucketSimple = self.execute_get_sql('select to_whom from contract_temp')
@@ -128,7 +133,9 @@ class fairtaskDB:
             for data in dataBucket:
                 toReturn.append((data[0],
                                  data[1],
-                                 resultForOrdering.get(data[3], 0),))
+                                 resultForOrdering.get(data[3], 0),
+                                 data[3],
+                                 data[4], ))
             return toReturn
         return dataBucket
 
@@ -222,7 +229,8 @@ class fairtaskDB:
     def get_admins(self):
         #badges 7(admin) and 8(badgeadmin)
         sql = 'select userId, email, username, badgeId from user_badges join user on user_badges.userId=user.id where user_badges.badgeId=7 or user_badges.badgeId=8'
-        toReturn = {}
+        toReturn = {'admin': {},
+                    'badgeadmin': {}}
         for one in self.execute_get_sql(sql):
             if one[3] == 7:
                 toReturn['admin'] = {one[1]: (one[0], one[2])}

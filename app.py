@@ -185,7 +185,7 @@ def addJobs():
                            inBucket=inBucket,
                            loggedUsernameEmail=loggedUsernameEmail)
 @app.route('/stats')
-def showStats():
+def stats():
     if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
@@ -299,11 +299,15 @@ def finalizeJob():
     _name = request.form['finalzeName']
     if int(_name) < 0:
         return redirect(url_for('addJobs'))
-    for whomWhat in storage.get_bucket_raw():
+    bucketContent = storage.get_bucket_raw()
+    if len(bucketContent) < 2:
+        flash('Cannot proceed with less then three orders!')
+        return redirect(url_for('addJobs'))
+
+    for whomWhat in bucketContent:
         storage.add_transaction(_name, whomWhat[0], whomWhat[1],
                                 loggedUsernameEmail['id'])
     storage.clean_bucket()
-
     dates = storage.get_last_transaction(n=1)
     for date in dates:
         actualbadges = badges.get_current_badges(date[0], storage=storage)
@@ -333,6 +337,20 @@ def grantBadge():
         storage.insert_user_badges(_name, _badge, None)
         storage.calculate_actal_scoring(commit=True)
     return redirect(url_for('showSignUp'))
+
+
+@app.route('/removeBucketItem', methods=['GET'])
+def removeBucketItem():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    try:
+        what = int(request.args.get('what', -1))
+        towhom = int(request.args.get('towhom', -1))
+    except ValueError:
+        redirect(url_for('main'))
+    if what > 0 and towhom > 0:
+        storage.remove_item_in_bucket(towhom, what)
+    return redirect(url_for('addJobs'))
 
 
 @app.route('/removeBadge', methods=['GET'])
