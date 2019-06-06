@@ -24,6 +24,7 @@
 
       <div class="jumbotron">
         <h1>Some statistics</h1>
+        {% include 'common_alerts.html' %}
         <hr class="my-3">
         {% include 'game_desc.html' %}
       </div>
@@ -70,39 +71,49 @@
       </div>
 
 
-            <div class="well">
-               <div class="row marketing">
-                     <h4> Badges Grant History </h4>
-                     <div class="table-responsive">
-                         <table class="table table-striped">
-                             <thead>
-                                 <tr>
-                                     <th scope="col">Date</th>
-                                     <th scope="col">Name</th>
-                                     <th scope="col">Badge</th>
-                                     <th scope="col">Badge name</th>
-                                     {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                                     <th scope="col">ACTION</th>
-                                     {% endif%}
-                                 </tr>
-                             </thead>
-                             <tbody>
-                             {% for lastEntry in grantedBadges %}
-                                 <tr >
-                                     <th scope="row">{{ lastEntry[4] }}</th>
-                                     <td> {{ lastEntry[1] }} </td>
-                                     <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /> </td>
-                                     <td> {{ lastEntry[2] }} </td>
-                                     {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                                      <td>  <a href="removeBadge?grantId={{lastEntry[0]}}"> <img src="http://chittagongit.com/download/133528"  width="25" height="25" /> </a> </td>
-                                     {% endif %}
-                                 </tr>
-                             {% endfor %}
-                             </tbody>
-                         </table>
-                     </div>
-                 </div>
-             </div>
+      <div class="well">
+         <div class="row marketing">
+               <h4> Badges Grant History </h4>
+               <div class="table-responsive">
+                   <table class="table table-striped">
+                       <thead>
+                           <tr>
+                               <th scope="col">Date (granted by) </th>
+                               <th scope="col">Name </th>
+                               <th scope="col">Badge</th>
+                               <th scope="col">Badge name</th>
+                               {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                               <th scope="col">  <p> {% include 'visible_badges.html' %} </p> </th>
+                               {% endif%}
+                           </tr>
+                       </thead>
+                       <tbody>
+                       {% for lastEntry in grantedBadges %}
+                          {% if not lastEntry[7] %}
+                           <tr class="table-danger">
+                          {% else %}
+                           <tr >
+                          {% endif %}
+                               <th scope="row"> {{ lastEntry[4] }} (by {{ lastEntry[5] }}) </th>
+                               <td> {{ lastEntry[1] }} </td>
+                               <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /> </td>
+                               <td> {{ lastEntry[2] }} </td>
+                               {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry[6] != 7 %}
+                                <td>
+                                  {% if lastEntry[7] %}
+                                    <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=0"> <img src="http://chittagongit.com/download/133528"  width="25" height="25" /> </a>
+                                  {% else %}
+                                    <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=1"> <img src="https://icon2.kisspng.com/20180530/xpp/kisspng-computer-icons-android-synchronization-refresh-icon-5b0ecd36de69c6.701157581527696694911.jpg"  width="25" height="25" /> </a>
+                                  {% endif %}
+                                 </td>
+                               {% endif %}
+                           </tr>
+                       {% endfor %}
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+       </div>
 
 
      <div class="well">
@@ -127,7 +138,7 @@
                           <tr >
                         {% endif %}
                               <th scope="row">{{ lastEntry[0] }}</th>
-                              <td> <img src="{{ lastEntry[2] }}" width="50" height="50" /> </td>
+                              <td> <img src="{{ lastEntry[2] }}" width="25" height="25" /> </td>
                               <td> {{ lastEntry[1] }} </td>
                               <td> {{ lastEntry[3] }} </td>
                               <td> {{ lastEntry[4] }} </td>

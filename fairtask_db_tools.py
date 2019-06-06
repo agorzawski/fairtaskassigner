@@ -143,16 +143,21 @@ class fairtaskDB:
         sql = "select * from user_badges %s" % sqlAdd
         return self.execute_get_sql(sql)
 
-    def get_all_badges(self, badgeUniqe=None):
+    def get_all_badges(self, badgeUniqe=None, adminBadges=False):
         whereBadge = ''
         if badgeUniqe is not None:
             whereBadge = ' where adminawarded=1 '
+            if adminBadges:
+                whereBadge += 'and name like \'%admin%\' '
 
         sql = 'select * from badges %s order by effect, name' % whereBadge
         return self.execute_get_sql(sql)
 
-    def get_badge_grant_history(self):
-        sql = 'select grantId, username, badgeName, img, date from badges_granted_timeline'
+    def get_badge_grant_history(self, allValidities=False):
+        sqlAdd = ' where valid=1 '
+        if allValidities:
+            sqlAdd = ''
+        sql = 'select grantId, username, badgeName, img, date, grantByUserName, badgeId, valid from badges_granted_timeline %s' % sqlAdd
         return self.execute_get_sql(sql)
 
     def get_users_badges_timeline(self):
@@ -167,14 +172,14 @@ class fairtaskDB:
         # TODO return as dict
         return self.execute_get_sql(sql)
 
-    def insert_user_badges(self, badgeId, userId, date):
+    def insert_user_badges(self, badgeId, userId, date, grantBy):
         if date is None:
             date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sql='insert into user_badges (userId, badgeId, date, valid) values (\'%d\', \'%d\',\'%s\', 1)'  % (badgeId, userId, date)
+        sql='insert into user_badges (userId, badgeId, date, valid, grantby) values (\'%d\', \'%d\',\'%s\', 1, \'%d\')'  % (badgeId, userId, date, grantBy)
         self.execute_sql(sql, commit=True)
 
-    def remove_user_bagde(self, badgeGrantId):
-        sql='update user_badges set valid=0 where id=%d' % badgeGrantId
+    def remove_user_bagde(self, badgeGrantId, valid, removigUserId):
+        sql='update user_badges set valid=%d, grantby=%d where id=%d' % (valid, removigUserId, badgeGrantId)
         self.execute_sql(sql, commit=True)
 
     def get_products(self):
@@ -188,9 +193,9 @@ class fairtaskDB:
             raise ValueError('No Product with that ID ', id)
 
     def get_users(self, onlyNotValidated=False):
-        sql = 'select * from user order by username'
+        sql = 'select * from user where id > 0 order by username'
         if onlyNotValidated:
-            sql = 'select * from user where validated=0 order by username'
+            sql = 'select * from user where validated=0 and id > 0 order by username'
         return self.execute_get_sql(sql)
 
     def get_users_stats(self):

@@ -3,7 +3,7 @@ from fairtask_db_tools import fairtaskDB
 import fairtask_badge_factory
 
 EMPTY_RESULT = {}
-
+SYSTEM_APP_ID = -9
 
 def get_current_badges(date, storage=None):
     storageReadOnly = storage
@@ -37,5 +37,5 @@ def get_current_badges(date, storage=None):
     toReturn = []
     for oneBadgeId in allTimeBadges.keys():
         for oneUserId in allTimeBadges[oneBadgeId].keys():
-            toReturn.append((oneUserId, oneBadgeId, date))
+            toReturn.append((oneUserId, oneBadgeId, date, SYSTEM_APP_ID))
     return toReturn

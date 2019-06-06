@@ -1,7 +1,8 @@
 CREATE TABLE sqlite_sequence(name,seq)
 
 CREATE TABLE "user_badges" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-  `userId` INTEGER NOT NULL, `badgeId` INTEGER NOT NULL, `date` TEXT NOT NULL, `valid` INTEGER )
+   `userId` INTEGER NOT NULL, `badgeId` INTEGER NOT NULL, `date` TEXT NOT NULL,
+   `valid` INTEGER NOT NULL, `grantby` INTEGER NOT NULL )
 
 CREATE TABLE "badges" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
   `name` TEXT NOT NULL, `img` TEXT, `desc` TEXT NOT NULL, `effect` INTEGER NOT NULL, `adminawarded` INTEGER NOT NULL )
@@ -22,8 +23,7 @@ CREATE VIEW all_list as select date, buyer, to_whom, name product, price, buyer_
     contract join user on contract.buyer=user.id) buyer join user on buyer.to_whom = user.id) transactions
     join product on transactions.product = product.id
 
-CREATE VIEW badges_granted_timeline AS
-select grantId, user.id, username, date, img, badgeName, badgeId from
-(select grantId, userId, badgeId, date, img, badges.name badgeName from
-  (select user_badges.id grantId, user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId where user_badges.valid=1) a
-  join badges on badges.id=a.badgeId) join user on user.id=userId order by date desc
+CREATE VIEW badges_granted_timeline AS select b.grantId, b.uid, b.username, b.date, b.img, b.badgeName, b.badgeId, b.grantById, user.username, b.valid from
+(select grantId, user.id uid, username, date, img, badgeName, badgeId, grantby grantById, valid from (select grantId, userId, badgeId, date, img, badges.name badgeName, grantby, valid from
+  (select user_badges.id grantId, user.id userId, date, badgeId, user_badges.grantby grantby, user_badges.valid valid from user join user_badges on user.id=user_badges.userId) a
+  join badges on badges.id=a.badgeId) join user on user.id=userId order by date desc) b join user on grantById=user.id
