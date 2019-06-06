@@ -1,8 +1,12 @@
 # FairTaskAssigner
 
-IT is a simple web server application that allows to track the activities (e.g. coffee servings) within the group of friends.
+It is a simple web server application that allows to track the activities (e.g. coffee servings) within the group of friends.
 
 It works based on google authentication token (uses only login and identity picture!).
+
+*1.3*
+- adapted do bootstrap 4.3
+- fixed bugs with badges management
 
 *1.2*
 - job can be saved only when at least three orders are in the bucket

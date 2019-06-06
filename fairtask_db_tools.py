@@ -147,8 +147,8 @@ class fairtaskDB:
         whereBadge = ''
         if badgeUniqe is not None:
             whereBadge = ' where adminawarded=1 '
-            if adminBadges:
-                whereBadge += 'and name like \'%admin%\' '
+            if not adminBadges:
+                whereBadge += 'and name not like \'%admin%\' '
 
         sql = 'select * from badges %s order by effect, name' % whereBadge
         return self.execute_get_sql(sql)
@@ -230,14 +230,15 @@ class fairtaskDB:
 
     def get_admins(self):
         #badges 7(admin) and 8(badgeadmin)
-        sql = 'select userId, email, username, badgeId from user_badges join user on user_badges.userId=user.id where user_badges.badgeId=7 or user_badges.badgeId=8'
+        sql = 'select userId, email, username, badgeId from user_badges join user on user_badges.userId=user.id where user_badges.valid=1 and (user_badges.badgeId=7 or user_badges.badgeId=8)'
         toReturn = {'admin': {},
                     'badgeadmin': {}}
         for one in self.execute_get_sql(sql):
+            print(one)
             if one[3] == 7:
-                toReturn['admin'] = {one[1]: (one[0], one[2])}
+                toReturn['admin'][one[1]] = (one[0], one[2])
             if one[3] == 8:
-                toReturn['badgeadmin'] = {one[1]: (one[0], one[2])}
+                toReturn['badgeadmin'][one[1]] = (one[0], one[2])
 
         return toReturn
 

@@ -6,20 +6,24 @@
   <body>
     <div class="container">
       <div class="header">
-          <nav>
-              <ul class="nav nav-pills pull-right">
-                <li role="presentation" ><a href="main">Home</a>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+           {% include 'common_title.html' %}
+            <ul class="navbar-nav">
+                <li class="nav-item" >
+                  <a class="nav-item nav-link" href="main">Home</a>
                 </li>
-                <li role="presentation"><a href="addJobs">Orders</a>
+                <li class="nav-item">
+                  <a class="nav-item nav-link" href="addJobs">Orders</a>
                 </li>
-                <li role="presentation" class="active"><a href="showSignUp">Add User</a>
+                <li class="nav-item active">
+                  <a class="nav-item nav-link" href="#">Add User</a>
                 </li>
-                <li role="presentation"><a href="stats">SystemStats</a>
+                <li class="nav-item">
+                  <a class="nav-item nav-link" href="stats">SystemStats</a>
                 </li>
-                  {% include 'google_login.html' %}
-              </ul>
+                 {% include 'google_login.html' %}
+            </ul>
           </nav>
-          {% include 'common_title.html' %}
       </div>
 
       <div class="jumbotron">
@@ -72,8 +76,8 @@
       </div>
 
       {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-      <div class="well">
-         <div class="row marketing">
+      <div class="container">
+              <hr class="my-3">
                <h4> GrantBadges</h4>
                <p>  {% include 'visible_badges.html' %} </p>
                <form class="form-signin">
@@ -120,17 +124,16 @@
                </script>
                </form>
 
-           </div>
        </div>
        {% endif %}
 
 
        {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
-       <div class="well">
-          <div class="row marketing">
+       <div class="container">
+                <hr class="my-3">
                 <h4> Add product </h4>
                 <p>  {% include 'visible_badges.html' %} </p>
-
+                <br>
                 <form class="form-signin">
                 <label for="productName" class="sr-only">name:</label>
                 <input type="name" name="productName" id="productName"
@@ -162,8 +165,6 @@
                 </script>
                 </form>
 
-
-            </div>
         </div>
         {% endif %}
 

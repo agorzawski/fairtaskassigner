@@ -1,4 +1,4 @@
-<li role="presentation"><a href="logout"> {{ loggedUsernameEmail['username'] }}
+<li role="nav-item"><a class="nav-link btn btn-outline-dark my-2 my-sm-0" href="logout"> {{ loggedUsernameEmail['username'] }}
   {% for badge in loggedUserBadges %}
     <img src="{{badge[5]}}" width=25 height=25 />
   {% endfor %}

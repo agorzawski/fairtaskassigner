@@ -110,11 +110,10 @@ def isLoginValid():
 def isAnAdmin():
     localId = getLoggedUsernameEmailPicture()
     adminsList = storage.get_admins()
-    if localId['id'] in adminsList['admin'].keys() \
-        or localId['id'] in adminsList['badgeadmin'].keys():
+    if localId['email'] in adminsList['admin'].keys() \
+        or localId['email'] in adminsList['badgeadmin'].keys():
         return True
     return True
-
 
 
 @app.route('/login')
@@ -161,9 +160,6 @@ def main():
 
 @app.route('/addJobs')
 def addJobs():
-    for one in get_flashed_messages():
-        print(one)
-
     if not isLoginValid():
         return redirect(url_for('login'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
@@ -187,6 +183,8 @@ def addJobs():
                            googleSession=googleSession,
                            inBucket=inBucket,
                            loggedUsernameEmail=loggedUsernameEmail)
+
+
 @app.route('/stats')
 def stats():
     if not isLoginValid():
@@ -199,7 +197,10 @@ def stats():
     getUsersStats = storage.get_users_stats()
     getAllBadges = storage.get_all_badges()
     getAssignedBadges = storage.get_users_badges()
-    grantedBadges = storage.get_badge_grant_history(allValidities=True)
+    allValidities = False
+    if isAnAdmin:
+        allValidities = True
+    grantedBadges = storage.get_badge_grant_history(allValidities=allValidities)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     return render_template('stats.html',
                            users=users,
@@ -215,6 +216,7 @@ def stats():
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
+
 @app.route('/showSignUp')
 def showSignUp():
     if not isLoginValid():
@@ -225,10 +227,12 @@ def showSignUp():
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     adminsList = storage.get_admins()
     adminBadges = False
-    if loggedUsernameEmail['id'] in adminsList['admin']:
+    if loggedUsernameEmail['email'] in adminsList['admin'].keys():
         adminBadges = True
     badgesToGrant = storage.get_all_badges(badgeUniqe=True,
                                            adminBadges=adminBadges)
+    print(adminsList)
+    print(badgesToGrant)
     return render_template('signup.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,
@@ -267,7 +271,8 @@ def signUp():
         flash('User %s/%s successfuly added!' % (_name, _email))
         return redirect(url_for('showSignUp'))
     else:
-        return json.dumps({'html': '<span>Enter the required fields</span>'})
+        flash("Cannot add user!")
+    return redirect(url_for('showSignUp'))
 
 
 @app.route('/registerJob', methods=['POST'])
@@ -286,7 +291,9 @@ def registerJob():
     if _name and _product:
         storage.add_to_bucket(_name, _product)
         flash('Registered in the whish list...')
-        return redirect(url_for('addJobs'))
+    else:
+        flash('Cannot register this order, select correct pair TO WHOM & WHAT')
+    return redirect(url_for('addJobs'))
 
 
 @app.route('/emptyBucket', methods=['POST'])
@@ -347,7 +354,7 @@ def grantBadge():
         _name = int(request.form['nameIdToGrant'])
         _badge = int(request.form['badgeId'])
     except ValueError:
-        redirect(url_for('showSignUp'))
+        return redirect(url_for('showSignUp'))
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if _name > 0 and _badge > 0:
         storage.insert_user_badges(_name, _badge, None, loggedUsernameEmail['id'])
@@ -363,9 +370,10 @@ def removeBucketItem():
         what = int(request.args.get('what', -1))
         towhom = int(request.args.get('towhom', -1))
     except ValueError:
-        redirect(url_for('main'))
+        return redirect(url_for('main'))
     if what > 0 and towhom > 0:
         storage.remove_item_in_bucket(towhom, what)
+        flash('Removed one entry form the bucket')
     return redirect(url_for('addJobs'))
 
 
@@ -382,7 +390,7 @@ def modifyBadge():
         valid = int(request.args.get('valid', 0))
     except ValueError:
         flash('Error in submited vaules for badge modification!')
-        redirect(url_for('stats'))
+        return redirect(url_for('stats'))
     if badgeId > 0 and (valid == 1 or valid == 0):
         storage.remove_user_bagde(badgeId, valid, loggedUsernameEmail['id'])
         flash('Modified Badge!')
