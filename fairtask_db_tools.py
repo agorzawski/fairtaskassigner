@@ -71,14 +71,14 @@ class fairtaskDB:
 
     def check_if_in_bucket(self, userId):
         result = self.execute_get_sql('select * from contract_temp where to_whom=%d' % userId)
-        if len(result):
+        if result:
             return True
         return False
 
     def get_favorite_product(self, userId):
         sql = 'SELECT product, COUNT(product) AS vo FROM contract where to_whom=%d GROUP BY product ORDER BY vo DESC LIMIT 1'%userId
         result = self.execute_get_sql(sql)
-        if len(result) > 0:
+        if len(result) > 0 and result[0]:
             return self.get_product_details(result[0][0])
         else:
             return (NON_SELECTED_VALUE, 'NOT FOUND')
@@ -119,7 +119,7 @@ class fairtaskDB:
     def get_bucket(self):
         dataBucket = self.execute_get_sql('select username, what, rating, user.id, whatId from (select to_whom whom, name what, product.id whatId from contract_temp join product on product.id = product) join user on user.id=whom')
         # (whom, what, rating) with origanl scorings
-        if len(dataBucket):
+        if dataBucket:
             dataBucketSimple = self.execute_get_sql('select to_whom from contract_temp')
             data = self.execute_get_sql('select buyer, to_whom, product from contract')
             scoring = fairtask_scoring()
@@ -129,13 +129,10 @@ class fairtaskDB:
                 presentContractors.append(one[0])
             resultForOrdering = scoring.recalculate_scoring(data,
                                                  presentContractors=presentContractors)
-            toReturn = []
-            for data in dataBucket:
-                toReturn.append((data[0],
-                                 data[1],
-                                 resultForOrdering.get(data[3], 0),
-                                 data[3],
-                                 data[4], ))
+            toReturn = [
+                (data[0], data[1], resultForOrdering.get(data[3], 0), data[3], data[4],)
+                for data in dataBucket
+            ]
             return toReturn
         return dataBucket
 
@@ -185,7 +182,7 @@ class fairtaskDB:
 
     def get_product_details(self, productId):
         data = self.execute_get_sql('select * from product where id=%s'%str(productId))
-        if len(data)>0:
+        if data:
             return data[0]
         else:
             raise ValueError('No Product with that ID ', id)
