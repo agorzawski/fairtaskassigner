@@ -273,7 +273,7 @@ def signUp():
     return redirect(url_for('showSignUp'))
 
 
-@app.route('/registerJob', methods=['POST'])
+@app.route('/registerJob', methods=['POST','GET'])
 def registerJob():
     if not isLoginValid():
         return redirect(url_for('login'))
@@ -281,12 +281,21 @@ def registerJob():
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     try:
-        _name = int(request.form['inputName'])
-        _product = int(request.form['inputProduct'])
+        if request.form:
+            _name = int(request.form['inputName'])
+            _product = int(request.form['inputProduct'])
     except ValueError:
         flash('Cannot register this order, select correct pair TO WHOM & WHAT')
         return redirect(url_for('addJobs'))
-    if _name and _product:
+    try:
+        if request.args:
+            _name = int(request.args.get('inputName', -1))
+            _product = int(request.args.get('inputProduct', -1))
+    except ValueError:
+        flash('Cannot register this order, select correct pair TO WHOM & WHAT')
+        return redirect(url_for('addJobs'))
+
+    if _name > 0 and _product > 0:
         storage.add_to_bucket(_name, _product)
         flash('Registered in the whish list...')
     else:

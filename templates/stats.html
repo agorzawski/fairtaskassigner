@@ -6,7 +6,6 @@
   <body>
     <div class="container">
       <div class="header">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
            {% include 'common_title.html' %}
             <ul class="navbar-nav">
                 <li class="nav-item" >
@@ -23,6 +22,7 @@
                 </li>
                  {% include 'google_login.html' %}
             </ul>
+          <!-- closing from the title temlate -->
           </nav>
       </div>
 
@@ -33,151 +33,146 @@
         {% include 'game_desc.html' %}
       </div>
 
-      <div class="well">
-        <div class="row marketing">
+
+      <div class="container">
+        <hr class="my-3">
+            <div>
               <h2 id='statistics'>Users and statistics: </h2>
               <p>
                 <li>All statistics caluclated exluding user->user serving unless specified otherwise. </i>
               </p>
-              <div class="table-responsive">
-                  <table class="table table-striped table-hover table-sm">
-                      <thead>
-                          <tr>
-                              <th scope="col">Id</th>
-                              <th scope="col">Name</th>
-                              <th scope="col">Email </th>
-                              <th scope="col"><badge title="Value WITH THE badge modificators, raw is offered - consumed">Actual Score (raw)*</badge> </th>
-                              <th scope="col"><badge title="Coffee offered withing # servings"> Offered** (#servings) </badge> </th>
-                              <th scope="col"><badge title="Value WITHOUT SELF BUYINGS (and including SELFBUYINGS = times coffe was served)">Consumed*** (total) </badge> </th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                      {% for user in users %}
-                          <tr >
-                              <th scope="row">{{ user[0] }}</th>
-                              <td> {{ user[2] }}
-                                {%for badge in assignedBadges %}
-                                  {%if  badge[0] == user[0] %}
-                                    <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
-                                  {% endif %}
-                                {% endfor %}
-                                </td>
-                              <td> {{ user[1] }} </td>
-                              <td> {{'%0.1f'| format(user[3]|float)}} ({{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}) </td>
-                              <td> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} ({{ usersStats.get(user[2], {False:0}).get('served', 0) }}) </td>
-                              <td> {{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} ({{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }})</td>
-                          </tr>
-                      {% endfor %}
-                      </tbody>
-                  </table>
-              </div>
+            </div>
+            <div class="table-responsive table-borderless">
+                <table class="table table-striped table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col"><badge title="Value WITH THE badge modificators, raw is offered - consumed">Actual Score (raw)*</badge> </th>
+                            <th scope="col"><badge title="Coffee offered withing # servings"> Offered** (#servings) </badge> </th>
+                            <th scope="col"><badge title="Value WITHOUT SELF BUYINGS (and including SELFBUYINGS = times coffe was served)">Consumed*** (total) </badge> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr >
+                            <th scope="row"> {{ user[2] }} <span class="text-muted"><small>({{ user[1] }})</small></span>
+                              {%for badge in assignedBadges %}
+                                {%if  badge[0] == user[0] %}
+                                  <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
+                                {% endif %}
+                              {% endfor %}
+                            </th>
+                            <td> {{'%0.1f'| format(user[3]|float)}} ({{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}) </td>
+                            <td> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} ({{ usersStats.get(user[2], {False:0}).get('served', 0) }}) </td>
+                            <td> {{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} ({{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }})</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+      </div>
+
+
+
+      <div class="container">
+        <hr class="my-3">
+           <h2> Badges Grant History </h2>
+           <div class="table-responsive table-borderless">
+               <table class="table table-striped table-hover table-sm">
+                   <thead>
+                       <tr>
+                           <th scope="col">Date (granted by) </th>
+                           <th scope="col">To Whom </th>
+                           <th scope="col">Badge</th>
+                           {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                           <th scope="col">  <p> {% include 'visible_badges.html' %} </p> </th>
+                           {% endif%}
+                       </tr>
+                   </thead>
+                   <tbody>
+                   {% for lastEntry in grantedBadges %}
+                      {% if not lastEntry[7] %}
+                       <tr class="table-dark text-danger">
+                      {% else %}
+                       <tr >
+                      {% endif %}
+                           <th scope="row"> <small>{{ lastEntry[4] }}</small> <span class="text-muted">(by {{ lastEntry[5] }})</span> </th>
+                           <td> {{ lastEntry[1] }} </td>
+                           <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /><span class="text-muted">{{ lastEntry[2] }} </span> </td>
+                           {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry[6] != 7 %}
+                            <td>
+                              {% if lastEntry[7] %}
+                                <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=0"> <img src="http://chittagongit.com/download/133528"  width="25" height="25" /> </a>
+                              {% else %}
+                                <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=1"> <img src="https://cdn2.iconfinder.com/data/icons/web/512/Refresh_Arrow-512.png"  width="25" height="25" /> </a>
+                              {% endif %}
+                             </td>
+                           {% endif %}
+                       </tr>
+                   {% endfor %}
+                   </tbody>
+               </table>
+           </div>
+       </div>
+
+
+       <div class="container">
+         <hr class="my-3">
+            <div>
+            <h2 id='Achievements'> Badges and Achievements</h2>
+              <p class="text-default">Badges awarded by the system after each scoring updade, trigered after each registered job.</p>
+              <p class="text-primary"> Badges that can be awarded by the SytemAdmin or BadgeAdmin</p>
+            </div>
+            <div class="table-responsive table-borderless">
+                <table class="table table-striped table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Badge</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for lastEntry in allBadges %}
+                      {% if lastEntry[5] == 1 %}
+                        <tr class="table-default text-primary">
+                      {% else %}
+                        <tr >
+                      {% endif %}
+                            <th scope="row">{{ lastEntry[1] }}</th>
+                            <td> <img src="{{ lastEntry[2] }}" width="25" height="25" /> </td>
+                            <td> {{ lastEntry[3] }} </td>
+                            <td> {{ lastEntry[4] }} </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
 
-
-      <div class="well">
-         <div class="row marketing">
-               <h2> Badges Grant History </h2>
-               <div class="table-responsive">
-                   <table class="table table-striped table-hover table-sm">
-                       <thead>
-                           <tr>
-                               <th scope="col">Date (granted by) </th>
-                               <th scope="col">Name </th>
-                               <th scope="col">Badge</th>
-                               <th scope="col">Badge name</th>
-                               {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                               <th scope="col">  <p> {% include 'visible_badges.html' %} </p> </th>
-                               {% endif%}
-                           </tr>
-                       </thead>
-                       <tbody>
-                       {% for lastEntry in grantedBadges %}
-                          {% if not lastEntry[7] %}
-                           <tr class="table-dark">
-                          {% else %}
-                           <tr >
-                          {% endif %}
-                               <th scope="row"> {{ lastEntry[4] }} (by {{ lastEntry[5] }}) </th>
-                               <td> {{ lastEntry[1] }} </td>
-                               <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /> </td>
-                               <td> {{ lastEntry[2] }} </td>
-                               {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry[6] != 7 %}
-                                <td>
-                                  {% if lastEntry[7] %}
-                                    <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=0"> <img src="http://chittagongit.com/download/133528"  width="25" height="25" /> </a>
-                                  {% else %}
-                                    <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=1"> <img src="https://cdn2.iconfinder.com/data/icons/web/512/Refresh_Arrow-512.png"  width="25" height="25" /> </a>
-                                  {% endif %}
-                                 </td>
-                               {% endif %}
-                           </tr>
-                       {% endfor %}
-                       </tbody>
-                   </table>
-               </div>
+        <div class="container">
+          <hr class="my-3">
+           <h2>Products: </h2>
+           <div class="table-responsive">
+               <table class="table table-striped table-hover table-sm">
+                   <thead>
+                       <tr>
+                           <th scope="col">Name</th>
+                           <th scope="col">Price </th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                   {% for user in products %}
+                       <tr >
+                           <th scope="row"> {{ user[1] }} </th>
+                           <td> {{'%0.1f'| format(user[2]|float)}}</td>
+                       </tr>
+                   {% endfor %}
+                   </tbody>
+               </table>
            </div>
-       </div>
-
-
-     <div class="well">
-        <div class="row marketing">
-              <h2 id='Achievements'> Badges and Achievements</h2>
-              <div class="table-responsive">
-                  <table class="table table-striped table-hover table-sm">
-                      <thead>
-                          <tr>
-                              <th scope="col">Id</th>
-                              <th scope="col">Badge</th>
-                              <th scope="col">Name</th>
-                              <th scope="col">Description</th>
-                              <th scope="col">Effect</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                      {% for lastEntry in allBadges %}
-                        {% if lastEntry[5] == 1 %}
-                          <tr class="table-default">
-                        {% else %}
-                          <tr >
-                        {% endif %}
-                              <th scope="row">{{ lastEntry[0] }}</th>
-                              <td> <img src="{{ lastEntry[2] }}" width="25" height="25" /> </td>
-                              <td> {{ lastEntry[1] }} </td>
-                              <td> {{ lastEntry[3] }} </td>
-                              <td> {{ lastEntry[4] }} </td>
-                          </tr>
-                      {% endfor %}
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </div>
-      <div class="well">
-         <div class="row marketing">
-             <h2>Products: </h2>
-             <div class="table-responsive">
-                 <table class="table table-striped table-hover table-sm">
-                     <thead>
-                         <tr>
-                             <th scope="col">Id</th>
-                             <th scope="col">Name</th>
-                             <th scope="col">Price </th>
-                         </tr>
-                     </thead>
-                     <tbody>
-                     {% for user in products %}
-                         <tr >
-                             <th scope="row">{{ user[0] }}</th>
-                             <td> {{ user[1] }} </td>
-                             <td> {{'%0.1f'| format(user[2]|float)}}</td>
-                         </tr>
-                     {% endfor %}
-                     </tbody>
-                 </table>
-             </div>
-           </div>
-       </div>
+         </div>
 
       <footer class="footer">
       {% include 'footer.html' %}

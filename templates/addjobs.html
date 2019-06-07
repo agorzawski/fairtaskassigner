@@ -6,7 +6,6 @@
   <body>
     <div class="container">
       <div class="header">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
            {% include 'common_title.html' %}
             <ul class="navbar-nav">
                 <li class="nav-item" >
@@ -23,6 +22,7 @@
                 </li>
                  {% include 'google_login.html' %}
             </ul>
+          <!-- closing from the title temlate -->
           </nav>
       </div>
 
@@ -79,9 +79,9 @@
           <h4>Bucket list</h4>
           <form class="form-bucket">
             {% if todaysJobs|length > 0 %}
-            <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button">Empty wish list</button>
+            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button">Empty wish list <img src="http://chittagongit.com/download/133528"  width="20" height="20" /></button>
             {% else %}
-            <button id="btnEmptyBucket" class="btn btn-sm btn-danger btn-block" type="button" disabled>Empty wish list</button>
+            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button" disabled>Empty wish list <img src="http://chittagongit.com/download/133528"  width="20" height="20" /></button>
             {% endif %}
             <script>
               $(function() {
