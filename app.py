@@ -198,7 +198,7 @@ def stats():
     getAllBadges = storage.get_all_badges()
     getAssignedBadges = storage.get_users_badges()
     allValidities = False
-    if isAnAdmin:
+    if isAnAdmin():
         allValidities = True
     grantedBadges = storage.get_badge_grant_history(allValidities=allValidities)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
@@ -231,8 +231,6 @@ def showSignUp():
         adminBadges = True
     badgesToGrant = storage.get_all_badges(badgeUniqe=True,
                                            adminBadges=adminBadges)
-    print(adminsList)
-    print(badgesToGrant)
     return render_template('signup.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,

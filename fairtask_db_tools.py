@@ -234,7 +234,6 @@ class fairtaskDB:
         toReturn = {'admin': {},
                     'badgeadmin': {}}
         for one in self.execute_get_sql(sql):
-            print(one)
             if one[3] == 7:
                 toReturn['admin'][one[1]] = (one[0], one[2])
             if one[3] == 8:
