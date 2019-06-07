@@ -113,7 +113,7 @@ def isAnAdmin():
     if localId['email'] in adminsList['admin'].keys() \
         or localId['email'] in adminsList['badgeadmin'].keys():
         return True
-    return True
+    return False
 
 
 @app.route('/login')
