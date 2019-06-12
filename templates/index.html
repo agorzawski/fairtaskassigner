@@ -34,9 +34,12 @@
             <h1>Coffee Bucket List</h1>
             <hr class="my-3">
             {% include 'common_alerts.html' %}
-            <p> To browse the actual status or place an order login is required!
+            <p> To browse the actual status, more statistics or place an order login is required!
             </p>
-            <p> <li>Last order placed: {{lastDate[0]}} </li></p>
+            <ul>
+              <li>Last order placed on <b> {{generalStats['lastDate']}} by {{generalStats['lastServant']}}</b></li>
+              <li>Total number of <b>shared tasks {{generalStats['totalServings']}}</b> with a total <b>number of orders {{generalStats['totalJobs']}}</b> for a total amount of <b> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </b></li>
+            </ul>
             {% include 'quick_add.html' %}
 
             {% if googleSession and loggedUsernameEmail['idProduct'] == -1 %}
@@ -69,7 +72,7 @@
                                   {% endif %}
                                 {% endfor %}
                               </th>
-                              <td> {{'%0.1f'| format(topper[2]|float)}}</td>
+                              <td> {{'%d'| format(topper[2]|float)}}</td>
                           </tr>
                       {% endfor %}
                       </tbody>
@@ -95,9 +98,9 @@
                               <th scope="row">{{ topper[0] }}
 
                               </th>
-                              <td> {{'%0.0f'| format(topper[1]|float)}} </td>
+                              <td> {{'%d'| format(topper[1]|float)}} </td>
                               <td> {{'%0.1f'| format(topper[2]|float)}} </td>
-                              <td> {{'%0.1f'| format(topper[3]|float)}}</td>
+                              <td> {{'%d'| format(topper[3]|float)}}</td>
                           </tr>
                       {% endfor %}
                       </tbody>

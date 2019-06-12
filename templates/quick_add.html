@@ -4,7 +4,7 @@
       ALREADY registered for the next order (go to the bucket) </a>
     {% else %}
     <a href='/registerJob?inputProduct={{loggedUsernameEmail['idProduct']}}&inputName={{loggedUsernameEmail['id']}}' class="btn btn-outline-primary btn-block">
-      Quick Add :{{loggedUsernameEmail['productName']}} for <img src="{{loggedUsernameEmail['picture']}}" width=20 height=20 class="rounded-circle"/>
+      Quick Add: {{loggedUsernameEmail['productName']}} for <img src="{{loggedUsernameEmail['picture']}}" width=20 height=20 class="rounded-circle"/>
     </a>
     {% endif %}
 {% endif %}

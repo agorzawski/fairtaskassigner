@@ -144,12 +144,13 @@ def main():
         inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
         getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     lastDate = storage.get_last_transaction(n=1)[0]
+    generalStats = storage.get_main_statistics()
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
     getAssignedBadges = storage.get_users_badges()
     return render_template('index.html',
                            top3=top3,
-                           lastDate=lastDate,
+                           generalStats=generalStats,
                            candidates=candidates,
                            googleSession=googleSession,
                            loggedUsernameEmail=loggedUsernameEmail,
@@ -259,9 +260,15 @@ def signUp():
         if loggedUsernameEmail['id'] == NON_EXISTING_ID:
             validated = 1
         if _assignedNameId == NON_SELECTED_VALUE:
-            storage.add_user(_name, _email,
-                             loggedUsernameEmail['id'],
-                             validated=validated)
+            nameId = storage.add_user(_name, _email,
+                                loggedUsernameEmail['id'],
+                                validated=validated)
+
+            storage.insert_user_badges(nameId,
+                                       badges.BAGDE_ID_FOR_A_NEW_GUY,
+                                       None,
+                                       badges.SYSTEM_APP_ID,
+                                       valid=1)
         else:
             storage.update_user(_assignedNameId, _email,
                                 loggedUsernameEmail['id'],

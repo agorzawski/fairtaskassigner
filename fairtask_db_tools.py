@@ -43,8 +43,9 @@ class fairtaskDB:
     # ####################
     # Customized calls
     def add_user(self, name, email, creator, validated=0):
-        sql = 'insert into user (email, username, rating, creator, validated) values (\'%s\', \'%s\', 0.0, %s, %s)' % (email, name, creator, validated)
+        sql = 'insert into user (email, username, rating, creator, validated, added) values (\'%s\', \'%s\', 0.0, %s, %s, CURRENT_TIMESTAMP)' % (email, name, creator, validated)
         self.execute_sql(sql, commit=True)
+        return self.execute_get_sql("select id from user where username=\'%s\' and email=\'%s\'"%(name, email))[0][0]
 
     def update_user(self, existingId, email, creator, validated=0):
         sql = 'update user set email=\'%s\', creator=%s, validated=%s where id=%s'%(email, creator, validated, existingId)
@@ -172,10 +173,10 @@ class fairtaskDB:
         # TODO return as dict
         return self.execute_get_sql(sql)
 
-    def insert_user_badges(self, badgeId, userId, date, grantBy):
+    def insert_user_badges(self, badgeId, userId, date, grantBy, valid=1):
         if date is None:
             date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sql='insert into user_badges (userId, badgeId, date, valid, grantby) values (\'%d\', \'%d\',\'%s\', 1, \'%d\')'  % (badgeId, userId, date, grantBy)
+        sql='insert into user_badges (userId, badgeId, date, valid, grantby) values (\'%d\', \'%d\',\'%s\', \'%d\', \'%d\')'  % (badgeId, userId, date, valid, grantBy)
         self.execute_sql(sql, commit=True)
 
     def remove_user_bagde(self, badgeGrantId, valid, removigUserId):
@@ -266,6 +267,18 @@ class fairtaskDB:
 
     def get_top_candidates(self):
         return self.execute_get_sql('select id, username, rating from user order by rating limit 5')
+
+    def get_main_statistics(self):
+        lastDateBuyer = self.execute_get_sql('select date,buyer from all_list group by date order by date desc limit 1')[0]
+        totalBudgetSpent = self.execute_get_sql('select sum(price), count(price) from all_list')[0]
+        totalServings = self.execute_get_sql('select count(distinct(date)) from all_list')[0][0]
+        return {
+            'lastDate':lastDateBuyer[0],
+            'lastServant':lastDateBuyer[1],
+            'totalServings':totalServings,
+            'totalBudgetSpent':totalBudgetSpent[0],
+            'totalJobs':totalBudgetSpent[1]
+        }
 
     def close_db(self):
         self.con.close()
