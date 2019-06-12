@@ -168,7 +168,7 @@ def addJobs():
         return redirect(url_for('showSignUp'))
     inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
     googleSession = True
-    users = storage.get_users()
+    users = storage.get_users(active=1)
     products = storage.get_products()
     allJobs = storage.get_jobs_summary()
     badgesTimeline = storage.get_badge_grant_history()
@@ -226,10 +226,12 @@ def showSignUp():
     users = storage.get_users()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    getAllBadges = storage.get_all_badges(badgeUniqe=True)
     adminsList = storage.get_admins()
     adminBadges = False
     if loggedUsernameEmail['email'] in adminsList['admin'].keys():
         adminBadges = True
+        getAllBadges = storage.get_all_badges()
     badgesToGrant = storage.get_all_badges(badgeUniqe=True,
                                            adminBadges=adminBadges)
     return render_template('signup.html',
@@ -239,6 +241,7 @@ def showSignUp():
                            loggedUsernameEmail=loggedUsernameEmail,
                            adminsList=adminsList,
                            badgesToGrant=badgesToGrant,
+                           allBadges=getAllBadges,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -389,6 +392,28 @@ def removeBucketItem():
         storage.remove_item_in_bucket(towhom, what)
         flash('Removed one entry form the bucket')
     return redirect(url_for('addJobs'))
+
+
+@app.route('/modifyUser', methods=['GET'])
+def modifyUser():
+    if not isLoginValid():
+        return redirect(url_for('login'))
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    try:
+        userId = int(request.args.get('userId', -1))
+        active = int(request.args.get('active', 0))
+    except ValueError:
+        flash('Error in submited vaules for badge modification!')
+        return redirect(url_for('stats'))
+    if userId > 0 and (active == 1 or active == 0):
+        storage.update_user_active(userId, active)
+        flash('Modified user status!')
+    else:
+        flash('Error in submited vaules for badge modification!')
+    return redirect(url_for('stats'))
 
 
 @app.route('/modifyBadge', methods=['GET'])

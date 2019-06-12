@@ -51,6 +51,10 @@ class fairtaskDB:
         sql = 'update user set email=\'%s\', creator=%s, validated=%s where id=%s'%(email, creator, validated, existingId)
         self.execute_sql(sql, commit=True)
 
+    def update_user_active(self, existingId, active=0):
+        sql = 'update user set active=%d where id=%s'%(active, existingId)
+        self.execute_sql(sql, commit=True)
+
     def add_product(self, name, price):
         sql = 'insert into user vales (%s, %s) ' % (name, price)
         self.execute_sql(sql, commit=True)
@@ -193,10 +197,13 @@ class fairtaskDB:
         else:
             raise ValueError('No Product with that ID ', id)
 
-    def get_users(self, onlyNotValidated=False):
-        sql = 'select * from user where id > 0 order by username'
+    def get_users(self, onlyNotValidated=False, active=None):
+        addSql = ''
+        if active is not None:
+            addSql = ' and active=%d'%active
+        sql = 'select * from user where id > 0 %s order by username' % addSql
         if onlyNotValidated:
-            sql = 'select * from user where validated=0 and id > 0 order by username'
+            sql = 'select * from user where validated=0 and id > 0 %s order by username' % addSql
         return self.execute_get_sql(sql)
 
     def get_users_stats(self):
