@@ -43,9 +43,10 @@ class fairtaskDB:
     # ####################
     # Customized calls
     def add_user(self, name, email, creator, validated=0):
-        sql = 'insert into user (email, username, rating, creator, validated, added) values (\'%s\', \'%s\', 0.0, %s, %s, CURRENT_TIMESTAMP)' % (email, name, creator, validated)
+        sql = 'insert into user (email, username, rating, creator, validated, added, active) values (\'%s\', \'%s\', 0.0, %s, %s, CURRENT_TIMESTAMP, 1)' % (email, name, creator, validated)
         self.execute_sql(sql, commit=True)
-        return self.execute_get_sql("select id from user where username=\'%s\' and email=\'%s\'"%(name, email))[0][0]
+        sql = 'select id from user where username=\'%s\' and email=\'%s\'' % (name, email)
+        return self.execute_get_sql(sql)[0][0]
 
     def update_user(self, existingId, email, creator, validated=0):
         sql = 'update user set email=\'%s\', creator=%s, validated=%s where id=%s'%(email, creator, validated, existingId)
