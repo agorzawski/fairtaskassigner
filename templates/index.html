@@ -38,7 +38,7 @@
             </p>
             <ul>
               <li>Last order placed on <b> {{generalStats['lastDate']}} by {{generalStats['lastServant']}}</b></li>
-              <li>Total number of <b>shared tasks {{generalStats['totalServings']}}</b> with a total <b>number of orders {{generalStats['totalJobs']}}</b> for a total amount of <b> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </b></li>
+              <li>Total number of <b>{{generalStats['totalServings']}} shared orders </b> with a total <b>number of {{generalStats['totalJobs']}} servings</b> for a total amount of <b> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </b></li>
             </ul>
             {% include 'quick_add.html' %}
 
@@ -58,7 +58,7 @@
                       <thead>
                           <tr>
                               <th scope="col">Name</th>
-                              <th scope="col">Global <br>rating</th>
+                              <th scope="col" class="text-right">Global <br>rating</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -72,7 +72,7 @@
                                   {% endif %}
                                 {% endfor %}
                               </th>
-                              <td> {{'%d'| format(topper[2]|float)}}</td>
+                              <td class="text-right"> {{'%d'| format(topper[2]|float)}}</td>
                           </tr>
                       {% endfor %}
                       </tbody>
@@ -87,9 +87,9 @@
                       <thead>
                           <tr>
                               <th scope="col">Name</th>
-                              <th scope="col">Served</th>
-                              <th scope="col">Spent <br>[CHF]</th>
-                              <th scope="col">Global <br> rating</th>
+                              <th scope="col" class="text-right">Served</th>
+                              <th scope="col" class="text-right">Spent <br>[CHF]</th>
+                              <th scope="col" class="text-right">Global <br> rating</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -98,9 +98,9 @@
                               <th scope="row">{{ topper[0] }}
 
                               </th>
-                              <td> {{'%d'| format(topper[1]|float)}} </td>
-                              <td> {{'%0.1f'| format(topper[2]|float)}} </td>
-                              <td> {{'%d'| format(topper[3]|float)}}</td>
+                              <td class="text-right"> {{'%d'| format(topper[1]|float)}} </td>
+                              <td class="text-right"> {{'%0.1f'| format(topper[2]|float)}} </td>
+                              <td class="text-right"> {{'%d'| format(topper[3]|float)}}</td>
                           </tr>
                       {% endfor %}
                       </tbody>

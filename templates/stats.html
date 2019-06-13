@@ -50,14 +50,14 @@
                     <thead>
                         <tr>
                             <th scope="col">name</th>
-                            <th scope="col">actual<br>score*</th>
-                            <th scope="col">raw score  </th>
-                            <th scope="col">#offered**</th>
-                            <th scope="col">#servings</th>
-                            <th scope="col">#consumed***</th>
-                            <th scope="col">#total <br>consumed</th>
+                            <th scope="col" class="text-right">actual<br>score*</th>
+                            <th scope="col" class="text-right">raw score  </th>
+                            <th scope="col" class="text-right">#offered**</th>
+                            <th scope="col" class="text-right">#servings</th>
+                            <th scope="col" class="text-right">#consumed***</th>
+                            <th scope="col" class="text-right">#total <br>consumed</th>
                             {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                            <th scope="col">  <p> {% include 'visible_badges.html' %} </p> </th>
+                            <th scope="col" class="text-center">  <p> {% include 'visible_badges.html' %} </p> </th>
                             {% endif%}
                         </tr>
                     </thead>
@@ -69,7 +69,7 @@
                         {% else %}
                          <tr >
                         {% endif %}
-                            <th scope="row"> <badge title="{{ user[1] }}"> {{ user[2] }}
+                            <th scope="row"> <badge title="{{ user[1] }}">{{ user[2] }}
                               {%if user[5] == 0 %}
                               <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/>
                               {% endif %}
@@ -79,14 +79,14 @@
                                 {% endif %}
                               {% endfor %} </badge>
                             </th>
-                            <td> <b>{{'%d'| format(user[3]|float)}}</b>  </td>
-                            <td>{{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}</td>
-                            <td> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} </td>
-                            <td>{{ usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
-                            <td> {{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} </td>
-                            <td>{{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
+                            <td class="text-right"> <b>{{'%d'| format(user[3]|float)}}</b>  </td>
+                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}</td>
+                            <td class="text-right"> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} </td>
+                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
+                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} </td>
+                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
                             {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                            <td>
+                            <td class="text-center">
                             {% if user[7] == 0 %}
                               <a href="modifyUser?userId={{user[0]}}&active=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                             {% else %}
@@ -129,7 +129,7 @@
                            <td> {{ lastEntry[1] }} </td>
                            <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /><span class="text">{{ lastEntry[2] }} </span> </td>
                            {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry[6] != 7 %}
-                            <td>
+                            <td class="text-center">
                               {% if lastEntry[7] %}
                                 <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
                               {% else %}
@@ -159,7 +159,7 @@
                             <th scope="col">Name</th>
                             <th scope="col">Badge</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Effect</th>
+                            <th scope="col" class="text-right">Effect</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,7 +172,7 @@
                             <th scope="row">{{ lastEntry[1] }}</th>
                             <td> <img src="{{ lastEntry[2] }}" width="25" height="25" /> </td>
                             <td> {{ lastEntry[3] }} </td>
-                            <td> {{ lastEntry[4] }} </td>
+                            <td class="text-right"> {{ lastEntry[4] }} </td>
                         </tr>
                     {% endfor %}
                     </tbody>
