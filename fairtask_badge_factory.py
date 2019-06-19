@@ -86,7 +86,7 @@ class badge_five_expensive_coffees(Abstract_Badge_On_Limit):
     def find(self, date, user, earlierDate=None):
         expensiveCoffeeId = self._storage.execute_get_sql('select id from product order by price desc limit 1 ')[0]
         sqlAdd = self.getDateLimiter(date=earlierDate)
-        sql = "select to_whom userId, count(to_whom) consumed from contract where to_whom={} and  product={} and date <='{}' {} group by to_whom".format(user, expensiveCoffeeId[0], date, sqlAdd)
+        sql = "select to_whom userId, count(to_whom) consumed from contract where to_whom!=buyer and to_whom={} and product={} and date <='{}' {} group by to_whom".format(user, expensiveCoffeeId[0], date, sqlAdd)
         return self.executeAndCompare(sql)
 
 

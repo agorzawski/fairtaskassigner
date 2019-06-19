@@ -90,7 +90,7 @@ class fairtaskDB:
             return (NON_SELECTED_VALUE, 'NOT FOUND')
 
     def get_scoring_from_badges(self):
-        scoringFromBadgesData = self.execute_get_sql('select userId, sum(effect) from user_badges join badges on user_badges.badgeId = badges.id group by userId')
+        scoringFromBadgesData = self.execute_get_sql('select userId, sum(effect) from user_badges join badges on user_badges.badgeId = badges.id  where user_badges.valid>0 group by userId')
         scoringFromBadges = {}
         for one in scoringFromBadgesData:
             scoringFromBadges[one[0]] = one[1]
@@ -145,8 +145,8 @@ class fairtaskDB:
     def get_granted_badges(self, date=None):
         sqlAdd = ""
         if date is not None:
-            sqlAdd = " where date <=\'%s\'" % date
-        sql = "select * from user_badges %s" % sqlAdd
+            sqlAdd = " and date <=\'%s\'" % date
+        sql = "select * from user_badges where valid>0 %s" % sqlAdd
         return self.execute_get_sql(sql)
 
     def get_all_badges(self, badgeUniqe=None, adminBadges=False):

@@ -143,6 +143,7 @@ def main():
         loggedUsernameEmail = getLoggedUsernameEmailPicture()
         inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
         getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    adminsList = storage.get_admins()
     lastDate = storage.get_last_transaction(n=1)[0]
     generalStats = storage.get_main_statistics()
     top3 = storage.get_top_buyers()
@@ -152,6 +153,7 @@ def main():
                            top3=top3,
                            generalStats=generalStats,
                            candidates=candidates,
+                           adminsList=adminsList,
                            googleSession=googleSession,
                            loggedUsernameEmail=loggedUsernameEmail,
                            inBucket=inBucket,
@@ -170,6 +172,7 @@ def addJobs():
     googleSession = True
     users = storage.get_users(active=1)
     products = storage.get_products()
+    adminsList = storage.get_admins()
     allJobs = storage.get_jobs_summary()
     badgesTimeline = storage.get_badge_grant_history()
     eventsTimeLine = fairtask_utils.combineEvents(allJobs, badgesTimeline)
@@ -180,6 +183,7 @@ def addJobs():
                            eventsTimeLine=eventsTimeLine,
                            loggedUserBadges=getLoggedUserBadges,
                            users=users,
+                           adminsList=adminsList,
                            products=products,
                            googleSession=googleSession,
                            inBucket=inBucket,
@@ -348,7 +352,14 @@ def finalizeJob():
         storage.add_transaction(_nameId, whomWhat[0], whomWhat[1],
                                 loggedUsernameEmail['id'])
     storage.clean_bucket()
-    dates = storage.get_last_transaction(n=1)
+
+    checkStatusForBadges()
+    flash('Order registered!')
+    return redirect(url_for('main'))
+
+
+def checkStatusForBadges():
+    dates = storage.get_last_transaction()
     for date in dates:
         actualbadges = badges.get_current_badges(date[0], storage=storage)
         for oneBadge in actualbadges:
@@ -356,8 +367,7 @@ def finalizeJob():
         if len(actualbadges):
             flash('New badges awarded!')
     storage.calculate_actal_scoring(commit=True)
-    flash('Order registered!')
-    return redirect(url_for('main'))
+    flash('Badges recalculated!')
 
 
 @app.route('/grantBadge', methods=['POST'])
@@ -454,7 +464,7 @@ def addProduct():
     return redirect(url_for('stats'))
 
 
-@app.route('/calculateScoring', methods=['POST'])
+@app.route('/calculateScoring')
 def calculateScoring():
     if not isLoginValid():
         return redirect(url_for('login'))
@@ -462,6 +472,7 @@ def calculateScoring():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
 
+    checkStatusForBadges()
     storage.calculate_actal_scoring(commit=True)
     flash('Scoring recalculated!')
     return redirect(url_for('stats'))
