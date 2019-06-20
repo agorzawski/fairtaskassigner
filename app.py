@@ -144,7 +144,6 @@ def main():
         inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
         getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     adminsList = storage.get_admins()
-    lastDate = storage.get_last_transaction(n=1)[0]
     generalStats = storage.get_main_statistics()
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
@@ -169,7 +168,6 @@ def addJobs():
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
-    googleSession = True
     users = storage.get_users(active=1)
     products = storage.get_products()
     adminsList = storage.get_admins()
@@ -185,7 +183,7 @@ def addJobs():
                            users=users,
                            adminsList=adminsList,
                            products=products,
-                           googleSession=googleSession,
+                           googleSession=True,
                            inBucket=inBucket,
                            loggedUsernameEmail=loggedUsernameEmail)
 
@@ -213,6 +211,7 @@ def stats():
                            products=products,
                            allBadges=getAllBadges,
                            adminsList=adminsList,
+                           googleSession=True,
                            usersStats=getUsersStats,
                            assignedBadges=getAssignedBadges,
                            loggedUserBadges=getLoggedUserBadges,
@@ -240,6 +239,7 @@ def showSignUp():
                                            adminBadges=adminBadges)
     return render_template('signup.html',
                            users=users,
+                           googleSession=True,
                            notValidatedUsers=notValidatedUsers,
                            loggedUserBadges=getLoggedUserBadges,
                            loggedUsernameEmail=loggedUsernameEmail,

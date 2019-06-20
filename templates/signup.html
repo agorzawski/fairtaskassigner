@@ -6,24 +6,9 @@
   <body>
     <div class="container">
       <div class="header">
-           {% include 'common_title.html' %}
-            <ul class="navbar-nav">
-                <li class="nav-item" >
-                  <a class="nav-item nav-link" href="main">Home</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-item nav-link" href="addJobs">Orders</a>
-                </li>
-                <li class="nav-item active">
-                  <a class="nav-item nav-link" href="#">Add User</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-item nav-link" href="stats">SystemStats</a>
-                </li>
-                 {% include 'google_login.html' %}
-            </ul>
-          <!-- closing from the title temlate -->
-          </nav>
+        {% with activeSite='showSignUp' %}
+        {% include 'common_title.html' %}
+        {% endwith %}
       </div>
 
       <div class="jumbotron">
@@ -79,6 +64,7 @@
       <div class="container">
               <hr class="my-3">
                <h4> GrantBadges</h4>
+               {% include 'totop.html' %}
                <p>  {% include 'visible_badges.html' %} </p>
                <form class="form-signin">
 
@@ -132,6 +118,7 @@
        <div class="container">
                 <hr class="my-3">
                 <h4> Add product </h4>
+                {% include 'totop.html' %}
                 <p>  {% include 'visible_badges.html' %} </p>
                 <br>
                 <form class="form-signin">

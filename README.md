@@ -4,6 +4,15 @@ It is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*1.5*
+- added orders/actions time line
+- sortable stats table
+- navigation issues (menu/top return)
+
+*1.4*
+- enabling/disabling badges
+- enabling/disabling users
+
 *1.3*
 - adapted do bootstrap 4.3
 - fixed bugs with badges management

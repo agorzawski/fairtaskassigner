@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="page-header">
+        <h2 id="timeline">Recorded timeline <span class="badge badge-warning">Your contribiution is marked</span> </h2>
+          {% include 'totop.html' %}
+    </div>
+    <ul class="timeline">
+        {% for date in eventsTimeLine.keys() %}
+        <li class="{{loop.cycle('', 'timeline-inverted')}}" >
+          <div class="timeline-badge dark"> </div>
+          <div class="timeline-panel">
+            <div class="timeline-heading">
+              <h4 class="timeline-title">Action on {{ date }}</h4>
+
+            </div>
+            <div class="timeline-body">
+              <p><small class="text-muted"><i class="glyphicon glyphicon-time">Total order value: {{ '%.1f'| format(eventsTimeLine.get(date).get('total', 0)|float) }} CHF </i> </small></p>
+              <ul>
+            {% for id in eventsTimeLine[date].keys() %}
+                {% if id !=  'total' %}
+                    <li> {{eventsTimeLine[date][id]['date']['all'].split(' ')[1]}}:
+                      {% if loggedUsernameEmail['username'] == eventsTimeLine[date][id]['who'] %}
+                      <span class="badge badge-warning"><b> {{eventsTimeLine[date][id]['who']}} </b></span> to
+                      {% else %}
+                      <span><b> {{eventsTimeLine[date][id]['who']}} </b></span> to
+                      {% endif %}
+                      {% if loggedUsernameEmail['username'] == eventsTimeLine[date][id]['towhom'] %}
+                      <span class="badge badge-warning">{{eventsTimeLine[date][id]['towhom']}}</span>
+                      {% else %}
+                      <span><i>{{eventsTimeLine[date][id]['towhom']}}</i></span>
+                      {%endif%}
+                      <span> with {{eventsTimeLine[date][id]['what']|safe }} </span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+             </ul>
+           </div>
+        </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
