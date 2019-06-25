@@ -35,7 +35,7 @@ def combineEvents(allJobs, badgesTimeline):
             if index > 0:
                 dictToReturn2[lastDateYYMMDD]['total'] = sum
                 pass
-            sum = 0
+            sum = one[4]
         if dateYYMMDD == lastDateYYMMDD or lastDateYYMMDD is None:
             localIndex += 1
             sum += one[4]
