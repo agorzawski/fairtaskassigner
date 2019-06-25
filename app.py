@@ -6,7 +6,7 @@ and storage connector.
 from fairtask_db_tools import fairtaskDB
 import fairtask_badges as badges
 import fairtask_utils
-from flask import Flask, render_template, request, json, redirect, url_for, session, flash, get_flashed_messages
+from flask import Flask, render_template, request, json, redirect, url_for, session, flash, get_flashed_messages, make_response
 from flask_oauth import OAuth
 import os
 
@@ -27,6 +27,7 @@ AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
 SCOPE_URL = 'https://www.googleapis.com/auth/userinfo.email'
 ACCESS_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
 USER_INFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token='
+COOKIE_NAME_REDIRECT = 'targetbeforelogin'
 
 HOUR_IN_SECONDS = 3600
 NON_EXISTING_ID = -666
@@ -55,7 +56,7 @@ google = oauth.remote_app('google',
 def authorized(resp):
     access_token = resp['access_token']
     session['access_token'] = access_token, ''
-    return redirect(url_for('main'))
+    return redirect(url_for(request.cookies.get(COOKIE_NAME_REDIRECT, 'main')))
 
 
 @google.tokengetter
@@ -116,6 +117,11 @@ def isAnAdmin():
     return False
 
 
+def rememberTheInitialRequest(request, initialUrl):
+    resp = make_response(request)
+    resp.set_cookie(COOKIE_NAME_REDIRECT, initialUrl)
+    return resp
+
 @app.route('/login')
 def login():
     if not isLoginValid():
@@ -163,7 +169,8 @@ def main():
 @app.route('/addJobs')
 def addJobs():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
@@ -191,7 +198,8 @@ def addJobs():
 @app.route('/stats')
 def stats():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     users = storage.get_users()
     products = storage.get_products()
@@ -224,7 +232,8 @@ def stats():
 @app.route('/showSignUp')
 def showSignUp():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     users = storage.get_users()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
@@ -253,7 +262,8 @@ def showSignUp():
 @app.route('/signUp', methods=['POST'])
 def signUp():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     _name = request.form['inputName']
     _email = request.form['inputEmail']
     try:
@@ -290,7 +300,8 @@ def signUp():
 @app.route('/registerJob', methods=['POST','GET'])
 def registerJob():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
@@ -320,7 +331,8 @@ def registerJob():
 @app.route('/emptyBucket', methods=['POST'])
 def emptyBucket():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
@@ -332,7 +344,8 @@ def emptyBucket():
 @app.route('/finalizeJob', methods=['POST'])
 def finalizeJob():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     loggedUsernameEmail = getLoggedUsernameEmailPicture()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
@@ -373,7 +386,8 @@ def checkStatusForBadges():
 @app.route('/grantBadge', methods=['POST'])
 def grantBadge():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
@@ -392,7 +406,8 @@ def grantBadge():
 @app.route('/removeBucketItem', methods=['GET'])
 def removeBucketItem():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     try:
         what = int(request.args.get('what', -1))
         towhom = int(request.args.get('towhom', -1))
@@ -407,11 +422,11 @@ def removeBucketItem():
 @app.route('/modifyUser', methods=['GET'])
 def modifyUser():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
     try:
         userId = int(request.args.get('userId', -1))
         active = int(request.args.get('active', 0))
@@ -429,7 +444,8 @@ def modifyUser():
 @app.route('/modifyBadge', methods=['GET'])
 def modifyBadge():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
@@ -451,7 +467,8 @@ def modifyBadge():
 @app.route('/addProduct', methods=['POST'])
 def addProduct():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
@@ -467,7 +484,8 @@ def addProduct():
 @app.route('/calculateScoring')
 def calculateScoring():
     if not isLoginValid():
-        return redirect(url_for('login'))
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
