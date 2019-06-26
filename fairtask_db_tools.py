@@ -159,10 +159,13 @@ class fairtaskDB:
         sql = 'select * from badges %s order by effect, name' % whereBadge
         return self.execute_get_sql(sql)
 
-    def get_badge_grant_history(self, allValidities=False):
-        sqlAdd = ' where valid=1 '
+    def get_badge_grant_history(self, allValidities=False, withUser=None):
+        sqlOnUser = ''
+        if withUser is not None:
+            sqlOnUser = ' and username like \'%s\' ' % withUser
+        sqlAdd = ' where valid=1 %s' % sqlOnUser
         if allValidities:
-            sqlAdd = ''
+            sqlAdd = sqlOnUser.replace('and', 'where')
         sql = 'select grantId, username, badgeName, img, date, grantByUserName, badgeId, valid from badges_granted_timeline %s' % sqlAdd
         return self.execute_get_sql(sql)
 
@@ -254,17 +257,20 @@ class fairtaskDB:
         if id is None and email is None:
             raise ValueError('Need at least one parameter!')
         if id is None:
-            sql = 'select id,username,email from user where email=\'%s\'' % email
+            sql = 'select id,username,email,rating from user where email=\'%s\'' % email
         if email is None:
-            sql = 'select id,username,email from user where id=\'%s\'' % id
+            sql = 'select id,username,email,rating from user where id=\'%s\'' % id
         return self.execute_get_sql(sql)
 
-    def get_jobs_summary(self, today=False, buffer_seconds=3*3600):
+    def get_jobs_summary(self, today=False, buffer_seconds=3*3600, withUser=None):
+        sqlOnUser=''
+        if withUser is not None:
+            sqlOnUser = ' where (buyer like \'%s\' or to_whom like \'%s\') '%(withUser, withUser)
         if today:
             now = datetime.now() - timedelta(seconds=buffer_seconds)
-            sql = 'select * from all_list where date > \'%s\' order by date desc' % now.strftime("%Y-%m-%d %H:%M:%S")
+            sql = 'select * from all_list where date > \'%s\'   %s  order by date desc' % (now.strftime("%Y-%m-%d %H:%M:%S"), sqlOnUser.replace('where','and'))
         else:
-            sql = 'select * from all_list order by date desc'
+            sql = 'select * from all_list %s order by date desc'%(sqlOnUser)
         return self.execute_get_sql(sql)
 
     def get_summary_per_user(self, user):

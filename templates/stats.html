@@ -72,7 +72,11 @@
                         {% else %}
                          <tr >
                         {% endif %}
-                            <th scope="row"> <badge title="{{ user[1] }}">{{ user[2] }}
+                            <th scope="row"> <badge title="{{ user[1] }}">
+                              {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
+                              <a class="btn btn-outline-dark btn-sm" href='/user?user={{user[0]}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
+                              {%endif%}
+                              {{ user[2] }}
                               {%if user[5] == 0 %}
                               <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/>
                               {% endif %}
@@ -80,7 +84,9 @@
                                 {%if  badge[0] == user[0] %}
                                   <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
                                 {% endif %}
-                              {% endfor %} </badge>
+                              {% endfor %}
+
+                          </badge>
                             </th>
                             <td class="text-right"> <b>{{'%d'| format(user[3]|float)}}</b>  </td>
                             <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}</td>

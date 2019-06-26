@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'common_head.html' %}
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        {% with activeSite='user' %}
+        {% include 'common_title.html' %}
+        {% endwith %}
+      </div>
+
+      <div class="jumbotron">
+        <h1>{{userNameToShow}} details (draft)</h1>
+
+        <div div class="alert alert-warning alert-dismissible fade show message_flash" role="alert">This is a prototype of this page. Some disagreement may arise if browsing <b>different</b> users!
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% include 'common_alerts.html' %}
+
+        <p><a class="btn btn-outline-primary btn-block" href="mailto:{{loggedUsernameEmail['email']}}">Contact <code>{{loggedUsernameEmail['email']}}</code></a></p>
+        <p> Current scoring (all coffees consumed minus offered plus badges from below): <span class="badge badge-light"> {{loggedUsernameEmail['scoring']}}</span> </p>
+        <hr class="my-3">
+        <h4>Collected badges and achievements</h4>
+        {% for badge in loggedUserBadges %}
+        <p>On {{badge[1]}}  <a class="dropdown-item" href="#"><img src="{{badge[5]}}" width=25 height=25 /> <b>{{badge[4]}}</b> ({{badge[6]}}, effect {{badge[7]}}) </a></p>
+        {% endfor %}
+      </div>
+
+      <div class="well">
+        <h2 id='pointsevolution'>User's points timeline </h2>
+        <p>To be implemented!</p>
+      </div>
+
+      <div id='timeline' class="well">
+        <h2 id='statistics'>User's actions timeline </h2>
+        <p>visible ONLY users related actions/badges/etc</p>
+        {% include 'events_time_line.html' %}
+      </div>
+
+      <footer class="footer">
+      {% include 'footer.html' %}
+      </footer>
+
+    </div>
+  </body>
+</html>

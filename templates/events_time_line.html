@@ -1,6 +1,6 @@
 <div class="container">
     <div class="page-header">
-        <h2 id="timeline">Recorded timeline <span class="badge badge-warning">Your contribiution is marked</span> </h2>
+        <h2 id="timeline">Recorded timeline <span class="badge badge-warning">{{loggedUsernameEmail['username']}}'s contribiution is marked</span> </h2>
           {% include 'totop.html' %}
     </div>
     <ul class="timeline">
@@ -17,7 +17,7 @@
               <ul>
             {% for id in eventsTimeLine[date].keys() %}
                 {% if id !=  'total' %}
-                    <li> {{eventsTimeLine[date][id]['date']['all'].split(' ')[1]}}:
+                    <li>
                       {% if loggedUsernameEmail['username'] == eventsTimeLine[date][id]['who'] %}
                       <span class="badge badge-warning"><b> {{eventsTimeLine[date][id]['who']}} </b></span> to
                       {% else %}

@@ -64,9 +64,9 @@
           <h4>Bucket list</h4>
           <form class="form-bucket">
             {% if todaysJobs|length > 0 %}
-            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button">Empty wish list <img src="http://chittagongit.com/download/133528"  width="20" height="20" /></button>
+            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button">Empty wish list <img src="static/delete.png"  width="20" height="20" /></button>
             {% else %}
-            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button" disabled>Empty wish list <img src="http://chittagongit.com/download/133528"  width="20" height="20" /></button>
+            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button" disabled>Empty wish list <img src="static/delete.png"  width="20" height="20" /></button>
             {% endif %}
             <script>
               $(function() {
@@ -105,7 +105,7 @@
                           <td> {{ lastEntry[0] }} </td>
                           <td> {{ lastEntry[1] }} </td>
                           <td> {{ lastEntry[2] }} </td>
-                          <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}"> <img src="http://chittagongit.com/download/133528"  width="25" height="25" /> </a> </td>
+                          <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}"> <img src="static/delete.png"  width="25" height="25" /> </a> </td>
                       </tr>
                   {% endfor %}
                   </tbody>
@@ -119,7 +119,7 @@
             <h4>Register the job</h4>
               <p>Who is buying? (default is the actual logged user)</p>
             <label for="finalzeName" class="sr-only">Name</label>
-            {% if todaysJobs|length > 2 %}
+            {% if todaysJobs|length > 1 %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus>
             {% else %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus disabled>
@@ -132,7 +132,7 @@
                 {% endif %}
               {% endfor %}
             </select>
-            {% if todaysJobs|length > 2 %}
+            {% if todaysJobs|length > 1 %}
                <button id="btnCloseJob" class="btn btn-lg btn-success btn-block" type="button">Save ordering</button>
               {% else %}
                <button id="btnCloseJob" class="btn btn-lg btn-success btn-block" disabled type="button">Save ordering</button>

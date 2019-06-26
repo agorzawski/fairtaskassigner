@@ -66,33 +66,35 @@ def getAccessToken():
 
 def getUserInfo(access_token):
     import urllib3
-    import json
     http = urllib3.PoolManager()
     res = http.request('GET', USER_INFO_URL+access_token)
     userData = json.loads(res.data.decode('utf-8'))
     return userData
 
 
-def getLoggedUsernameEmailPicture():
+def getLoggedUserDetails():
     access_token = getAccessToken()[0]
     userData = getUserInfo(access_token)
     email, picture = (userData['email'], userData['picture'])
     localUserData = storage.get_username_and_email(email=email)
     if len(localUserData):
-        id, username, emailLocal = localUserData[0]
+        id, username, emailLocal, scoring = localUserData[0]
         if emailLocal == email:
             favProduct = storage.get_favorite_product(id)
 
             return {'id': id, 'email': email,
                     'username': username,
                     'picture': picture,
-                    'idProduct':favProduct[0],
-                    'productName': favProduct[1].upper()}
+                    'idProduct': favProduct[0],
+                    'productName': favProduct[1].upper(),
+                    'scoring': scoring}
     else:
         return {'id': NON_EXISTING_ID, 'email': email,
-                'username': '', 'picture': picture,
-                    'idProduct':NON_SELECTED_VALUE,
-                    'productName': 'NONE'}
+                'username': '',
+                'picture': picture,
+                'idProduct': NON_SELECTED_VALUE,
+                'productName': 'NONE',
+                'scoring': 0}
 
 
 def isLoginValid():
@@ -109,7 +111,7 @@ def isLoginValid():
 
 
 def isAnAdmin():
-    localId = getLoggedUsernameEmailPicture()
+    localId = getLoggedUserDetails()
     adminsList = storage.get_admins()
     if localId['email'] in adminsList['admin'].keys() \
         or localId['email'] in adminsList['badgeadmin'].keys():
@@ -146,7 +148,7 @@ def main():
     inBucket = False
     if isLoginValid():
         googleSession = True
-        loggedUsernameEmail = getLoggedUsernameEmailPicture()
+        loggedUsernameEmail = getLoggedUserDetails()
         inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
         getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     adminsList = storage.get_admins()
@@ -171,7 +173,7 @@ def addJobs():
     if not isLoginValid():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     inBucket = storage.check_if_in_bucket(loggedUsernameEmail['id'])
@@ -200,7 +202,7 @@ def stats():
     if not isLoginValid():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     users = storage.get_users()
     products = storage.get_products()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
@@ -234,7 +236,7 @@ def showSignUp():
     if not isLoginValid():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     users = storage.get_users()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
@@ -259,6 +261,46 @@ def showSignUp():
                            nonSelectedId=NON_SELECTED_VALUE)
 
 
+@app.route('/user',  methods=['GET'])
+def user():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    loggedUsernameEmail = getLoggedUserDetails()
+
+    try:
+        userToDisplay = int(request.args.get('user', -1))
+    except ValueError:
+        return redirect(url_for('main'))
+
+    if not isAnAdmin() and userToDisplay > 0:
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    if userToDisplay < 0:
+        userIdToShow = loggedUsernameEmail['id']
+        userNameToShow = loggedUsernameEmail['username']
+    else:
+        userIdToShow = userToDisplay
+        if storage.get_username_and_email(id=userToDisplay):
+            userNameToShow = storage.get_username_and_email(id=userToDisplay)[0][1]
+        else:
+            flash('No user with selected ID', 'error')
+            return redirect(url_for('main'))
+
+    adminsList = storage.get_admins()
+    getLoggedUserBadges = storage.get_users_badges(userId=userIdToShow)
+    allJobs = storage.get_jobs_summary(withUser=userNameToShow)
+    badgesTimeline = storage.get_badge_grant_history(withUser=userNameToShow)
+    eventsTimeLine = fairtask_utils.combineEvents(allJobs, badgesTimeline)
+    return render_template('user.html',
+                           userNameToShow=userNameToShow,
+                           loggedUsernameEmail=loggedUsernameEmail,
+                           googleSession=True,
+                           adminsList=adminsList,
+                           loggedUserBadges=getLoggedUserBadges,
+                           eventsTimeLine=eventsTimeLine,)
+
+
 @app.route('/signUp', methods=['POST'])
 def signUp():
     if not isLoginValid():
@@ -272,7 +314,7 @@ def signUp():
         _assignedNameId = NON_SELECTED_VALUE
 
     validated = 0
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     if _email and (_name or _assignedNameId != NON_SELECTED_VALUE):
         if loggedUsernameEmail['id'] == NON_EXISTING_ID:
             validated = 1
@@ -302,7 +344,7 @@ def registerJob():
     if not isLoginValid():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     try:
@@ -333,7 +375,7 @@ def emptyBucket():
     if not isLoginValid():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     storage.clean_bucket()
@@ -346,7 +388,7 @@ def finalizeJob():
     if not isLoginValid():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     if loggedUsernameEmail['id'] == NON_EXISTING_ID:
         return redirect(url_for('showSignUp'))
     try:
@@ -358,8 +400,7 @@ def finalizeJob():
         return redirect(url_for('addJobs'))
     bucketContent = storage.get_bucket_raw()
     if len(bucketContent) < 2:
-        flash('Cannot proceed with less then three orders!')
-        return redirect(url_for('addJobs'))
+        flash('This will be only saved for the analysis purpose. Scoring will not be countig this mini job.')
 
     for whomWhat in bucketContent:
         storage.add_transaction(_nameId, whomWhat[0], whomWhat[1],
@@ -396,7 +437,7 @@ def grantBadge():
         _badge = int(request.form['badgeId'])
     except ValueError:
         return redirect(url_for('showSignUp'))
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     if _name > 0 and _badge > 0:
         storage.insert_user_badges(_name, _badge, None, loggedUsernameEmail['id'])
         storage.calculate_actal_scoring(commit=True)
@@ -449,7 +490,7 @@ def modifyBadge():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    loggedUsernameEmail = getLoggedUsernameEmailPicture()
+    loggedUsernameEmail = getLoggedUserDetails()
     try:
         badgeId = int(request.args.get('grantId', -1))
         valid = int(request.args.get('valid', 0))
