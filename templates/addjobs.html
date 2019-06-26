@@ -64,9 +64,9 @@
           <h4>Bucket list</h4>
           <form class="form-bucket">
             {% if todaysJobs|length > 0 %}
-            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button">Empty wish list <img src="static/delete.png"  width="20" height="20" /></button>
+            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button">Empty wish list <img src="static/delete.jpg"  width="20" height="20" /></button>
             {% else %}
-            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button" disabled>Empty wish list <img src="static/delete.png"  width="20" height="20" /></button>
+            <button id="btnEmptyBucket" class="btn btn-sm btn-outline-danger btn-block" type="button" disabled>Empty wish list <img src="static/delete.jpg"  width="20" height="20" /></button>
             {% endif %}
             <script>
               $(function() {
@@ -105,7 +105,7 @@
                           <td> {{ lastEntry[0] }} </td>
                           <td> {{ lastEntry[1] }} </td>
                           <td> {{ lastEntry[2] }} </td>
-                          <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}"> <img src="static/delete.png"  width="25" height="25" /> </a> </td>
+                          <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}"> <img src="static/delete.jpg"  width="25" height="25" /> </a> </td>
                       </tr>
                   {% endfor %}
                   </tbody>
