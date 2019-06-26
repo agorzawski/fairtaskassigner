@@ -1,0 +1,11 @@
+{% for userIdEmailName in users %}
+{% if  whoActive > 0 %}
+  {% if userIdEmailName[0] == whoActive  %}
+    <option value={{userIdEmailName[0]}} selected>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
+  {% else %}
+    <option value={{userIdEmailName[0]}}>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
+  {% endif %}
+{% else %}
+    <option value={{userIdEmailName[0]}}> N/A </option>
+{% endif %}
+{% endfor %}

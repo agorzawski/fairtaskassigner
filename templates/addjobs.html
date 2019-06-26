@@ -23,9 +23,9 @@
           <label for="inputName" class="sr-only">Name</label>
           <select type="name" name="inputName" id="inputName" class="form-control" placeholder="To whom (name)" required autofocus>
             <option value=-1>To whom (name)</option>
-            {% for username in users %}
-              <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
-            {% endfor %}
+            {% with whoActive = 1 %}
+            {% include 'userselectoptions.html' %}
+            {% endwith %}
           </select>
           <br>
           <label for="inputProduct" class="sr-only">Product</label>
@@ -124,13 +124,9 @@
             {% else %}
             <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus disabled>
             {% endif %}
-              {% for userIdEmailName in users %}
-                {% if userIdEmailName[0] == loggedUsernameEmail['id'] %}
-                  <option value={{userIdEmailName[0]}} selected>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
-                {% else %}
-                  <option value={{userIdEmailName[0]}}>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
-                {% endif %}
-              {% endfor %}
+            {% with whoActive = loggedUsernameEmail['id'] %}
+            {% include 'userselectoptions.html' %}
+            {% endwith %}
             </select>
             {% if todaysJobs|length > 1 %}
                <button id="btnCloseJob" class="btn btn-lg btn-success btn-block" type="button">Save ordering</button>
