@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'common_head.html' %}
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        {% with activeSite='jobedit' %}
+        {% include 'common_title.html' %}
+        {% endwith %}
+      </div>
+
+      <div class="jumbotron">
+        <h1>Job on {{jobToEdit['date']}} details (draft)</h1>
+
+        <div div class="alert alert-warning alert-dismissible fade show message_flash" role="alert">This is a prototype of this page. Use with caution!
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+
+        <div div class="alert alert-warning alert-dismissible fade show message_flash" role="alert">By editing this page your login will be assigned to the job.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+
+        {% include 'common_alerts.html' %}
+        <h4>Job details:</h4>
+
+
+        <form class="form-signin">
+          <table class="table table-striped table-hover table-sm">
+              <thead>
+                  <tr>
+                      <th scope="col">When</th>
+                      <th scope="col">Who</th>
+                      <th scope="col">To Whom</th>
+                      <th scope="col">What</th>
+                      <th scope="col">registred by</th>
+                  </tr>
+              </thead>
+              <tbody>
+
+
+          {% for oneJob in jobToEdit['jobs'] %}
+              <tr >
+              <td>
+                <input type="name" name="productName" id="productName"
+                  class="form-control" value="{{oneJob['date']|datetimefilter}}" required autofocus disabled>
+              </td>
+             <td>
+               <select type="name" name="whoName" id="whoName" class="form-control" required autofocus disabled>
+                 {% with whoActive = oneJob['who'] %}
+                 {% include 'userselectoptions.html' %}
+                 {% endwith %}
+               </select>
+             </td>
+
+             <td>
+               <select type="name" name="towhomName" id="towhomName" class="form-control" required autofocus disabled>
+                 {% with whoActive = oneJob['to_whom'] %}
+                 {% include 'userselectoptions.html' %}
+                 {% endwith %}
+               </select>
+             </td>
+
+                <td>
+              <select type="name" name="inputProduct" id="inputProduct" class="form-control" placeholder="To whom (name)" required autofocus>
+                <option value=-1>What to buy (product)</option>
+                {% for product in products %}
+                  <option value={{product[0]}}>{{product[1]}} ({{product[2]}} CHF)</option>
+                {% endfor %}
+              </select>
+            </td>
+
+             <td>
+               <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus disabled>
+                 {% with whoActive = oneJob['creator'] %}
+                 {% include 'userselectoptions.html' %}
+                 {% endwith %}
+               </select>
+             </td>
+
+
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        <button id="modifyJob" class="btn btn-lg btn-warning btn-block" type="button">Save changes</button>
+        <script>
+          $(function() {
+              $('#modifyJob').click(function() {
+                  $.ajax({
+                      url: '/modifyJob',
+                      data: $('form').serialize(),
+                      type: 'POST',
+                      success: function(response) {
+                          location.reload();
+                          console.log(response);
+                      },
+                      error: function(error) {
+                          console.log(error);
+                      }
+                  });
+              });
+            }
+          );
+        </script>
+        </form>
+
+      </div>
+
+      <footer class="footer">
+      {% include 'footer.html' %}
+      </footer>
+
+    </div>
+  </body>
+</html>

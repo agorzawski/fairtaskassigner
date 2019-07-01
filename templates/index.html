@@ -18,7 +18,7 @@
             <p> To browse the actual status, more statistics or place an order login is required!
             </p>
             <ul>
-              <li>Last order placed on <b> {{generalStats['lastDate']}} by {{generalStats['lastServant']}}</b></li>
+              <li>Last order placed on <b> {{generalStats['lastDate']|datetimefilter }} by {{generalStats['lastServant']}}</b></li>
               <li>Total number of <b>{{generalStats['totalServings']}} shared orders </b> with a total <b>number of {{generalStats['totalJobs']}} servings</b> for a total amount of <b> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </b></li>
             </ul>
             {% include 'quick_add.html' %}
