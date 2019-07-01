@@ -42,7 +42,7 @@
                   "searching": false,
                   "pageLength": 20,
                   "scrollX": false,
-                  "order": [[ 3, "desc" ]] // false to disable search (or any other option)
+                  "order": [[ 4, "desc" ]] // false to disable search (or any other option)
                   });
             } );
             </script>
@@ -52,6 +52,7 @@
                     <thead>
                         <tr>
                             <th scope="col">name</th>
+                            <th scope="col">Badges</th>
                             <th scope="col" class="text-right">actual<br>score*</th>
                             <th scope="col" class="text-right">raw score  </th>
                             <th scope="col" class="text-right">#offered<br>**</th>
@@ -72,11 +73,14 @@
                         {% else %}
                          <tr >
                         {% endif %}
-                            <th scope="row"> <badge title="{{ user[1] }}">
+                            <th scope="row">
+                              {{ user[2] }}
+                            </th>
+                            <td class="text-left">
+                               <badge title="{{ user[1] }}">
                               {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
                               <a class="btn btn-outline-dark btn-sm" href='/user?user={{user[0]}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
                               {%endif%}
-                              {{ user[2] }}
                               {%if user[5] == 0 %}
                               <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/>
                               {% endif %}
@@ -85,9 +89,8 @@
                                   <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
                                 {% endif %}
                               {% endfor %}
-
-                          </badge>
-                            </th>
+                            </badge>
+                            </td>
                             <td class="text-right"> <b>{{'%d'| format(user[3]|float)}}</b>  </td>
                             <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}</td>
                             <td class="text-right"> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} </td>
@@ -115,6 +118,66 @@
                     </tbody>
                 </table>
             </div>
+
+            <div id="containerPlot" style="min-width: 310px; height: 350px; margin: 0 auto;"></div>
+            <div id="containerPlotTotal" style="min-width: 310px; height: 350px; margin: 0 auto; "></div>
+            <script>
+            $(function () {
+              $('#containerPlot').highcharts({
+                      data: {
+                          table: document.getElementById('dtBasicExample'),
+          						    switchRowsAndColumns: false,
+                          startColumn:3,
+                          endColumn: 4,
+                        },
+                      chart: {
+                        type: 'pie',
+                      },
+                      title: {
+                          text: 'Offered coffees'
+                      },
+                      yAxis: {
+                          allowDecimals: false,
+                          title: {
+                              text: 'Units'
+                          }
+                      },
+                      tooltip: {
+                          formatter: function() {
+                              return '<b>'+ this.series.name +'</b><br/>'+
+                                  this.point.y +' '+ this.point.name.toLowerCase();
+                          }
+                      }
+                    });
+                    $('#containerPlotTotal').highcharts({
+                            data: {
+
+                             table: document.getElementById('dtBasicExample'),
+                						 switchRowsAndColumns: false,
+                             startColumn:7,
+                             endColumn: 8,
+                              },
+                            chart: {
+                              type: 'pie',
+                            },
+                            title: {
+                                text: 'Consumed coffees (total)'
+                            },
+                            yAxis: {
+                                allowDecimals: false,
+                                title: {
+                                    text: 'Units'
+                                }
+                            },
+                            tooltip: {
+                                formatter: function() {
+                                    return '<b>'+ this.series.name +'</b><br/>'+
+                                        this.point.y +' '+ this.point.name.toLowerCase();
+                                }
+                            }
+                          });
+              });
+            </script>
       </div>
 
 
