@@ -262,6 +262,18 @@ class fairtaskDB:
             sql = 'select id,username,email,rating from user where id=\'%s\'' % id
         return self.execute_get_sql(sql)
 
+    def get_job_summary(self, jobDate):
+        sql = "select * from contract where date like \'{}%\' ".format(jobDate)
+        data = self.execute_get_sql(sql)
+        toReturn = {'date': jobDate, 'jobs': []}
+        for one in data:
+            toReturn['jobs'].append({'who': one[1],
+                                     'to_whom': one[2],
+                                     'what': one[3],
+                                     'creator': one[5],
+                                     'date': one[4]})
+        return toReturn
+
     def get_jobs_summary(self, today=False, buffer_seconds=3*3600, withUser=None):
         sqlOnUser=''
         if withUser is not None:
