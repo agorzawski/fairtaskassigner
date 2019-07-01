@@ -52,7 +52,6 @@
                     <thead>
                         <tr>
                             <th scope="col">name</th>
-                            <th scope="col">Badges</th>
                             <th scope="col" class="text-right">actual<br>score*</th>
                             <th scope="col" class="text-right">raw score  </th>
                             <th scope="col" class="text-right">#offered<br>**</th>
@@ -66,31 +65,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                      <!-- https://cdn3.iconfinder.com/data/icons/common-4/24/ui-09-512.png -->
                     {% for user in users %}
-                        {% if not user[7] %}
-                         <tr class="table-dark text-muted">
-                        {% else %}
-                         <tr >
-                        {% endif %}
-                            <th scope="row">
-                              {{ user[2] }}
-                            </th>
-                            <td class="text-left">
-                               <badge title="{{ user[1] }}">
+                        {% if not user[7] %} <tr class="table-dark text-muted">
+                        {% else %} <tr >{% endif %}
+                            <th class="text-left">
+                              <badge title="{{ user[1] }}">   {{ user[2] }}
                               {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
                               <a class="btn btn-outline-dark btn-sm" href='/user?user={{user[0]}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
-                              {%endif%}
-                              {%if user[5] == 0 %}
-                              <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/>
-                              {% endif %}
-                              {%for badge in assignedBadges %}
-                                {%if  badge[0] == user[0] %}
+                              {%endif%} {%if user[5] == 0 %}
+                              <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/> {% endif %}
+                              {%for badge in assignedBadges %} {%if  badge[0] == user[0] %}
                                   <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
-                                {% endif %}
-                              {% endfor %}
+                                {% endif %} {% endfor %}
                             </badge>
-                            </td>
+                          </th>
                             <td class="text-right"> <b>{{'%d'| format(user[3]|float)}}</b>  </td>
                             <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}</td>
                             <td class="text-right"> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} </td>
@@ -98,9 +86,7 @@
                             <td class="text-right">
                               {% if usersStats.get(user[2], {False:0}).get('offered', 0) > 0 %}
                                {{ '%.1f'|format(usersStats.get(user[2], {False:0}).get('offered', 0) / usersStats.get(user[2], {False:0}).get('served', 0) ) }}
-                              {% else %}
-                               0
-                              {% endif %}
+                              {% else %} 0 {% endif %}
                             </td>
                             <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} </td>
                             <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
@@ -111,72 +97,88 @@
                             {% else %}
                               <a href="modifyUser?userId={{user[0]}}&active=0"> <img src="static/lock.png"  width="25" height="25" /> </a>
                             {% endif %}
-                          </td>
-                          {% endif %}
-                        </tr>
-                    {% endfor %}
+                          </td>{% endif %}
+                        </tr>{% endfor %}
                     </tbody>
                 </table>
             </div>
 
-            <div id="containerPlot" style="min-width: 310px; height: 350px; margin: 0 auto;"></div>
-            <div id="containerPlotTotal" style="min-width: 310px; height: 350px; margin: 0 auto; "></div>
+            <div id="containerPlot" style="min-width: 330px; height: 350px; margin: 0 auto;"></div>
+            <div id="containerPlotTotal" style="min-width: 330px; height: 350px; margin: 0 auto; "></div>
             <script>
-            $(function () {
-              $('#containerPlot').highcharts({
-                      data: {
-                          table: document.getElementById('dtBasicExample'),
-          						    switchRowsAndColumns: false,
-                          startColumn:3,
-                          endColumn: 4,
-                        },
-                      chart: {
-                        type: 'pie',
-                      },
-                      title: {
-                          text: 'Offered coffees'
-                      },
-                      yAxis: {
-                          allowDecimals: false,
-                          title: {
-                              text: 'Units'
-                          }
-                      },
-                      tooltip: {
-                          formatter: function() {
-                              return '<b>'+ this.series.name +'</b><br/>'+
-                                  this.point.y +' '+ this.point.name.toLowerCase();
+            Highcharts.chart('containerPlot', {
+              chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+              },
+              title: {
+                text: 'Total coffees offered'
+              },
+              tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              },
+              plotOptions: {
+                      pie: {
+                          allowPointSelect: true,
+                          cursor: 'pointer',
+                          dataLabels: {
+                              enabled: true,
+                              format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                              style: {
+                                  color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                              }
                           }
                       }
-                    });
-                    $('#containerPlotTotal').highcharts({
-                            data: {
+                  },
+              series: [{
+                name: 'Brands',
+                colorByPoint: true,
+                data: [
+                {% for user in users %} {name: '{{user[2]}}',
+                    y: {{ usersStats.get(user[2], {False:0}).get('offered', 0) }}
+                }, {% endfor %} ]
+              }]
+            });
 
-                             table: document.getElementById('dtBasicExample'),
-                						 switchRowsAndColumns: false,
-                             startColumn:7,
-                             endColumn: 8,
-                              },
-                            chart: {
-                              type: 'pie',
-                            },
-                            title: {
-                                text: 'Consumed coffees (total)'
-                            },
-                            yAxis: {
-                                allowDecimals: false,
-                                title: {
-                                    text: 'Units'
-                                }
-                            },
-                            tooltip: {
-                                formatter: function() {
-                                    return '<b>'+ this.series.name +'</b><br/>'+
-                                        this.point.y +' '+ this.point.name.toLowerCase();
-                                }
-                            }
-                          });
-              });
+            Highcharts.chart('containerPlotTotal', {
+              chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+              },
+              title: {
+                text: 'Total coffees consumed'
+              },
+              tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              },
+              plotOptions: {
+                      pie: {
+                          allowPointSelect: true,
+                          cursor: 'pointer',
+                          dataLabels: {
+                              enabled: true,
+                              format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                              style: {
+                                  color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                              }
+                          }
+                      }
+                  },
+              series: [{
+                name: 'Users',
+                colorByPoint: true,
+                data: [
+                {% for user in users %}
+                  {name: '{{user[2]}}',
+                    y: {{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}
+                }, {% endfor %}
+              ]
+              }]
+            });
             </script>
       </div>
 
