@@ -1,0 +1,61 @@
+<!--  Requires a dict of users -> [(t1,v1)]-->
+<div id="containerPointsEvo" style="min-width: 330px; height: 490px; margin: 0 auto; "></div>
+<script>
+Highcharts.chart('containerPointsEvo', {
+  chart: {
+    type: 'line'
+  },
+  title: {
+    text: 'Ranking evolution'
+  },
+  plotOptions: {
+    line: {
+      dataLabels: {
+        enabled: {% if singleUser %}true{%else%}false{%endif%}
+      },
+      enableMouseTracking: true
+    }
+  },
+  xAxis: {
+      type: 'datetime',
+      dateTimeLabelFormats: { // don't display the dummy year
+        month: '%e. %b',
+        year: '%b'
+      },
+      title: {
+        text: 'Date'
+      }
+    },
+    yAxis: {
+      title: {
+        text: 'Global Rating'
+      },
+      plotLines: [{
+         value: 0,
+         color: 'green',
+         dashStyle: 'shortdash',
+         width: 2,
+         label: {
+           text: 'Neutral'
+         }
+       }, {
+         value: 10,
+         color: 'red',
+         dashStyle: 'shortdash',
+         width: 2,
+         label: {
+           text: 'Coffee serving champion'
+         }
+       }]
+    },
+  series: [
+  {% for user in pointsEvolution.keys()%} {% if pointsEvolution[user]|count > 0 %}
+  { name:"{{user}}",
+    data: [
+    {% for dataPoint in pointsEvolution[user] %}  [Date.UTC({{dataPoint[0].split('-')[0]}}, {{dataPoint[0].split('-')[1]}}, {{dataPoint[0].split('-')[2]}}), {{dataPoint[1]}}],
+    {%endfor%}
+    ]
+  },{% endif %}{% endfor %}
+  ] //SERIES
+});
+</script>

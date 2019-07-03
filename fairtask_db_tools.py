@@ -89,27 +89,35 @@ class fairtaskDB:
         else:
             return (NON_SELECTED_VALUE, 'NOT FOUND')
 
-    def get_scoring_from_badges(self):
-        scoringFromBadgesData = self.execute_get_sql('select userId, sum(effect) from user_badges join badges on user_badges.badgeId = badges.id  where user_badges.valid>0 group by userId')
+    def get_scoring_from_badges(self, date=None):
+        sqlDate = ''
+        if date is not None:
+            sqlDate =' and user_badges.date <= \'%s\'' % date
+        scoringFromBadgesData = self.execute_get_sql('select userId, sum(effect) from user_badges join badges on user_badges.badgeId = badges.id  where user_badges.valid>0 %s group by userId' % sqlDate)
         scoringFromBadges = {}
         for one in scoringFromBadgesData:
             scoringFromBadges[one[0]] = one[1]
         return scoringFromBadges
 
-    def calculate_actal_scoring(self, commit=False, presentContractors=[]):
-        data = self.execute_get_sql('select buyer, to_whom, product from contract')
+    def calculate_actal_scoring(self, date=None, updateDb=True, commit=False, presentContractors=[]):
+        sqlDate = ''
+        if date is not None:
+            sqlDate =' where date <= \'%s\'' % date
+        data = self.execute_get_sql('select buyer, to_whom, product from contract %s' % sqlDate)
         scoring = fairtask_scoring()
-        scoring.setScoringFromBadges(self.get_scoring_from_badges())
+        scoring.setScoringFromBadges(self.get_scoring_from_badges(date=date))
         result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
-
-        for one in result.keys():
-            self.c.execute('update user set rating=%f where id=%s' % (result[one], one))
+        if updateDb:
+            for one in result.keys():
+                self.c.execute('update user set rating=%f where id=%s' % (result[one], one))
         if commit and self.ALLOW_COMMIT:
             try:
                 self.con.commit()
-                return True
+                return (True, result)
             except sqlite3.IntegrityError:
-                return False
+                return (False, result)
+        else:
+            return (True, result)
 
     def clean_bucket(self):
         self.execute_sql('delete from contract_temp', commit=True)
@@ -305,6 +313,30 @@ class fairtaskDB:
             'totalBudgetSpent':totalBudgetSpent[0],
             'totalJobs':totalBudgetSpent[1]
         }
+
+    def get_points_evolution(self, specificUser=None):
+        dateToUserPoints = {}
+        users = {}
+        for user in self.get_users():
+            users[user[0]]=user[2]
+        for a in self.get_last_transaction():
+            dateAndTime = a[0]
+            date = dateAndTime.split(' ')[0]
+            scoringToDate = self.calculate_actal_scoring(date=dateAndTime, updateDb=False, commit=False)[1] # second paramter
+            dateToUserPoints[date]={}
+            for userId in scoringToDate.keys():
+                if specificUser is not None and userId != specificUser:
+                    continue
+                dateToUserPoints[date][users[userId]]=scoringToDate[userId]
+        userToPointsEvolution = {}
+        for user in users.values():
+            userToPointsEvolution[user]= []
+            for date in dateToUserPoints.keys():
+                value = dateToUserPoints[date].get(user,-999)
+                if value == -999:
+                    continue
+                userToPointsEvolution[user].append((date,  value))
+        return userToPointsEvolution
 
     def close_db(self):
         self.con.close()
