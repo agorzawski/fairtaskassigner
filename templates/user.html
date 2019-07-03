@@ -32,7 +32,9 @@
 
       <div class="well">
         <h2 id='pointsevolution'>User's points timeline </h2>
-        <p>To be implemented!</p>
+        {%with singleUser=True%}
+            {% include 'points-evolution.html' %}
+        {%endwith%}
       </div>
 
       <div id='timeline' class="well">

@@ -232,6 +232,7 @@ def stats():
         allValidities = True
     grantedBadges = storage.get_badge_grant_history(allValidities=allValidities)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    evolution = storage.get_points_evolution();
     return render_template('stats.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,
@@ -244,6 +245,7 @@ def stats():
                            loggedUserBadges=getLoggedUserBadges,
                            grantedBadges=grantedBadges,
                            loggedUsernameEmail=loggedUsernameEmail,
+                           pointsEvolution=evolution,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -309,11 +311,13 @@ def user():
     allJobs = storage.get_jobs_summary(withUser=userNameToShow)
     badgesTimeline = storage.get_badge_grant_history(withUser=userNameToShow)
     eventsTimeLine = fairtask_utils.combineEvents(allJobs, badgesTimeline)
+    evolution = storage.get_points_evolution(specificUser=userIdToShow)
     return render_template('user.html',
                            userNameToShow=userNameToShow,
                            loggedUsernameEmail=loggedUsernameEmail,
                            googleSession=True,
                            adminsList=adminsList,
+                           pointsEvolution=evolution,
                            loggedUserBadges=getLoggedUserBadges,
                            eventsTimeLine=eventsTimeLine,)
 
