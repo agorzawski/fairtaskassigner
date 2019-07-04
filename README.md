@@ -4,6 +4,11 @@ It is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*1.6*
+- users details subpage
+- plots with points evolutions
+- pie charts on statistics
+
 *1.5*
 - added orders/actions time line
 - sortable stats table

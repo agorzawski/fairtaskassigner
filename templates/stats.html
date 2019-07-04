@@ -200,16 +200,17 @@
                        </tr>
                    </thead>
                    <tbody>
-                   {% for user in products %}
+                   {% for product in products %}
                        <tr >
-                           <th scope="row"> {{ user[1] }} </th>
-                           <td> {{'%0.1f'| format(user[2]|float)}}</td>
+                           <th scope="row"> {{ product[1] }} </th>
+                           <td> {{'%0.1f'| format(product[2]|float)}}</td>
                        </tr>
                    {% endfor %}
                    </tbody>
                </table>
            </div>
          </div>
+         {% include 'bar-chart.html' %}
 
       <footer class="footer">
       {% include 'footer.html' %}
