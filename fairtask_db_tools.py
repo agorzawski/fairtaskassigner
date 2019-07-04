@@ -6,6 +6,7 @@ import os
 # use db/dbScheme.sql to create an sqlite db
 DATABASE_NAME = os.environ.get("FN_DB_TO_USE", default=False)
 NON_SELECTED_VALUE = -1
+DUMMY_VALUE = -666
 '''
 utility class for SQLite connection
 '''
@@ -331,12 +332,24 @@ class fairtaskDB:
         userToPointsEvolution = {}
         for user in users.values():
             userToPointsEvolution[user]= []
+            lastValue = DUMMY_VALUE
             for date in dateToUserPoints.keys():
-                value = dateToUserPoints[date].get(user,-999)
-                if value == -999:
+                value = dateToUserPoints[date].get(user, DUMMY_VALUE)
+                if value == DUMMY_VALUE or value == lastValue:
                     continue
                 userToPointsEvolution[user].append((date,  value))
+                lastValue = value
         return userToPointsEvolution
+
+    def get_products_summary(self, userId=None):
+        sqlUser=''
+        if userId is not None:
+            sqlUser=' where to_whom=%d ' % userId
+        data = self.execute_get_sql('select contract.product pId, product.name, count(contract.product) pCount, sum(product.price) pPrice from contract join product on contract.product=product.id %s group by contract.product'%sqlUser)
+        result = {}
+        for one in data:
+            result[one[0]]={'name':one[1], 'value':one[2], 'totalprice': one[3]}
+        return result
 
     def close_db(self):
         self.con.close()
