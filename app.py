@@ -216,6 +216,7 @@ def stats():
     grantedBadges = storage.get_badge_grant_history(allValidities=allValidities)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     evolution = storage.get_points_evolution();
+    productsUse = storage.get_products_summary()
     return render_template('stats.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,
@@ -229,6 +230,7 @@ def stats():
                            grantedBadges=grantedBadges,
                            loggedUsernameEmail=loggedUsernameEmail,
                            pointsEvolution=evolution,
+                           productsUse=productsUse,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -295,6 +297,8 @@ def user():
     badgesTimeline = storage.get_badge_grant_history(withUser=userNameToShow)
     eventsTimeLine = fairtask_utils.combineEvents(allJobs, badgesTimeline)
     evolution = storage.get_points_evolution(specificUser=userIdToShow)
+    products = storage.get_products()
+    productsUse = storage.get_products_summary(userId=userIdToShow)
     return render_template('user.html',
                            userNameToShow=userNameToShow,
                            loggedUsernameEmail=loggedUsernameEmail,
@@ -302,6 +306,8 @@ def user():
                            adminsList=adminsList,
                            pointsEvolution=evolution,
                            loggedUserBadges=getLoggedUserBadges,
+                           products=products,
+                           productsUse=productsUse,
                            eventsTimeLine=eventsTimeLine,)
 
 

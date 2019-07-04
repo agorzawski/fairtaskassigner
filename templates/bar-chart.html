@@ -1,0 +1,46 @@
+
+<div id="barChart" style="min-width: 330px; height: 350px; margin: 0 auto;"></div>
+<script>
+Highcharts.chart('barChart', {
+  chart: {
+    type: 'bar'
+  },
+  title: {
+    text: 'Products consumption'
+  },
+  xAxis: {
+    categories: [{%for product in products %}'{{product[1]}}',{%endfor%}],
+    title: {
+      text: null
+    }
+  },
+  yAxis: {
+    min: 0,
+    title: {
+      text: 'count',
+      align: 'high'
+    },
+    labels: {
+      overflow: 'justify'
+    }
+  },
+  plotOptions: {
+    bar: {
+      dataLabels: {
+        enabled: true
+      }
+    }
+  },
+  credits: {
+    enabled: false
+  },
+  series: [{
+    name:'counts [1]',
+    data: [{%for product in products%}{{productsUse.get(product[0],{}).get('value', 0)}}, {%endfor%}]
+  },
+  {
+    name:'total price [CHF]',
+    data: [{%for product in products%}{{'%0.1f'| format(productsUse.get(product[0],{}).get('totalprice', 0))}}, {%endfor%}]
+  }]
+});
+</script>
