@@ -196,14 +196,18 @@
                    <thead>
                        <tr>
                            <th scope="col">Name</th>
-                           <th scope="col">Price </th>
+                           <th scope="col">Price [CHF] </th>
+                           <th scope="col">Size [ml] </th>
+                           <th scope="col">Caffeine [mg] </th>
                        </tr>
                    </thead>
                    <tbody>
-                   {% for product in products %}
+                   {% for id in products %}
                        <tr >
-                           <th scope="row"> {{ product[1] }} </th>
-                           <td> {{'%0.1f'| format(product[2]|float)}}</td>
+                           <th scope="row"> {{ products[id]['name'] }} </th>
+                           <td> {{'%0.1f'| format(products[id]['price']|float)}}</td>
+                           <td> {{'%0.1f'| format(products[id]['size']|float)}}</td>
+                           <td> {{'%0.1f'| format(products[id]['caffeine']|float)}}</td>
                        </tr>
                    {% endfor %}
                    </tbody>

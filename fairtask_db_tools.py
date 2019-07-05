@@ -201,12 +201,25 @@ class fairtaskDB:
         self.execute_sql(sql, commit=True)
 
     def get_products(self):
-        return self.execute_get_sql('select * from product order by price, name')
+        data = self.execute_get_sql('select * from product order by price, name')
+        toReturn = {}
+        for one in data:
+            toReturn[one[0]] = {'id': one[0],
+                                'name': one[1],
+                                'price': one[2],
+                                'size': one[3],
+                                'caffeine': one[4]}
+        return toReturn
 
     def get_product_details(self, productId):
         data = self.execute_get_sql('select * from product where id=%s'%str(productId))
         if data:
-            return data[0]
+            one = data[0]
+            return {'id': one[0],
+                    'name': one[1],
+                    'price': one[2],
+                    'size': one[3],
+                    'caffeine': one[4]}
         else:
             raise ValueError('No Product with that ID ', id)
 
@@ -345,10 +358,14 @@ class fairtaskDB:
         sqlUser=''
         if userId is not None:
             sqlUser=' where to_whom=%d ' % userId
-        data = self.execute_get_sql('select contract.product pId, product.name, count(contract.product) pCount, sum(product.price) pPrice from contract join product on contract.product=product.id %s group by contract.product'%sqlUser)
+        data = self.execute_get_sql('select contract.product pId, product.name, count(contract.product) pCount, sum(product.price) pPrice, sum(product.size) pSize, sum(product.caffeine) pCaf from contract join product on contract.product=product.id %s group by contract.product'%sqlUser)
         result = {}
         for one in data:
-            result[one[0]]={'name':one[1], 'value':one[2], 'totalprice': one[3]}
+            result[one[0]] = {'name': one[1],
+                              'value': one[2],
+                              'totalprice': one[3],
+                              'totalsize': one[4],
+                              'totalcaffeine': one[5]}
         return result
 
     def close_db(self):
