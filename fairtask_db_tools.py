@@ -196,15 +196,15 @@ class fairtaskDB:
         sql = 'select grantId, username, badgeName, img, date, grantByUserName, badgeId, valid from badges_granted_timeline %s' % sqlAdd
         data = self.execute_get_sql(sql)
         toReturn = {}
-        for one in data:
-            toReturn[one[0]] = {'grantId': one[0],
-                                'username': one[1],
-                                'badgeName': one[2],
-                                'img': one[3],
-                                'date': one[4],
-                                'grantByUserName': one[5],
-                                'badgeId': one[6],
-                                'valid': one[7]}
+        for i, one in enumerate(data):
+            toReturn[i] = {'grantId': one[0],
+                           'username': one[1],
+                           'badgeName': one[2],
+                           'img': one[3],
+                           'date': one[4],
+                           'grantByUserName': one[5],
+                           'badgeId': one[6],
+                           'valid': one[7]}
         return toReturn
 
     # def get_users_badges_timeline(self):
@@ -232,16 +232,16 @@ class fairtaskDB:
         sql = 'select * from (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId %s ) a join badges on badges.id=a.badgeId' % (where)
         toReturn = {}
         data = self.execute_get_sql(sql)
-        for one in data:
-            toReturn[one[1]] = {'userId': one[0],
-                                'date': one[1],
-                                'badgeId': one[2],
-                                'id': one[3],
-                                'name': one[4],
-                                'img': one[5],
-                                'desc': one[6],
-                                'effect': one[7],
-                                'adminawarded': one[8]}
+        for i, one in enumerate(data):
+            toReturn[i] = {'userId': one[0],
+                           'date': one[1],
+                           'badgeId': one[2],
+                           'id': one[3],
+                           'name': one[4],
+                           'img': one[5],
+                           'desc': one[6],
+                           'effect': one[7],
+                           'adminawarded': one[8]}
         return toReturn
 
     def insert_user_badges(self, badgeId, userId, date, grantBy, valid=1):
