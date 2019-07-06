@@ -128,23 +128,23 @@
                   </tr>
               </thead>
               <tbody>
-          {% for badge in allBadges %}
+          {% for badge in allBadges.values() %}
           {% if badge[5] == 1 %}
             <tr class="table-default text-primary">
           {% else %}
             <tr >
           {% endif %}
           <!-- <td> {{badge[0]}} </td> -->
-           <td>  <input type="name" name="inputName{{badge[0]}}" id="inputName{{badge[0]}}"
-                     class="form-control" value="{{badge[1]}}" required autofocus>   </td>
-           <td> <input type="name" name="inputName{{badge[0]}}" id="inputName{{badge[0]}}"
-                     class="form-control" value="{{badge[2]}}" required autofocus>  </td>
-           <td> <input type="name" name="inputName{{badge[0]}}" id="inputName{{badge[0]}}"
-                     class="form-control" value="{{badge[3]}}" required autofocus>  </td>
-           <td> <input type="name" name="inputName{{badge[0]}}" id="inputName{{badge[0]}}"
-                     class="form-control" value="{{badge[4]}}" required autofocus>  </td>
-           <td> <input type="name" name="inputName{{badge[0]}}" id="inputName{{badge[0]}}"
-                     class="form-control" value="{{badge[5]}}" required autofocus>  </td>
+           <td>  <input type="name" name="inputName{{badge['id']}}" id="inputName{{badge['id']}}"
+                     class="form-control" value="{{badge['name']}}" required autofocus>   </td>
+           <td> <input type="name" name="inputName{{badge['id']}}" id="inputName{{badge['id']}}"
+                     class="form-control" value="{{badge['img']}}" required autofocus>  </td>
+           <td> <input type="name" name="inputName{{badge['id']}}" id="inputName{{badge['id']}}"
+                     class="form-control" value="{{badge['desc']}}" required autofocus>  </td>
+           <td> <input type="name" name="inputName{{badge['id']}}" id="inputName{{badge['id']}}"
+                     class="form-control" value="{{badge['effect']}}" required autofocus>  </td>
+           <td> <input type="name" name="inputName{{badge['id']}}" id="inputName{{badge['id']}}"
+                     class="form-control" value="{{badge['adminawarded']}}" required autofocus>  </td>
           </tr>
           {% endfor %}
         </tbody>
