@@ -52,7 +52,7 @@ Highcharts.chart('containerPointsEvo', {
   {% for user in pointsEvolution.keys()%} {% if pointsEvolution[user]|count > 0 %}
   { name:"{{user}}",
     data: [
-    {% for dataPoint in pointsEvolution[user] %}  [Date.UTC({{dataPoint[0].split('-')[0]}}, {{dataPoint[0].split('-')[1]}}, {{dataPoint[0].split('-')[2]}}), {{dataPoint[1]}}],
+    {% for dataPoint in pointsEvolution[user] %}  [Date.UTC({{dataPoint[2][0]}}, {{dataPoint[2][1]}}, {{dataPoint[2][2]}}), {{dataPoint[1]}}],
     {%endfor%}
     ]
   },{% endif %}{% endfor %}

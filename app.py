@@ -102,8 +102,8 @@ def getLoggedUserDetails():
             return {'id': id, 'email': email,
                     'username': username,
                     'picture': picture,
-                    'idProduct': favProduct[0],
-                    'productName': favProduct[1].upper(),
+                    'idProduct': favProduct['id'],
+                    'productName': favProduct['name'].upper(),
                     'scoring': scoring}
     else:
         return {'id': NON_EXISTING_ID, 'email': email,
@@ -140,6 +140,7 @@ def rememberTheInitialRequest(request, initialUrl):
     resp = make_response(request)
     resp.set_cookie(COOKIE_NAME_REDIRECT, initialUrl)
     return resp
+
 
 @app.route('/login')
 def login():

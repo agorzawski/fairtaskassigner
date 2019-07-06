@@ -82,8 +82,8 @@
 
                  <select type="name" name="badgeId" id="badgeId" class="form-control" required autofocus>
                    <option value=-1>With the following badge</option>
-                     {% for badge in badgesToGrant %}
-                     <option value={{badge[0]}}> <img src='{{badge[2]}}' width="10" height="10" /> {{badge[1]}} (effect={{badge[4]}})  </option>
+                     {% for badge in badgesToGrant.values() %}
+                     <option value={{badge['id']}}> <img src='{{badge['img']}}' width="10" height="10" /> {{badge['name']}} (effect={{badge['effect']}})  </option>
                      {% endfor %}
                  </select>
 

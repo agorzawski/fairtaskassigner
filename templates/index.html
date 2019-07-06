@@ -46,10 +46,10 @@
                       {% for topper in candidates %}
                           <tr>
                               <th scope="row">{{ topper[1] }}
-                                {%for badge in assignedBadges %}
-                                  {%if  badge[0] == topper[0] %}
-                                    <img src="{{ badge[5] }}"
-                                    width="25" height="25" title="{{ badge[4] }}({{ badge[1] }})"/>
+                                {%for badge in assignedBadges.values() %}
+                                  {%if  badge['userId'] == topper[0] %}
+                                    <img src="{{ badge['img'] }}"
+                                    width="25" height="25" title="{{ badge['name'] }}({{ badge['date'] }})"/>
                                   {% endif %}
                                 {% endfor %}
                               </th>
