@@ -10,7 +10,7 @@ def combineEvents(allJobs, badgesTimeline):
                          "<img src=\'%s\'/ width=\"25\", height=\"25\"> %s " % (oneBadge['img'], oneBadge['badgeName']),0))
     sortedToReturn = sorted(toReturn, key=lambda x: x[0], reverse=True)
 
-    dictToReturn = {}  # valid for time-line
+    dictToReturn = {}
     localIndex = 0
     lastDateYYMMDD = None
     sum = 0

@@ -77,17 +77,15 @@ def getLoggedUserDetails():
     userData = getUserInfo(access_token)
     email, picture = (userData['email'], userData['picture'])
     localUserData = storage.get_username_and_email(email=email)
-    if len(localUserData):
-        id, username, emailLocal, scoring = localUserData[0]
-        if emailLocal == email:
-            favProduct = storage.get_favorite_product(id)
-
-            return {'id': id, 'email': email,
-                    'username': username,
+    if len(localUserData.keys()):
+        if localUserData['email'] == email:
+            favProduct = storage.get_favorite_product(localUserData['id'])
+            return {'id': localUserData['id'], 'email': localUserData['email'],
+                    'username': localUserData['username'],
                     'picture': picture,
                     'idProduct': favProduct['id'],
                     'productName': favProduct['name'].upper(),
-                    'scoring': scoring}
+                    'scoring': localUserData['scoring']}
     else:
         return {'id': NON_EXISTING_ID, 'email': email,
                 'username': '',
@@ -286,8 +284,9 @@ def user():
         userNameToShow = loggedUsernameEmail['username']
     else:
         userIdToShow = userToDisplay
-        if storage.get_username_and_email(id=userToDisplay):
-            userNameToShow = storage.get_username_and_email(id=userToDisplay)[0][1]
+        userDb = storage.get_username_and_email(id=userToDisplay)
+        if userDb.keys():
+            userNameToShow = userDb['username']
         else:
             flash('No user with selected ID', 'error')
             return redirect(url_for('main'))

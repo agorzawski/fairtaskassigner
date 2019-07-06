@@ -72,8 +72,8 @@
 
                  <select type="name" name="nameIdToGrant" id="nameIdToGrant" class="form-control" required autofocus>
                    <option value=-1>Who should be granted"</option>
-                     {% for username in users %}
-                     <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+                     {% for username in users.values() %}
+                     <option value={{username['id']}}>{{username['username']}} ({{username['email']}})</option>
                      {% endfor %}
                  </select>
 

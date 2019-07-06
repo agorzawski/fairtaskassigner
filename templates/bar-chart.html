@@ -9,7 +9,7 @@ Highcharts.chart('barChart', {
     text: 'Products consumption'
   },
   xAxis: {
-    categories: [{%for product in products %}'{{product['name']}}',{%endfor%}],
+    categories: [{%for product in products.values() %}'{{product['name']}}',{%endfor%}],
     title: {
       text: null
     }

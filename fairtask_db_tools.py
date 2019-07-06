@@ -50,11 +50,11 @@ class fairtaskDB:
         return self.execute_get_sql(sql)[0][0]
 
     def update_user(self, existingId, email, creator, validated=0):
-        sql = 'update user set email=\'%s\', creator=%s, validated=%s where id=%s'%(email, creator, validated, existingId)
+        sql = 'update user set email=\'%s\', creator=%s, validated=%s where id=%s' % (email, creator, validated, existingId)
         self.execute_sql(sql, commit=True)
 
     def update_user_active(self, existingId, active=0):
-        sql = 'update user set active=%d where id=%s'%(active, existingId)
+        sql = 'update user set active=%d where id=%s' % (active, existingId)
         self.execute_sql(sql, commit=True)
 
     def add_product(self, name, price):
@@ -285,7 +285,19 @@ class fairtaskDB:
         sql = 'select * from user where id > 0 %s order by username' % addSql
         if onlyNotValidated:
             sql = 'select * from user where validated=0 and id > 0 %s order by username' % addSql
-        return self.execute_get_sql(sql)
+        data = self.execute_get_sql(sql)
+        toReturn = {}
+        for one in data:
+            toReturn[one[0]] = {'id': one[0],
+                                'email': one[1],
+                                'username': one[2],
+                                'rating': one[3],
+                                'creator': one[4],
+                                'validated': one[5],
+                                'added': one[6],
+                                'active': one[7]
+                                }
+        return toReturn
 
     def get_users_stats(self):
         toReturn = {}
@@ -337,7 +349,14 @@ class fairtaskDB:
             sql = 'select id,username,email,rating from user where email=\'%s\'' % email
         if email is None:
             sql = 'select id,username,email,rating from user where id=\'%s\'' % id
-        return self.execute_get_sql(sql)
+        data = self.execute_get_sql(sql)
+        user = {}
+        for one in data:
+            user['id'] = one[0]
+            user['username'] = one[1]
+            user['email'] = one[2]
+            user['scoring'] = one[3]
+        return user
 
     def get_job_summary(self, jobDate):
         sql = "select * from contract where date like \'{}%\' ".format(jobDate)
@@ -376,30 +395,33 @@ class fairtaskDB:
         totalBudgetSpent = self.execute_get_sql('select sum(price), count(price) from all_list')[0]
         totalServings = self.execute_get_sql('select count(distinct(date)) from all_list')[0][0]
         return {
-            'lastDate':lastDateBuyer[0],
-            'lastServant':lastDateBuyer[1],
-            'totalServings':totalServings,
-            'totalBudgetSpent':totalBudgetSpent[0],
-            'totalJobs':totalBudgetSpent[1]
+            'lastDate': lastDateBuyer[0],
+            'lastServant': lastDateBuyer[1],
+            'totalServings': totalServings,
+            'totalBudgetSpent': totalBudgetSpent[0],
+            'totalJobs': totalBudgetSpent[1]
         }
 
     def get_points_evolution(self, specificUser=None):
         dateToUserPoints = {}
         users = {}
-        for user in self.get_users():
-            users[user[0]]=user[2]
+        for user in self.get_users().values():
+            users[user['id']] = user['username']
         for a in self.get_last_transaction():
             dateAndTime = a[0]
             date = dateAndTime.split(' ')[0]
-            scoringToDate = self.calculate_actal_scoring(date=dateAndTime, updateDb=False, commit=False)[1] # second paramter
-            dateToUserPoints[date]={}
+            scoringToDate = self.calculate_actal_scoring(date=dateAndTime,
+                                                         updateDb=False,
+                                                         commit=False)[1]
+                                                        # second paramter
+            dateToUserPoints[date] = {}
             for userId in scoringToDate.keys():
                 if specificUser is not None and userId != specificUser:
                     continue
-                dateToUserPoints[date][users[userId]]=scoringToDate[userId]
+                dateToUserPoints[date][users[userId]] = scoringToDate[userId]
         userToPointsEvolution = {}
         for user in users.values():
-            userToPointsEvolution[user]= []
+            userToPointsEvolution[user] = []
             lastValue = DUMMY_VALUE
             for date in dateToUserPoints.keys():
                 value = dateToUserPoints[date].get(user, DUMMY_VALUE)

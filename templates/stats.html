@@ -65,37 +65,37 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for user in users %}
-                        {% if not user[7] %} <tr class="table-dark text-muted">
+                    {% for user in users.values() %}
+                        {% if not user['active'] %} <tr class="table-dark text-muted">
                         {% else %} <tr >{% endif %}
                             <th class="text-left">
-                              <badge title="{{ user[1] }}">   {{ user[2] }}
+                              <badge title="{{ user['email'] }}">   {{ user['username'] }}
                               {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
-                              <a class="btn btn-outline-dark btn-sm" href='/user?user={{user[0]}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
-                              {%endif%} {%if user[5] == 0 %}
+                              <a class="btn btn-outline-dark btn-sm" href='/user?user={{user['id']}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
+                              {%endif%} {%if user['validated'] == 0 %}
                               <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/> {% endif %}
-                              {%for badge in assignedBadges.values() %} {%if  badge['userId'] == user[0] %}
+                              {%for badge in assignedBadges.values() %} {%if  badge['userId'] == user['id'] %}
                                   <img src="{{ badge['img'] }}" width="25" height="25" title="{{ badge['name'] }}({{ badge['date'] }}, effect: {{badge['effect']}})"/>
                                 {% endif %} {% endfor %}
                             </badge>
                           </th>
-                            <td class="text-right"> <b>{{'%d'| format(user[3]|float)}}</b>  </td>
-                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('offered', 0) - usersStats.get(user[2], {False:0}).get('consumed', 0) }}</td>
-                            <td class="text-right"> {{ usersStats.get(user[2], {False:0}).get('offered', 0) }} </td>
-                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
+                            <td class="text-right"> <b>{{'%d'| format(user['rating']|float)}}</b>  </td>
+                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('offered', 0) - usersStats.get(user['username'], {False:0}).get('consumed', 0) }}</td>
+                            <td class="text-right"> {{ usersStats.get(user['username'], {False:0}).get('offered', 0) }} </td>
+                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
                             <td class="text-right">
-                              {% if usersStats.get(user[2], {False:0}).get('offered', 0) > 0 %}
-                               {{ '%.1f'|format(usersStats.get(user[2], {False:0}).get('offered', 0) / usersStats.get(user[2], {False:0}).get('served', 0) ) }}
+                              {% if usersStats.get(user['username'], {False:0}).get('offered', 0) > 0 %}
+                               {{ '%.1f'|format(usersStats.get(user['username'], {False:0}).get('offered', 0) / usersStats.get(user['username'], {False:0}).get('served', 0) ) }}
                               {% else %} 0 {% endif %}
                             </td>
-                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('consumed', 0) }} </td>
-                            <td class="text-right">{{ usersStats.get(user[2], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}</td>
+                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) }} </td>
+                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) + usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
                             {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                             <td class="text-center">
-                            {% if user[7] == 0 %}
-                              <a href="modifyUser?userId={{user[0]}}&active=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                            {% if user['active'] == 0 %}
+                              <a href="modifyUser?userId={{user['id']}}&active=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                             {% else %}
-                              <a href="modifyUser?userId={{user[0]}}&active=0"> <img src="static/lock.png"  width="25" height="25" /> </a>
+                              <a href="modifyUser?userId={{user['id']}}&active=0"> <img src="static/lock.png"  width="25" height="25" /> </a>
                             {% endif %}
                           </td>{% endif %}
                         </tr>{% endfor %}
