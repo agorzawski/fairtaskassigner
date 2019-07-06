@@ -12,11 +12,11 @@ def get_current_badges(date, storage=None):
         storageReadOnly = fairtaskDB(allowCommit=False)
 
     badgesAlredyInTheSystem = {}
-    for one in storageReadOnly.get_granted_badges(date):
+    for one in storageReadOnly.get_granted_badges(date).values():
         try:
-            badgesAlredyInTheSystem[one[2]].append((one[1], one[3]))
+            badgesAlredyInTheSystem[one['badgeId']].append((one['userId'], one['date']))
         except KeyError:
-            badgesAlredyInTheSystem[one[2]] = [(one[1], one[3])]
+            badgesAlredyInTheSystem[one['badgeId']] = [(one['userId'], one['date'])]
 
     userIds = storageReadOnly.execute_get_sql('select id from user')
     allTimeBadges = {}

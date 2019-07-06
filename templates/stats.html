@@ -74,8 +74,8 @@
                               <a class="btn btn-outline-dark btn-sm" href='/user?user={{user[0]}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
                               {%endif%} {%if user[5] == 0 %}
                               <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/> {% endif %}
-                              {%for badge in assignedBadges %} {%if  badge[0] == user[0] %}
-                                  <img src="{{ badge[5] }}" width="25" height="25" title="{{ badge[4] }}({{ badge[1] }}, effect: {{badge[7]}})"/>
+                              {%for badge in assignedBadges.values() %} {%if  badge['userId'] == user[0] %}
+                                  <img src="{{ badge['img'] }}" width="25" height="25" title="{{ badge['name'] }}({{ badge['date'] }}, effect: {{badge['effect']}})"/>
                                 {% endif %} {% endfor %}
                             </badge>
                           </th>
@@ -125,21 +125,21 @@
                        </tr>
                    </thead>
                    <tbody>
-                   {% for lastEntry in grantedBadges %}
-                      {% if not lastEntry[7] %}
+                   {% for lastEntry in grantedBadges.values() %}
+                      {% if not lastEntry['valid'] %}
                        <tr class="table-dark text-muted">
                       {% else %}
                        <tr >
                       {% endif %}
-                           <th scope="row"> <small>{{ lastEntry[4] }}</small> <span class="text-muted">(by {{ lastEntry[5] }})</span> </th>
-                           <td> {{ lastEntry[1] }} </td>
-                           <td> <img src="{{ lastEntry[3] }}" width="25" height="25" /><span class="text">{{ lastEntry[2] }} </span> </td>
-                           {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry[6] != 7 %}
+                           <th scope="row"> <small>{{ lastEntry['date'] }}</small> <span class="text-muted">(by {{ lastEntry['grantByUserName'] }})</span> </th>
+                           <td> {{ lastEntry['username'] }} </td>
+                           <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /><span class="text">{{ lastEntry['badgeName'] }} </span> </td>
+                           {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                             <td class="text-center">
-                              {% if lastEntry[7] %}
-                                <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                              {% if lastEntry['valid'] %}
+                                <a href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
                               {% else %}
-                                <a href="modifyBadge?grantId={{lastEntry[0]}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                                <a href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                               {% endif %}
                              </td>
                            {% endif %}
@@ -170,16 +170,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% for lastEntry in allBadges %}
-                      {% if lastEntry[5] == 1 %}
+                    {% for lastEntry in allBadges.values() %}
+                      {% if lastEntry['adminawarded'] == 1 %}
                         <tr class="table-default text-primary">
                       {% else %}
                         <tr >
                       {% endif %}
-                            <th scope="row">{{ lastEntry[1] }}</th>
-                            <td> <img src="{{ lastEntry[2] }}" width="25" height="25" /> </td>
-                            <td> {{ lastEntry[3] }} </td>
-                            <td class="text-right"> {{ lastEntry[4] }} </td>
+                            <th scope="row">{{ lastEntry['name'] }}</th>
+                            <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
+                            <td> {{ lastEntry['desc'] }} </td>
+                            <td class="text-right"> {{ lastEntry['effect'] }} </td>
                         </tr>
                     {% endfor %}
                     </tbody>

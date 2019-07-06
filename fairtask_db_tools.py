@@ -156,7 +156,16 @@ class fairtaskDB:
         if date is not None:
             sqlAdd = " and date <=\'%s\'" % date
         sql = "select * from user_badges where valid>0 %s" % sqlAdd
-        return self.execute_get_sql(sql)
+        data = self.execute_get_sql(sql)
+        toReturn = {}
+        for one in data:
+            toReturn[one[0]] = {'id': one[0],
+                                'userId': one[1],
+                                'badgeId': one[2],
+                                'date': one[3],
+                                'valid': one[4],
+                                'grantBy': one[5]}
+        return toReturn
 
     def get_all_badges(self, badgeUniqe=None, adminBadges=False):
         whereBadge = ''
@@ -166,7 +175,16 @@ class fairtaskDB:
                 whereBadge += 'and name not like \'%admin%\' '
 
         sql = 'select * from badges %s order by effect, name' % whereBadge
-        return self.execute_get_sql(sql)
+        data = self.execute_get_sql(sql)
+        toReturn = {}
+        for one in data:
+            toReturn[one[0]] = {'id': one[0],
+                                'name': one[1],
+                                'img': one[2],
+                                'desc': one[3],
+                                'effect': one[4],
+                                'adminawarded': one[5]}
+        return toReturn
 
     def get_badge_grant_history(self, allValidities=False, withUser=None):
         sqlOnUser = ''
@@ -176,19 +194,55 @@ class fairtaskDB:
         if allValidities:
             sqlAdd = sqlOnUser.replace('and', 'where')
         sql = 'select grantId, username, badgeName, img, date, grantByUserName, badgeId, valid from badges_granted_timeline %s' % sqlAdd
-        return self.execute_get_sql(sql)
+        data = self.execute_get_sql(sql)
+        toReturn = {}
+        for one in data:
+            toReturn[one[0]] = {'grantId': one[0],
+                                'username': one[1],
+                                'badgeName': one[2],
+                                'img': one[3],
+                                'date': one[4],
+                                'grantByUserName': one[5],
+                                'badgeId': one[6],
+                                'valid': one[7]}
+        return toReturn
 
-    def get_users_badges_timeline(self):
-        sql = 'select * from badges_granted_timeline'
-        return self.execute_get_sql(sql)
+    # def get_users_badges_timeline(self):
+    #     # TODO combine with the above
+    #     sql = 'select * from badges_granted_timeline'
+    #     data = self.execute_get_sql(sql)
+    #     toReturn = {}
+    #     for one in data:
+    #         toReturn[one[0]] = {'grantId': one[0],
+    #                             'userId': one[1],
+    #                             'username': one[2],
+    #                             'date': one[3],
+    #                             'img': one[4],
+    #                             'badgeName': one[5],
+    #                             'badgeId': one[6],
+    #                             'grantById': one[7],
+    #                             'grantByUserName': one[8],
+    #                             'valid': one[9]}
+    #     return toReturn
 
     def get_users_badges(self, userId=None):
         where = ' where user_badges.valid=1 '
         if userId is not None:
             where = ' where user_badges.valid=1 and user.id=%d ' % userId
         sql = 'select * from (select user.id userId, date, badgeId from user join user_badges on user.id=user_badges.userId %s ) a join badges on badges.id=a.badgeId' % (where)
-        # TODO return as dict
-        return self.execute_get_sql(sql)
+        toReturn = {}
+        data = self.execute_get_sql(sql)
+        for one in data:
+            toReturn[one[1]] = {'userId': one[0],
+                                'date': one[1],
+                                'badgeId': one[2],
+                                'id': one[3],
+                                'name': one[4],
+                                'img': one[5],
+                                'desc': one[6],
+                                'effect': one[7],
+                                'adminawarded': one[8]}
+        return toReturn
 
     def insert_user_badges(self, badgeId, userId, date, grantBy, valid=1):
         if date is None:
@@ -224,6 +278,7 @@ class fairtaskDB:
             raise ValueError('No Product with that ID ', id)
 
     def get_users(self, onlyNotValidated=False, active=None):
+        # TODO move to dict
         addSql = ''
         if active is not None:
             addSql = ' and active=%d'%active
@@ -350,7 +405,10 @@ class fairtaskDB:
                 value = dateToUserPoints[date].get(user, DUMMY_VALUE)
                 if value == DUMMY_VALUE or value == lastValue:
                     continue
-                userToPointsEvolution[user].append((date,  value))
+                userToPointsEvolution[user].append((date,  value,
+                                                    (date.split('-')[0],
+                                                     int(date.split('-')[1])-1,
+                                                     date.split('-')[2])))
                 lastValue = value
         return userToPointsEvolution
 
