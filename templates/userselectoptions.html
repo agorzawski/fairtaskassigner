@@ -1,11 +1,11 @@
-{% for userIdEmailName in users %}
+{% for userIdEmailName in users.values() %}
 {% if  whoActive > 0 %}
-  {% if userIdEmailName[0] == whoActive  %}
-    <option value={{userIdEmailName[0]}} selected>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
+  {% if userIdEmailName['id'] == whoActive  %}
+    <option value={{userIdEmailName['id']}} selected>{{userIdEmailName['username']}} ({{userIdEmailName['email']}})</option>
   {% else %}
-    <option value={{userIdEmailName[0]}}>{{userIdEmailName[2]}} ({{userIdEmailName[1]}})</option>
+    <option value={{userIdEmailName['id']}}>{{userIdEmailName['username']}} ({{userIdEmailName['email']}})</option>
   {% endif %}
 {% else %}
-    <option value={{userIdEmailName[0]}}> N/A </option>
+    <option value={{userIdEmailName['id']}}> N/A </option>
 {% endif %}
 {% endfor %}

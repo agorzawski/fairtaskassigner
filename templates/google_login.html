@@ -1,15 +1,15 @@
 <li role="nav-item dropdown">
   <a class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
   {{ loggedUsernameEmail['username'] }} <span class="badge badge-light"><img src="static/coffee.png" width="12" height="12"/> {{ loggedUsernameEmail['scoring'] }}</span>
-  {% for badge in loggedUserBadges %}
-    <img src="{{badge[5]}}" width=20 height=20 />
+  {% for badge in loggedUserBadges.values() %}
+    <img src="{{badge['img']}}" width=20 height=20 />
   {% endfor %}
   <img src="{{loggedUsernameEmail['picture']}}" width=20 height=20 class="rounded-circle" />
   </a>
   <div class="dropdown-menu">
      <a class="btn btn-outline-primary btn-block" href="/user">More about <code>{{loggedUsernameEmail['email']}}</code></a>
-     {% for badge in loggedUserBadges %}
-       <a class="dropdown-item" href="#"><img src="{{badge[5]}}" width=25 height=25 /> <b>{{badge[4]}}</b> ({{badge[6]}}, effect {{badge[7]}}) </a>
+     {% for badge in loggedUserBadges.values() %}
+       <a class="dropdown-item" href="#"><img src="{{badge['img']}}" width=25 height=25 /> <b>{{badge['name']}}</b> ({{badge['desc']}}, effect {{badge['effect']}}) </a>
      {% endfor %}
      {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
      <div class="dropdown-divider"></div>

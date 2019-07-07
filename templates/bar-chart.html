@@ -9,7 +9,7 @@ Highcharts.chart('barChart', {
     text: 'Products consumption'
   },
   xAxis: {
-    categories: [{%for product in products %}'{{product[1]}}',{%endfor%}],
+    categories: [{%for product in products.values() %}'{{product['name']}}',{%endfor%}],
     title: {
       text: null
     }
@@ -17,7 +17,7 @@ Highcharts.chart('barChart', {
   yAxis: {
     min: 0,
     title: {
-      text: 'count',
+      text: '',
       align: 'high'
     },
     labels: {
@@ -36,11 +36,20 @@ Highcharts.chart('barChart', {
   },
   series: [{
     name:'counts [1]',
-    data: [{%for product in products%}{{productsUse.get(product[0],{}).get('value', 0)}}, {%endfor%}]
+    data: [{%for id in products%}{{productsUse.get(id,{}).get('value', 0)}}, {%endfor%}]
   },
   {
     name:'total price [CHF]',
-    data: [{%for product in products%}{{'%0.1f'| format(productsUse.get(product[0],{}).get('totalprice', 0))}}, {%endfor%}]
-  }]
+    data: [{%for id in products%}{{'%0.1f'| format(productsUse.get(id,{}).get('totalprice', 0))}}, {%endfor%}]
+  },
+  {
+    name:'total size [L]',
+    data: [{%for id in products%}{{'%0.3f'| format(productsUse.get(id,{}).get('totalsize', 0)/1000)}}, {%endfor%}]
+  },
+  {
+    name:'total caffeine [g]',
+    data: [{%for id in products%}{{'%0.3f'| format(productsUse.get(id,{}).get('totalcaffeine', 0)/1000)}}, {%endfor%}]
+  }
+]
 });
 </script>

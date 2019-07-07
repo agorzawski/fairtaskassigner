@@ -72,8 +72,8 @@
 
                  <select type="name" name="nameIdToGrant" id="nameIdToGrant" class="form-control" required autofocus>
                    <option value=-1>Who should be granted"</option>
-                     {% for username in users %}
-                     <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+                     {% for username in users.values() %}
+                     <option value={{username['id']}}>{{username['username']}} ({{username['email']}})</option>
                      {% endfor %}
                  </select>
 
@@ -82,8 +82,8 @@
 
                  <select type="name" name="badgeId" id="badgeId" class="form-control" required autofocus>
                    <option value=-1>With the following badge</option>
-                     {% for badge in badgesToGrant %}
-                     <option value={{badge[0]}}> <img src='{{badge[2]}}' width="10" height="10" /> {{badge[1]}} (effect={{badge[4]}})  </option>
+                     {% for badge in badgesToGrant.values() %}
+                     <option value={{badge['id']}}> <img src='{{badge['img']}}' width="10" height="10" /> {{badge['name']}} (effect={{badge['effect']}})  </option>
                      {% endfor %}
                  </select>
 
