@@ -1,5 +1,5 @@
 <li role="nav-item dropdown">
-  <a class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+  <a class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
   {{ loggedUsernameEmail['username'] }} <span class="badge badge-light"><img src="static/coffee.png" width="12" height="12"/> {{ loggedUsernameEmail['scoring'] }}</span>
   {% for badge in loggedUserBadges.values() %}
     <img src="{{badge['img']}}" width=20 height=20 />

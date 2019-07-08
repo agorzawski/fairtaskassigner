@@ -102,10 +102,12 @@
                     </tbody>
                 </table>
             </div>
+            <div id='plots'>
             {% include 'pie-charts.html' %}
             {%with singleUser=False%}
             {% include 'points-evolution.html' %}
             {%endwith%}
+          </div>
       </div>
 
       <div id='badgeshistory' class="container">

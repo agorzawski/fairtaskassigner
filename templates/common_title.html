@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
 <a class="navbar-brand" href="#"><img src="static/coffee.png" width="20" height="20"/> OporniKawiarze v1.7.0 </a>
-<ul class="navbar-nav">
 
+<ul class="navbar-nav">
 {% if activeSite == 'main' %}
 <li class="nav-item active" >
 {%else%}
@@ -36,12 +36,29 @@
 <a class="nav-item nav-link" href="showSignUp#">Add User</a>
 </li>
 
-{% if activeSite == 'stats' %}
+<!-- {% if activeSite == 'stats' %}
 <li class="nav-item active" >
 {%else%}
 <li class="nav-item" >
 {%endif%}
 <a class="nav-item nav-link" href="stats#">SystemStats</a>
+</li> -->
+
+<li role="nav-item dropdown">
+  {% if activeSite == 'stats' %}<a class="btn btn-outline-dark dropdown-toggle"
+  {%else%} <a class="btn btn-outline-secondary dropdown-toggle" {%endif%}
+  data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+    System Stats
+  </a>
+  <div class="dropdown-menu">
+    <a class="nav-item nav-link" href="stats#">SystemStats</a>
+    <div class="dropdown-divider"></div>
+    <a class='dropdown-item' href='stats#statistics'> Users and statistics</a>
+    <a class='dropdown-item' href='stats#plots'>Contribiution charts and plots</a>
+    <a class='dropdown-item' href='stats#badgeshistory'>Badges Grant History</a>
+    <a class='dropdown-item' href='stats#Achievements'>Badges and Achievements</a>
+    <a class='dropdown-item' href='stats#products'>Products Descriton</a>
+ </div>
 </li>
 
 {% if not googleSession %}
