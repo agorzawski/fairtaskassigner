@@ -145,7 +145,7 @@ class fairtaskDB:
             resultForOrdering = scoring.recalculate_scoring(data,
                                                  presentContractors=presentContractors)
             toReturn = [
-                (data[0], data[1], resultForOrdering.get(data[3], 0), data[3], data[4],)
+                (data[0], data[1], resultForOrdering.get(data[3], 0), data[3], data[4], data[2])
                 for data in dataBucket
             ]
             return toReturn
