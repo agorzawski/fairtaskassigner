@@ -103,10 +103,10 @@
                   <tbody>
                   {% for lastEntry in todaysJobs %}
                       <tr>
-                          <td> {{ lastEntry[0] }} </td>
+                          <td> <b>{{ lastEntry[0] }}</b> </td>
                           <td> {{ lastEntry[1] }} </td>
-                          <td> {{ lastEntry[2] }} </td>
-                          <td> {{ lastEntry[5] }} </td>
+                          <td> <span class="badge badge-{%if lastEntry[2] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry[2] }}</span> </td>
+                          <td> <span class="badge badge-{%if lastEntry[5] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry[5] }}</span> </td>
                           <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}"> <img src="static/delete.jpg"  width="25" height="25" /> </a> </td>
                       </tr>
                   {% endfor %}

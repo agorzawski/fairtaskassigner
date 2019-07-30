@@ -155,8 +155,10 @@ def main():
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
     getAssignedBadges = storage.get_users_badges()
+    summaryToday = storage.get_bucket()
     return render_template('index.html',
                            top3=top3,
+                           todaysJobs=summaryToday,
                            generalStats=generalStats,
                            candidates=candidates,
                            adminsList=adminsList,

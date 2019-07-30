@@ -179,7 +179,7 @@
                             <th scope="row">{{ lastEntry['name'] }}</th>
                             <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
                             <td> {{ lastEntry['desc'] }} </td>
-                            <td class="text-right"> {{ lastEntry['effect'] }} </td>
+                            <td class="text-right"> <span class="badge badge-{%if lastEntry['effect'] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry['effect'] }} </td>
                         </tr>
                     {% endfor %}
                     </tbody>
