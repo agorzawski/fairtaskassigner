@@ -216,7 +216,8 @@ def stats():
         allValidities = True
     grantedBadges = storage.get_badge_grant_history(allValidities=allValidities)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
-    evolution = storage.get_points_evolution();
+    evolution = storage.get_points_evolution()
+    transferHistory = storage.get_debt_transfer_history()
     productsUse = storage.get_products_summary()
     return render_template('stats.html',
                            users=users,
@@ -232,6 +233,7 @@ def stats():
                            loggedUsernameEmail=loggedUsernameEmail,
                            pointsEvolution=evolution,
                            productsUse=productsUse,
+                           transferHistory=transferHistory,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -491,6 +493,36 @@ def modifyUser():
         flash('Modified user status!')
     else:
         flash('Error in submited vaules for badge modification!')
+    return redirect(url_for('stats'))
+
+
+@app.route('/transferDebt', methods=['GET'])
+def transferDebt():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    try:
+        fromUserId = int(request.args.get('fromUserId', -1))
+        toUserId = int(request.args.get('toUserId', -1))
+    except ValueError:
+        flash('Error in submited vaules for badge modification!')
+        return redirect(url_for('stats'))
+    if fromUserId > 0 or fromUserId > 0:
+        fromUser = storage.get_username_and_email(id=fromUserId)
+        toUser = storage.get_username_and_email(id=toUserId)
+        storage.add_debt_transfer(fromUser['scoring'], fromUserId, toUserId)
+        storage.insert_user_badges(toUserId,
+                                   badges.BAGDE_ID_FOR_ACCEPTING_DEBT,
+                                   None, badges.SYSTEM_APP_ID, valid=1)
+        storage.insert_user_badges(fromUserId,
+                                   badges.BAGDE_ID_FOR_SELLING_DEBT,
+                                   None, badges.SYSTEM_APP_ID, valid=1)
+        storage.calculate_actal_scoring(commit=True)
+        flash('Transfered %s\'s debt of %d points to %s!' % (fromUser['username'],
+                                                             fromUser['scoring'],
+                                                             toUser['username']))
+    else:
+        flash('Error in submited vaules for debt transfer, aborting!!')
     return redirect(url_for('stats'))
 
 

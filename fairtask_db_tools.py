@@ -100,6 +100,23 @@ class fairtaskDB:
             scoringFromBadges[one[0]] = one[1]
         return scoringFromBadges
 
+    def get_scoring_from_transfers(self, date=None):
+        sqlDate = ''
+        if date is not None:
+            sqlDate =' and date <= \'%s\'' % date
+        scoringFromTransfersData = self.execute_get_sql('select from_user, to_user, value from rating_transfer where valid>0 %s ' % sqlDate)
+        scoringFromTransfers = {}
+        for one in scoringFromTransfersData:
+            try:
+                scoringFromTransfers[one[0]] += -1 * one[2]
+            except KeyError:
+                scoringFromTransfers[one[0]] = -1 * one[2]
+            try:
+                scoringFromTransfers[one[1]] += one[2]
+            except KeyError:
+                scoringFromTransfers[one[1]] = one[2]
+        return scoringFromTransfers
+
     def calculate_actal_scoring(self, date=None, updateDb=True, commit=False, presentContractors=[]):
         sqlDate = ''
         if date is not None:
@@ -107,6 +124,7 @@ class fairtaskDB:
         data = self.execute_get_sql('select buyer, to_whom, product from contract %s' % sqlDate)
         scoring = fairtask_scoring()
         scoring.setScoringFromBadges(self.get_scoring_from_badges(date=date))
+        scoring.setScoringFromTransfers(self.get_scoring_from_transfers(date=date))
         result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
         if updateDb:
             for one in result.keys():
@@ -453,6 +471,24 @@ class fairtaskDB:
                               'totalsize': one[4],
                               'totalcaffeine': one[5]}
         return result
+
+    def add_debt_transfer(self, rating, fromUserId, toUserId):
+        self.execute_sql('insert into rating_transfer (value, from_user, to_user, date, valid) values (%d, %d, %d, CURRENT_TIMESTAMP,1)' % (rating, fromUserId, toUserId),
+                         commit=True)
+
+    def get_debt_transfer_history(self):
+        history = {}
+        data = self.execute_get_sql('select a.id, from_user, a.username, to_user, user.username, date, value, valid from (select * from rating_transfer left join user on user.id= from_user) a  left join user on a.to_user=user.id')
+        for one in data:
+            history[one[0]]={'transferId': one[0],
+                             'fromUserId': one[1],
+                             'fromUserName': one[2],
+                             'toUserId': one[3],
+                             'toUserName': one[4],
+                             'date': one[5],
+                             'value': one[6],
+                             'valid': one[7]}
+        return history
 
     def close_db(self):
         self.con.close()

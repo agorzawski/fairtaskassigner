@@ -7,6 +7,7 @@ class fairtask_scoring:
      to narrow down the 'winner' within the present order makers
     '''
     _scoringFromBadges = {}
+    _scoringFromTransfers = {}
 
     def recalculate_scoring(self, allContracts, presentContractors=[]):
         if len(presentContractors):
@@ -29,10 +30,13 @@ class fairtask_scoring:
         return resultScoring
 
     def getScoringFor(self, one, servedPerOne, offeredPerOne):
-        return (servedPerOne - offeredPerOne) + self._scoringFromBadges.get(one, 0)
+        return (servedPerOne - offeredPerOne) + self._scoringFromBadges.get(one, 0) + self._scoringFromTransfers.get(one, 0)
 
     def setScoringFromBadges(self, scoringFromBadges):
         self._scoringFromBadges = scoringFromBadges
+
+    def setScoringFromTransfers(self, scoringFromTransfers):
+        self._scoringFromTransfers = scoringFromTransfers
 
     def filterContracts(self, list, elementsLookFor, i=1):
         toReturn = []
