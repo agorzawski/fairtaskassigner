@@ -23,7 +23,7 @@
           <select type="name" name="assignedNameId" id="assignedNameId" class="form-control" required autofocus>
             <option value=-1>"Or to whom assign this email..."</option>
               {% for username in notValidatedUsers %}
-              <option value={{username[0]}}>{{username[2]}} ({{username[1]}})</option>
+              <option value={{username['id']}}>{{username['username']}} ({{username['email']}})</option>
               {% endfor %}
           </select>
           {% endif %}

@@ -5,6 +5,9 @@ import fairtask_badge_factory
 EMPTY_RESULT = {}
 SYSTEM_APP_ID = -9
 BAGDE_ID_FOR_A_NEW_GUY = 5
+BAGDE_ID_FOR_ACCEPTING_DEBT = 12
+BAGDE_ID_FOR_SELLING_DEBT = 13
+
 
 def get_current_badges(date, storage=None):
     storageReadOnly = storage

@@ -17,6 +17,7 @@
         <h5> Quick jump to: </h5>
         <li><a href='#statistics'> Users and statistics</a></li>
         <li><a href='#badgeshistory'>Badges Grant History</a></li>
+        <li><a href='#debtTransfer'>Debt Transfers History</a></li>
         <li><a href='#Achievements'>Badges and Achievements</a></li>
         <li><a href='#products'>Products Descriton</a></li>
         <hr class="my-3">
@@ -59,9 +60,9 @@
                             <th scope="col" class="text-right">#avg<br>/serving</th>
                             <th scope="col" class="text-right">#consumed<br>***</th>
                             <th scope="col" class="text-right">#total <br>consumed</th>
-                            {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                            <th scope="col" class="text-center">  <p> {% include 'visible_badges.html' %} </p> </th>
-                            {% endif%}
+                            <!-- {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %} -->
+                            <th scope="col" class="text-center">  <p> Action {% include 'visible_badges.html' %} </p> </th>
+                            <!-- {% endif%} -->
                         </tr>
                     </thead>
                     <tbody>
@@ -90,14 +91,18 @@
                             </td>
                             <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) }} </td>
                             <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) + usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
-                            {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                             <td class="text-center">
+                            {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                             {% if user['active'] == 0 %}
                               <a href="modifyUser?userId={{user['id']}}&active=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                             {% else %}
                               <a href="modifyUser?userId={{user['id']}}&active=0"> <img src="static/lock.png"  width="25" height="25" /> </a>
                             {% endif %}
-                          </td>{% endif %}
+                            {% endif %}
+                            {% if user['rating'] < 0  %}
+                            <a href="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"> <img src="static/debt-collector.png"  width="25" height="25" /> </a>
+                            {% endif %}
+                          </td>
                         </tr>{% endfor %}
                     </tbody>
                 </table>
@@ -153,6 +158,49 @@
        </div>
 
 
+       <div id='debtTransfer' class="container">
+         <hr class="my-3">
+            <h2> Debt Transfer History </h2>
+            {% include 'totop.html' %}
+            <div class="table-responsive table-borderless">
+                <table class="table table-striped table-hover table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">From</th>
+                            <th scope="col">To Whom</th>
+                            <th scope="col">Value</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for lastEntry in transferHistory.values() %}
+                       {% if not lastEntry['valid'] %}
+                        <tr class="table-dark text-muted">
+                       {% else %}
+                        <tr >
+                       {% endif %}
+                            <th scope="row"> <small>{{ lastEntry['date'] }}</small> </th>
+                            <td> <img src="static/debt-relief.png" width="25" height="25" />{{ lastEntry['fromUserName'] }} </td>
+                            <td> <img src="static/debt-collector.png" width="25" height="25" /><span class="text">{{ lastEntry['toUserName'] }} </span> </td>
+                            <td> <span class="badge badge-{%if lastEntry['value'] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry['value'] }} </span> </td>
+                            {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
+                             <td class="text-center">
+                               {% if lastEntry['valid'] %}
+                                 <a href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                               {% else %}
+                                 <a href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                               {% endif %}
+                              </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
        <div class="container">
          <hr class="my-3">
             <div>
@@ -181,7 +229,7 @@
                             <th scope="row">{{ lastEntry['name'] }}</th>
                             <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
                             <td> {{ lastEntry['desc'] }} </td>
-                            <td class="text-right"> {{ lastEntry['effect'] }} </td>
+                            <td class="text-right"> <span class="badge badge-{%if lastEntry['effect'] > 0%}success{%elif lastEntry['effect']==0 %}secondary{%else%}danger{%endif%}">{{ lastEntry['effect'] }} </td>
                         </tr>
                     {% endfor %}
                     </tbody>

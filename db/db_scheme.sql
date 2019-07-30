@@ -28,3 +28,7 @@ CREATE VIEW badges_granted_timeline AS select b.grantId, b.uid, b.username, b.da
 (select grantId, user.id uid, username, date, img, badgeName, badgeId, grantby grantById, valid from (select grantId, userId, badgeId, date, img, badges.name badgeName, grantby, valid from
   (select user_badges.id grantId, user.id userId, date, badgeId, user_badges.grantby grantby, user_badges.valid valid from user join user_badges on user.id=user_badges.userId) a
   join badges on badges.id=a.badgeId) join user on user.id=userId order by date desc) b join user on grantById=user.id
+
+CREATE TABLE `rating_transfer` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+  `from_user` INTEGER NOT NULL,   `to_user` INTEGER NOT NULL, `value` INTEGER NOT NULL,
+  `date` INTEGER NOT NULL, `valid` INTEGER NOT NULL )
