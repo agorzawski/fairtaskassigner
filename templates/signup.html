@@ -22,7 +22,7 @@
           {%if loggedUsernameEmail['id'] == invalidId %}
           <select type="name" name="assignedNameId" id="assignedNameId" class="form-control" required autofocus>
             <option value=-1>"Or to whom assign this email..."</option>
-              {% for username in notValidatedUsers %}
+              {% for username in notValidatedUsers.values() %}
               <option value={{username['id']}}>{{username['username']}} ({{username['email']}})</option>
               {% endfor %}
           </select>

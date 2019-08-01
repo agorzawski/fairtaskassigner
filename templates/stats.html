@@ -15,11 +15,23 @@
         <h1>Some statistics</h1>
         {% include 'common_alerts.html' %}
         <h5> Quick jump to: </h5>
-        <li><a href='#statistics'> Users and statistics</a></li>
-        <li><a href='#badgeshistory'>Badges Grant History</a></li>
-        <li><a href='#debtTransfer'>Debt Transfers History</a></li>
-        <li><a href='#Achievements'>Badges and Achievements</a></li>
-        <li><a href='#products'>Products Descriton</a></li>
+        <div class="row">
+          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#statistics'> <img src="static/users.png" width="35" height="35" /> Users and statistics</a></div>
+          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#badgeshistory'><img src="static/award-badge.png" width="35" height="35" /> Badges Grant History</a></div>
+          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#debtTransfer'><img src="static/debt-collector.png" width="35" height="35" /> Debt Transfers History</a></div>
+        </div>
+        <hr class="my-3">
+        <h5> Items used in the game:</h5>
+        <div class="row">
+          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#Achievements'> <img src="static/trophee.png" width="35" height="35" /> Badges and Achievements</a></div>
+          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#products'> <img src="static/coffee.png" width="35" height="35" /> Products Descriptons</a></div>
+        </div>
+        <!-- <li><a class="btn btn-light btn-outline" href='#statistics'> <img src="static/users.png" width="35" height="35" /> Users and statistics</a></li>
+        <li><a class="btn btn-light btn-outline" href='#badgeshistory'><img src="static/award-badge.png" width="35" height="35" /> Badges Grant History</a></li>
+        <li><a class="btn btn-light btn-outline" href='#debtTransfer'><img src="static/debt-collector.png" width="35" height="35" /> Debt Transfers History</a></li>
+        <li><a class="btn btn-light btn-outline" href='#Achievements'> <img src="static/trophee.png" width="35" height="35" /> Badges and Achievements</a></li>
+        <li><a class="btn btn-light btn-outline" href='#products'> <img src="static/coffee.png" width="35" height="35" /> Products Descriptons</a></li> -->
+
         <hr class="my-3">
         {% include 'game_desc.html' %}
       </div>
@@ -94,13 +106,17 @@
                             <td class="text-center">
                             {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                             {% if user['active'] == 0 %}
-                              <a href="modifyUser?userId={{user['id']}}&active=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                              <a class="btn btn-light btn-sm" href="modifyUser?userId={{user['id']}}&active=1"> <img src="static/refresh.png" width="25" height="25" /> </a>
                             {% else %}
-                              <a href="modifyUser?userId={{user['id']}}&active=0"> <img src="static/lock.png"  width="25" height="25" /> </a>
+                              <a class="btn btn-light btn-sm" href="modifyUser?userId={{user['id']}}&active=0"> <img src="static/lock.png" width="25" height="25" /> </a>
                             {% endif %}
                             {% endif %}
                             {% if user['rating'] < 0  %}
-                            <a href="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"> <img src="static/debt-collector.png"  width="25" height="25" /> </a>
+                            <button type="button" class="btn btn-warning btn-sm modalDebtTransfer" tabindex="0"
+                                data-toggle="modal" data-target="#modalDebtTransfer"
+                                data-link="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"
+                                data-label="{{user['rating']}} from {{user['username']}}"><img src="static/debt-collector.png" width="25" height="25"/></button>
+                            <!-- <a href="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"> <img src="static/debt-collector.png"  width="25" height="25" /> </a> -->
                             {% endif %}
                           </td>
                         </tr>{% endfor %}
@@ -112,6 +128,42 @@
             {% include 'points-evolution.html' %}
             {%endwith%}
       </div>
+
+      <div class="modal fade" id="modalDebtTransfer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel"><img src="static/debt-collector.png" width="35" height="35" /> Debt Transfer </h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Some (neutral but stigmatic) badges will be awarded by this action. Do you confirm to take over balance of  
+              <h4><span class="badge badge-warning badge-lg debtTransferName"></span>?</h4>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+              <a id='transferDebtLink' class="btn btn-danger transferDebtLink" href=''>Transfer the balance to <b>{{loggedUsernameEmail['username']}}</b></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        $(function(){
+          $('.modalDebtTransfer').click(function(e){
+            e.preventDefault();
+            var button = $(e.delegateTarget);
+            var textToDisplay = button.data('label'); // Extract info from data-* attributes
+            var recipient = button.data('link');      // Extract info from data-* attributes
+            var mymodal = $('#modalDebtTransfer');
+            mymodal.find('.debtTransferName').text(textToDisplay);
+            document.getElementsByClassName("transferDebtLink")[0].setAttribute('href', recipient)
+            mymodal.modal('show');
+          });
+        })
+      </script>
+
 
       <div id='badgeshistory' class="container">
         <hr class="my-3">
@@ -142,9 +194,9 @@
                            {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                             <td class="text-center">
                               {% if lastEntry['valid'] %}
-                                <a href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                                <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
                               {% else %}
-                                <a href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                                <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                               {% endif %}
                              </td>
                            {% endif %}
@@ -185,9 +237,9 @@
                             {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                              <td class="text-center">
                                {% if lastEntry['valid'] %}
-                                 <a href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                                 <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
                                {% else %}
-                                 <a href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                                 <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                                {% endif %}
                               </td>
                             {% endif %}

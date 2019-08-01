@@ -19,12 +19,14 @@
             </p>
             <h5>Quick System statistics:</h5>
             <ul>
-              <li>Last order placed on  <span class="badge badge-secondary"> {{generalStats['lastDate']}} by {{generalStats['lastServant']}}</span>,</li>
-              <li>Total number of <span class="badge badge-dark">{{generalStats['totalServings']}} shared orders </span> with a total <span class="badge badge-dark"> number of {{generalStats['totalJobs']}} servings</span> for a total amount of
+              <li>Last order placed on  <span class="badge badge-light"> {{generalStats['lastDate'].split(' ')[0]}} by {{generalStats['lastServant']}}</span>,</li>
+              <li><span class="badge badge-dark">{{generalStats['totalServings']}} shared orders </span> with a
+                <span class="badge badge-dark">total number of {{generalStats['totalJobs']}} servings</span> for a total amount of
                 <span class="badge badge-dark"> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </span>,</li>
+              <li> Total number of <span class="badge badge-dark">{{generalStats['activeUsers']}} active users</span></li>
               <li>Total <span class="badge badge-primary"> system ratings balance: {{generalStats['totalRating']}}</span>
                 where <span class="badge badge-success">{{generalStats['onePlusBadges']}} granted points </span>
-                and <span class="badge badge-danger">{{generalStats['oneMinusBadges']}} penalty points </span>.
+                and <span class="badge badge-danger">{{generalStats['oneMinusBadges']}} penalty points </span></li>
             </ul>
             <hr class="my-3">
             {% include 'quick_add.html' %}
