@@ -560,9 +560,14 @@ def addProduct():
     _name = request.form['productName']
     try:
         _price = float(request.form['productPrice'])
+        _size = float(request.form['productSize'])
+        _coffeine = float(request.form['productCoffeine'])
     except ValueError:
+        flash('Cannot add product! One of the numeric values is not valid!')
         return redirect(url_for('showSignUp'))
-    storage.add_product(_name, _price)
+    print(_name)
+    storage.add_product(_name, _price, _size, _coffeine)
+    flash('Successfully added %s into product\'s database' % _name)
     return redirect(url_for('stats'))
 
 

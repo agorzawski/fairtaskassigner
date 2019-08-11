@@ -57,8 +57,12 @@ class fairtaskDB:
         sql = 'update user set active=%d where id=%s' % (active, existingId)
         self.execute_sql(sql, commit=True)
 
-    def add_product(self, name, price):
-        sql = 'insert into user vales (%s, %s) ' % (name, price)
+    def add_product(self, name, price, size, coffeine):
+        sql = 'insert into product (name, price, size, caffeine) values (\'%s\', %.1f, %.1f, %.1f)' % (name,
+                                                            price,
+                                                            size,
+                                                            coffeine )
+        print(sql)
         self.execute_sql(sql, commit=True)
 
     def add_transaction(self, who, whom, what, creator, commit=False):
