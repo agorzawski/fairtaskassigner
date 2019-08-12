@@ -429,7 +429,9 @@ def finalizeJob():
 def checkStatusForBadges():
     dates = storage.get_last_transaction()
     for date in dates:
-        actualbadges = badges.get_current_badges(date[0], storage=storage)
+        actualbadges = badges.get_current_badges(date[0],
+                                                 app=app,
+                                                 storage=storage)
         for oneBadge in actualbadges:
             storage.insert_user_badges(*oneBadge)
         if len(actualbadges):
@@ -560,9 +562,13 @@ def addProduct():
     _name = request.form['productName']
     try:
         _price = float(request.form['productPrice'])
+        _size = float(request.form['productSize'])
+        _coffeine = float(request.form['productCoffeine'])
     except ValueError:
+        flash('Cannot add product! One of the numeric values is not valid!')
         return redirect(url_for('showSignUp'))
-    storage.add_product(_name, _price)
+    storage.add_product(_name, _price, _size, _coffeine)
+    flash('Successfully added %s into product\'s database' % _name)
     return redirect(url_for('stats'))
 
 
@@ -574,10 +580,11 @@ def calculateScoring():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-
+    flash('Removing all System Awarded Badges!')
+    storage.remove_users_bagde_by_system()
     checkStatusForBadges()
     storage.calculate_actal_scoring(commit=True)
-    flash('Scoring recalculated!')
+    flash('Bageds checked & Scoring recalculated!')
     return redirect(url_for('stats'))
 
 

@@ -13,8 +13,8 @@
      {% endfor %}
      {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
      <div class="dropdown-divider"></div>
-     <a href='/calculateScoring' class="btn btn-outline-warning btn-block">
-       Refresh badges&scoring <img src="static/refresh.png" width=20 height=20 />
+     <a href='/calculateScoring' class="btn btn-outline-danger btn-block">
+       Refresh badges & scoring <img src="static/delete.jpg" width=20 height=20 /> <img src="static/refresh.png" width=20 height=20 />
      </a>
      {% endif %}
      <div class="dropdown-divider"></div>

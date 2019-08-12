@@ -22,7 +22,7 @@
           {%if loggedUsernameEmail['id'] == invalidId %}
           <select type="name" name="assignedNameId" id="assignedNameId" class="form-control" required autofocus>
             <option value=-1>"Or to whom assign this email..."</option>
-              {% for username in notValidatedUsers %}
+              {% for username in notValidatedUsers.values() %}
               <option value={{username['id']}}>{{username['username']}} ({{username['email']}})</option>
               {% endfor %}
           </select>
@@ -67,26 +67,24 @@
                {% include 'totop.html' %}
                <p>  {% include 'visible_badges.html' %} </p>
                <form class="form-signin">
-
-               <label for="inputNameForBadge" class="sr-only">Name</label>
-
+               <div class="form-group">
+               <label for="inputNameForBadge">Name</label>
                  <select type="name" name="nameIdToGrant" id="nameIdToGrant" class="form-control" required autofocus>
                    <option value=-1>Who should be granted"</option>
                      {% for username in users.values() %}
                      <option value={{username['id']}}>{{username['username']}} ({{username['email']}})</option>
                      {% endfor %}
                  </select>
-
-               <br>
-               <label for="inputBadge" class="sr-only">Email address</label>
-
+               </div>
+               <div class="form-group">
+               <label for="inputBadge">Email address</label>
                  <select type="name" name="badgeId" id="badgeId" class="form-control" required autofocus>
                    <option value=-1>With the following badge</option>
                      {% for badge in badgesToGrant.values() %}
                      <option value={{badge['id']}}> <img src='{{badge['img']}}' width="10" height="10" /> {{badge['name']}} (effect={{badge['effect']}})  </option>
                      {% endfor %}
                  </select>
-
+               </div>
                <br><br>
                <button id="grantBadge" class="btn btn-lg btn-success btn-block" type="button">Award with badge</button>
                <script>
@@ -122,20 +120,34 @@
                 <p>  {% include 'visible_badges.html' %} </p>
                 <br>
                 <form class="form-signin">
-                <label for="productName" class="sr-only">name:</label>
-                <input type="name" name="productName" id="productName"
-                  class="form-control" placeholder="What name to use" required autofocus>
+                <div class="form-group">
+                  <label for="productName">name:</label>
+                  <input name="productName" id="productName"
+                    class="form-control" placeholder="What name to use" required autofocus>
+                </div>
+                <div class="form-group">
+                <label for="productPrice">price [chf]:</label>
+                  <input  name="productPrice" id="productPrice"
+                    class="form-control" placeholder= "0.0" required autofocus>
+                </div>
+                <div class="form-group">
+                <label for="productSize">size [mL]:</label>
+                  <input name="productSize" id="productSize"
+                    class="form-control" placeholder= "100.0" required autofocus>
+                </div>
+                <div class="form-group">
+                <label for="productCoffeine">coffeine [mg]:</label>
+                  <input name="productCoffeine" id="productCoffeine"
+                    class="form-control" placeholder= "30.0" required autofocus>
+                </div>
+
                 <br>
-                <label for="productPrice" class="sr-only">price:</label>
-                  <input type="name" name="productPrice" id="productPrice"
-                    class="form-control" placeholder= "Email address" required autofocus>
-                <br><br>
                 <button id="addProduct" class="btn btn-lg btn-success btn-block" type="button">Add product</button>
                 <script>
                   $(function() {
                       $('#addProduct').click(function() {
                           $.ajax({
-                              url: '/signUp',
+                              url: '/addProduct',
                               data: $('form').serialize(),
                               type: 'POST',
                               success: function(response) {

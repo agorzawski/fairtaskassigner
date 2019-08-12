@@ -57,8 +57,11 @@ class fairtaskDB:
         sql = 'update user set active=%d where id=%s' % (active, existingId)
         self.execute_sql(sql, commit=True)
 
-    def add_product(self, name, price):
-        sql = 'insert into user vales (%s, %s) ' % (name, price)
+    def add_product(self, name, price, size, coffeine):
+        sql = 'insert into product (name, price, size, caffeine) values (\'%s\', %.1f, %.1f, %.1f)' % (name,
+                                                            price,
+                                                            size,
+                                                            coffeine)
         self.execute_sql(sql, commit=True)
 
     def add_transaction(self, who, whom, what, creator, commit=False):
@@ -272,6 +275,10 @@ class fairtaskDB:
         sql='update user_badges set valid=%d, grantby=%d where id=%d' % (valid, removigUserId, badgeGrantId)
         self.execute_sql(sql, commit=True)
 
+    def remove_users_bagde_by_system(self):
+        sql = 'delete from user_badges WHERE user_badges.badgeId IN (select id from badges where badges.adminawarded=0)'
+        self.execute_sql(sql=sql, commit=True)
+
     def get_products(self):
         data = self.execute_get_sql('select * from product order by price, name')
         toReturn = {}
@@ -415,6 +422,7 @@ class fairtaskDB:
         totalRatingBalance = self.execute_get_sql('select sum(rating) from user ')[0][0]
         onePlusBadges = self.execute_get_sql('select sum(effect) from (select * from user_badges join badges on badges.id=user_badges.badgeId where user_badges.valid=1 and effect = 1)')[0][0]
         oneMinusBadges = self.execute_get_sql('select sum(effect) from (select * from user_badges join badges on badges.id=user_badges.badgeId where user_badges.valid=1 and effect = -1)')[0][0]
+        activeUsers = self.execute_get_sql('select count(id) from user where active>0 and id>0 ')[0][0]
         return {
             'lastDate': lastDateBuyer[0],
             'lastServant': lastDateBuyer[1],
@@ -423,7 +431,8 @@ class fairtaskDB:
             'totalJobs': totalBudgetSpent[1],
             'totalRating': totalRatingBalance,
             'oneMinusBadges': oneMinusBadges,
-            'onePlusBadges': onePlusBadges
+            'onePlusBadges': onePlusBadges,
+            'activeUsers': activeUsers,
         }
 
     def get_points_evolution(self, specificUser=None):
