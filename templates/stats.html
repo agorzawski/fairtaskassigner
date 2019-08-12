@@ -92,7 +92,7 @@
                                 {% endif %} {% endfor %}
                             </badge>
                           </th>
-                            <td class="text-right"> <b>{{'%d'| format(user['rating']|float)}}</b>  </td>
+                            <td class="text-right"> {%with valueToShow= user['rating']%}{%include 'badge-points.html'%}{%endwith %}  </td>
                             <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('offered', 0) - usersStats.get(user['username'], {False:0}).get('consumed', 0) }}</td>
                             <td class="text-right"> {{ usersStats.get(user['username'], {False:0}).get('offered', 0) }} </td>
                             <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
@@ -139,7 +139,7 @@
               </button>
             </div>
             <div class="modal-body">
-              Some (neutral but stigmatic) badges will be awarded by this action. Do you confirm to take over balance of  
+              Some (neutral but stigmatic) badges will be awarded by this action. Do you confirm to take over balance of
               <h4><span class="badge badge-warning badge-lg debtTransferName"></span>?</h4>
             </div>
             <div class="modal-footer">
@@ -233,7 +233,7 @@
                             <th scope="row"> <small>{{ lastEntry['date'] }}</small> </th>
                             <td> <img src="static/debt-relief.png" width="25" height="25" />{{ lastEntry['fromUserName'] }} </td>
                             <td> <img src="static/debt-collector.png" width="25" height="25" /><span class="text">{{ lastEntry['toUserName'] }} </span> </td>
-                            <td> <span class="badge badge-{%if lastEntry['value'] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry['value'] }} </span> </td>
+                            <td> {%with valueToShow= lastEntry['value']%}{%include 'badge-points.html'%}{%endwith %}</td>
                             {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                              <td class="text-center">
                                {% if lastEntry['valid'] %}
@@ -279,7 +279,7 @@
                             <th scope="row">{{ lastEntry['name'] }}</th>
                             <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
                             <td> {{ lastEntry['desc'] }} </td>
-                            <td class="text-right"> <span class="badge badge-{%if lastEntry['effect'] > 0%}success{%elif lastEntry['effect']==0 %}secondary{%else%}danger{%endif%}">{{ lastEntry['effect'] }} </td>
+                            <td class="text-right"> {%with valueToShow= lastEntry['effect']%}{%include 'badge-points.html'%}{%endwith %}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
