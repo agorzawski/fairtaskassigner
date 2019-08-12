@@ -5,8 +5,11 @@ import fairtask_badge_factory
 EMPTY_RESULT = {}
 SYSTEM_APP_ID = -9
 BAGDE_ID_FOR_A_NEW_GUY = 5
+BAGDE_ID_FOR_ACCEPTING_DEBT = 12
+BAGDE_ID_FOR_SELLING_DEBT = 13
 
-def get_current_badges(date, storage=None):
+
+def get_current_badges(date, app=None, storage=None):
     storageReadOnly = storage
     if storage is None:
         storageReadOnly = fairtaskDB(allowCommit=False)
@@ -23,7 +26,8 @@ def get_current_badges(date, storage=None):
     for name, obj in inspect.getmembers(fairtask_badge_factory):
         if inspect.isclass(obj) and name.startswith('badge'):
             oneBadge = obj(storageReadOnly)
-            print(oneBadge.getBadgeId(), name)
+            if app is not None:
+                app.logger.debug(oneBadge.getBadgeId(), name)
             allTimeBadges[oneBadge.getBadgeId()] = {}
             for userId in userIds:
                 tmpBadges = badgesAlredyInTheSystem.get(oneBadge.getBadgeId(),[])

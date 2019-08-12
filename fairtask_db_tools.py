@@ -57,8 +57,11 @@ class fairtaskDB:
         sql = 'update user set active=%d where id=%s' % (active, existingId)
         self.execute_sql(sql, commit=True)
 
-    def add_product(self, name, price):
-        sql = 'insert into user vales (%s, %s) ' % (name, price)
+    def add_product(self, name, price, size, coffeine):
+        sql = 'insert into product (name, price, size, caffeine) values (\'%s\', %.1f, %.1f, %.1f)' % (name,
+                                                            price,
+                                                            size,
+                                                            coffeine)
         self.execute_sql(sql, commit=True)
 
     def add_transaction(self, who, whom, what, creator, commit=False):
@@ -100,6 +103,23 @@ class fairtaskDB:
             scoringFromBadges[one[0]] = one[1]
         return scoringFromBadges
 
+    def get_scoring_from_transfers(self, date=None):
+        sqlDate = ''
+        if date is not None:
+            sqlDate =' and date <= \'%s\'' % date
+        scoringFromTransfersData = self.execute_get_sql('select from_user, to_user, value from rating_transfer where valid>0 %s ' % sqlDate)
+        scoringFromTransfers = {}
+        for one in scoringFromTransfersData:
+            try:
+                scoringFromTransfers[one[0]] += -1 * one[2]
+            except KeyError:
+                scoringFromTransfers[one[0]] = -1 * one[2]
+            try:
+                scoringFromTransfers[one[1]] += one[2]
+            except KeyError:
+                scoringFromTransfers[one[1]] = one[2]
+        return scoringFromTransfers
+
     def calculate_actal_scoring(self, date=None, updateDb=True, commit=False, presentContractors=[]):
         sqlDate = ''
         if date is not None:
@@ -107,6 +127,7 @@ class fairtaskDB:
         data = self.execute_get_sql('select buyer, to_whom, product from contract %s' % sqlDate)
         scoring = fairtask_scoring()
         scoring.setScoringFromBadges(self.get_scoring_from_badges(date=date))
+        scoring.setScoringFromTransfers(self.get_scoring_from_transfers(date=date))
         result = scoring.recalculate_scoring(data, presentContractors=presentContractors)
         if updateDb:
             for one in result.keys():
@@ -145,7 +166,7 @@ class fairtaskDB:
             resultForOrdering = scoring.recalculate_scoring(data,
                                                  presentContractors=presentContractors)
             toReturn = [
-                (data[0], data[1], resultForOrdering.get(data[3], 0), data[3], data[4],)
+                (data[0], data[1], resultForOrdering.get(data[3], 0), data[3], data[4], data[2])
                 for data in dataBucket
             ]
             return toReturn
@@ -253,6 +274,10 @@ class fairtaskDB:
     def remove_user_bagde(self, badgeGrantId, valid, removigUserId):
         sql='update user_badges set valid=%d, grantby=%d where id=%d' % (valid, removigUserId, badgeGrantId)
         self.execute_sql(sql, commit=True)
+
+    def remove_users_bagde_by_system(self):
+        sql = 'delete from user_badges WHERE user_badges.badgeId IN (select id from badges where badges.adminawarded=0)'
+        self.execute_sql(sql=sql, commit=True)
 
     def get_products(self):
         data = self.execute_get_sql('select * from product order by price, name')
@@ -394,12 +419,20 @@ class fairtaskDB:
         lastDateBuyer = self.execute_get_sql('select date,buyer from all_list group by date order by date desc limit 1')[0]
         totalBudgetSpent = self.execute_get_sql('select sum(price), count(price) from all_list')[0]
         totalServings = self.execute_get_sql('select count(distinct(date)) from all_list')[0][0]
+        totalRatingBalance = self.execute_get_sql('select sum(rating) from user ')[0][0]
+        onePlusBadges = self.execute_get_sql('select sum(effect) from (select * from user_badges join badges on badges.id=user_badges.badgeId where user_badges.valid=1 and effect = 1)')[0][0]
+        oneMinusBadges = self.execute_get_sql('select sum(effect) from (select * from user_badges join badges on badges.id=user_badges.badgeId where user_badges.valid=1 and effect = -1)')[0][0]
+        activeUsers = self.execute_get_sql('select count(id) from user where active>0 and id>0 ')[0][0]
         return {
             'lastDate': lastDateBuyer[0],
             'lastServant': lastDateBuyer[1],
             'totalServings': totalServings,
             'totalBudgetSpent': totalBudgetSpent[0],
-            'totalJobs': totalBudgetSpent[1]
+            'totalJobs': totalBudgetSpent[1],
+            'totalRating': totalRatingBalance,
+            'oneMinusBadges': oneMinusBadges,
+            'onePlusBadges': onePlusBadges,
+            'activeUsers': activeUsers,
         }
 
     def get_points_evolution(self, specificUser=None):
@@ -447,6 +480,24 @@ class fairtaskDB:
                               'totalsize': one[4],
                               'totalcaffeine': one[5]}
         return result
+
+    def add_debt_transfer(self, rating, fromUserId, toUserId):
+        self.execute_sql('insert into rating_transfer (value, from_user, to_user, date, valid) values (%d, %d, %d, CURRENT_TIMESTAMP,1)' % (rating, fromUserId, toUserId),
+                         commit=True)
+
+    def get_debt_transfer_history(self):
+        history = {}
+        data = self.execute_get_sql('select a.id, from_user, a.username, to_user, user.username, date, value, valid from (select * from rating_transfer left join user on user.id= from_user) a  left join user on a.to_user=user.id')
+        for one in data:
+            history[one[0]]={'transferId': one[0],
+                             'fromUserId': one[1],
+                             'fromUserName': one[2],
+                             'toUserId': one[3],
+                             'toUserName': one[4],
+                             'date': one[5],
+                             'value': one[6],
+                             'valid': one[7]}
+        return history
 
     def close_db(self):
         self.con.close()
