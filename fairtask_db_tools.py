@@ -61,8 +61,7 @@ class fairtaskDB:
         sql = 'insert into product (name, price, size, caffeine) values (\'%s\', %.1f, %.1f, %.1f)' % (name,
                                                             price,
                                                             size,
-                                                            coffeine )
-        print(sql)
+                                                            coffeine)
         self.execute_sql(sql, commit=True)
 
     def add_transaction(self, who, whom, what, creator, commit=False):
@@ -275,6 +274,10 @@ class fairtaskDB:
     def remove_user_bagde(self, badgeGrantId, valid, removigUserId):
         sql='update user_badges set valid=%d, grantby=%d where id=%d' % (valid, removigUserId, badgeGrantId)
         self.execute_sql(sql, commit=True)
+
+    def remove_users_bagde_by_system(self):
+        sql = 'delete from user_badges WHERE user_badges.badgeId IN (select id from badges where badges.adminawarded=0)'
+        self.execute_sql(sql=sql, commit=True)
 
     def get_products(self):
         data = self.execute_get_sql('select * from product order by price, name')

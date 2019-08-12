@@ -107,6 +107,8 @@ class badge_ten_minus_penalty(Abstract_Badge):
 
         from fairtask_scoring import fairtask_scoring
         scoring = fairtask_scoring()
+        scoring.setScoringFromBadges(self._storage.get_scoring_from_badges(date=date))
+        scoring.setScoringFromTransfers(self._storage.get_scoring_from_transfers(date=date))
         result = scoring.recalculate_scoring(allContracts)
         toReturn = {}
         for one in result.keys():
@@ -132,6 +134,8 @@ class badge_ten_plus_buffer(Abstract_Badge):
 
         from fairtask_scoring import fairtask_scoring
         scoring = fairtask_scoring()
+        scoring.setScoringFromBadges(self._storage.get_scoring_from_badges(date=date))
+        scoring.setScoringFromTransfers(self._storage.get_scoring_from_transfers(date=date))
         result = scoring.recalculate_scoring(allContracts)
         toReturn = {}
         for one in result.keys():

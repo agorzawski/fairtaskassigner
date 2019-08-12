@@ -9,6 +9,7 @@ It works based on google authentication token (uses only login and identity pict
 - debt transfer (on demand form any user at negative balance)
 - internal data structure change
 - few layout improvements
+- few bugs fixed: debt/scoring calculation, new products add (admin)
 
 *1.6*
 - users details subpage
