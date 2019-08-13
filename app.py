@@ -219,6 +219,7 @@ def stats():
     evolution = storage.get_points_evolution()
     transferHistory = storage.get_debt_transfer_history()
     productsUse = storage.get_products_summary()
+    dependencyWheelData = storage.get_dependecy_data()
     return render_template('stats.html',
                            users=users,
                            notValidatedUsers=notValidatedUsers,
@@ -234,6 +235,7 @@ def stats():
                            pointsEvolution=evolution,
                            productsUse=productsUse,
                            transferHistory=transferHistory,
+                           dependencyWheelData=dependencyWheelData,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 

@@ -435,6 +435,10 @@ class fairtaskDB:
             'activeUsers': activeUsers,
         }
 
+    def get_dependecy_data(self):
+        sql = 'select buyer, to_whom, count(to_whom) from all_list where buyer!=to_whom group by buyer, to_whom '
+        return self.execute_get_sql(sql)
+
     def get_points_evolution(self, specificUser=None):
         dateToUserPoints = {}
         users = {}
