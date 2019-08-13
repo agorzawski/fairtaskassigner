@@ -47,6 +47,7 @@
                 <li>* Value WITH THE badge modificators, raw is offered - consumed</li>
                 <li>** Coffee offered withing # servings</li>
                 <li>*** Value without selfbuyings (Total: including selfbuyings)</li>
+                <li><span class="badge badge-light text-muted">User temporary inactive</span></li>
               </p>
             </div>
             <script>
@@ -123,10 +124,13 @@
                     </tbody>
                 </table>
             </div>
+            <div id='plots'>
             {% include 'pie-charts.html' %}
             {%with singleUser=False%}
             {% include 'points-evolution.html' %}
             {%endwith%}
+            {% include 'dependency-wheel.html' %}
+          </div>
       </div>
 
       <div class="modal fade" id="modalDebtTransfer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

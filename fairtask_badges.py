@@ -27,7 +27,7 @@ def get_current_badges(date, app=None, storage=None):
         if inspect.isclass(obj) and name.startswith('badge'):
             oneBadge = obj(storageReadOnly)
             if app is not None:
-                app.logger.debug(oneBadge.getBadgeId(), name)
+                app.logger.debug('%s / %s '%(oneBadge.getBadgeId(), name))
             allTimeBadges[oneBadge.getBadgeId()] = {}
             for userId in userIds:
                 tmpBadges = badgesAlredyInTheSystem.get(oneBadge.getBadgeId(),[])

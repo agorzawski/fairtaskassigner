@@ -7,6 +7,7 @@ It works based on google authentication token (uses only login and identity pict
 *1.7*
 - products stats
 - debt transfer (on demand form any user at negative balance)
+- dependancy wheel chart in stats tab
 - internal data structure change
 - few layout improvements
 - few bugs fixed: debt/scoring calculation, new products add (admin)

@@ -1,0 +1,29 @@
+<!--  Requires a dict of users -> [(t1,v1)]-->
+<div id="dependencyWheel"></div>
+<script>
+Highcharts.chart('dependencyWheel', {
+    title: {
+        text: 'Serving Dependency Wheel'
+    },
+    series: [{
+        keys: ['from', 'to', 'weight'],
+      data: [
+        {% for oneData in dependencyWheelData%} [ '{{oneData[0]}}', '{{oneData[1]}}', {{oneData[2]}} ] ,
+        {%endfor%}
+        ],
+        type: 'dependencywheel',
+        name: 'Transaction',
+        dataLabels: {
+            color: '#333',
+            textPath: {
+                enabled: true,
+                attributes: {
+                    dy: 5
+                }
+            },
+            distance: 10
+        },
+        size: '95%'
+    }]
+});
+</script>
