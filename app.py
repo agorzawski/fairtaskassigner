@@ -515,12 +515,7 @@ def transferDebt():
         fromUser = storage.get_username_and_email(id=fromUserId)
         toUser = storage.get_username_and_email(id=toUserId)
         storage.add_debt_transfer(fromUser['scoring'], fromUserId, toUserId)
-        storage.insert_user_badges(toUserId,
-                                   badges.BAGDE_ID_FOR_ACCEPTING_DEBT,
-                                   None, badges.SYSTEM_APP_ID, valid=1)
-        storage.insert_user_badges(fromUserId,
-                                   badges.BAGDE_ID_FOR_SELLING_DEBT,
-                                   None, badges.SYSTEM_APP_ID, valid=1)
+        addUserBadgesForDebtTransfer(fromUserId, toUserId)
         storage.calculate_actal_scoring(commit=True)
         flash('Transfered %s\'s debt of %d points to %s!' % (fromUser['username'],
                                                              fromUser['scoring'],
@@ -584,11 +579,26 @@ def calculateScoring():
         return redirect(url_for('main'))
     flash('Removing all System Awarded Badges!')
     storage.remove_users_bagde_by_system()
+    debtTransfers = storage.get_debt_transfer_history().values()
+    for oneDebtTransfer in debtTransfers:
+        addUserBadgesForDebtTransfer(oneDebtTransfer['fromUserId'],
+                                     oneDebtTransfer['toUserId'],
+                                     date=oneDebtTransfer['date'])
+    if len(debtTransfers):
+        flash('Reverted %d debt transfer Badges' % len(debtTransfers))
     checkStatusForBadges()
     storage.calculate_actal_scoring(commit=True)
     flash('Bageds checked & Scoring recalculated!')
     return redirect(url_for('stats'))
 
+
+def addUserBadgesForDebtTransfer(fromUserId, toUserId, date=None):
+    storage.insert_user_badges(toUserId,
+                               badges.BAGDE_ID_FOR_ACCEPTING_DEBT,
+                               date, badges.SYSTEM_APP_ID, valid=1)
+    storage.insert_user_badges(fromUserId,
+                               badges.BAGDE_ID_FOR_SELLING_DEBT,
+                               date, badges.SYSTEM_APP_ID, valid=1)
 
 if __name__ == "__main__":
     import logging
