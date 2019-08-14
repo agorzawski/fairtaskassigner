@@ -19,10 +19,11 @@
             </p>
             <h5>Quick System statistics:</h5>
             <ul>
-              <li>Last order placed on  <span class="badge badge-light"> {{generalStats['lastDate'].split(' ')[0]}} by {{generalStats['lastServant']}}</span>,</li>
+              <li>Last order placed on  <span class="badge badge-light"> {{generalStats['lastDate'].split(' ')[0]}} by {{generalStats['lastServant']}}</span></li>
               <li><span class="badge badge-dark">{{generalStats['totalServings']}} shared orders </span> with a
                 <span class="badge badge-dark">total number of {{generalStats['totalJobs']}} servings</span> for a total amount of
-                <span class="badge badge-dark"> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </span>,</li>
+                <span class="badge badge-dark"> {{'%0.1f'| format(generalStats['totalBudgetSpent'])}} CHF </span></li>
+              <li> Total of <span class="badge badge-light">{{'%0.1f'| format(generalStats['totalAmmount'])}} L of consumed coffee </span> with  <span class="badge badge-dark">{{'%0.1f'| format(generalStats['totalCaffeine'])}}g of caffeine </span></li>
               <li> Total number of <span class="badge badge-dark">{{generalStats['activeUsers']}} active users</span></li>
               <li>Total <span class="badge badge-primary"> system ratings balance: {{generalStats['totalRating']}}</span>
                 where <span class="badge badge-success">{{generalStats['onePlusBadges']}} granted points </span>
@@ -68,7 +69,7 @@
             <hr class="my-3">
             <div class="row">
             <div class="col">
-              <h4>  Next candidates (all population):</h4>
+              <h4>  Next candidates:</h4>
               <div class="table-responsive table-borderless alert alert-danger" role="alert">
                   <table class="table table-striped table-hover table-sm">
                       <thead>
@@ -111,9 +112,7 @@
                       <tbody>
                       {% for topper in top3 %}
                           <tr id={{ topper[0] }}>
-                              <th scope="row">{{ topper[0] }}
-
-                              </th>
+                              <th scope="row">{{ topper[0] }}</th>
                               <td class="text-right"> {{'%d'| format(topper[1]|float)}} </td>
                               <td class="text-right"> {{'%0.1f'| format(topper[2]|float)}} </td>
                               <td class="text-right"> <span class="badge badge-{%if topper[3] >= 0%}success{%else%}danger{%endif%}">{{'%d'| format(topper[3]|float)}}</span></td>
@@ -123,6 +122,33 @@
                   </table>
               </div>
             </div>
+
+            <div class="col">
+              <h4> Top orders: </h4>
+              <div class="table-responsive table-borderless alert alert-dark" role="alert">
+                  <table class="table table-striped table-hover table-sm ">
+                      <thead>
+                          <tr>
+                              <th scope="col">Name</th>
+                              <th scope="col" class="text-right">when</th>
+                              <th scope="col" class="text-right">Spent<br>[CHF]</th>
+                              <th scope="col" class="text-right"> <img src="static/coffee.png" width=20 height=20 class="img-circle"  /> </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      {% for topper in topOrders %}
+                          <tr>
+                              <th scope="row"> {{ topper[0] }}</th>
+                              <td class="text-right"> <small>{{ topper[1].split(' ')[0] }}</small> </td>
+                              <td class="text-right"> {{'%0.1f'| format(topper[2]|float)}} </td>
+                              <td class="text-right"> {{'%d'| format(topper[3]|float)}} </td>
+                          </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+
           </div>
           <!-- <p><a class="btn btn-lg btn-success btn-block" href="addJobs#addorder" role="button">Prepare the order</a></p> -->
           </div>
