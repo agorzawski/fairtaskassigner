@@ -416,7 +416,7 @@ class fairtaskDB:
         return self.execute_get_sql('select id, username, rating from user order by rating limit %d'%limit)
 
     def get_top_orders(self, limit=5):
-        sql = 'select buyer, date, sum(price), count(buyer) a from all_list group by date order by a desc limit %d ' % limit
+        sql = 'select buyer, date, sum(price) b, count(buyer) a from all_list group by date order by a desc, b desc limit %d ' % limit
         return self.execute_get_sql(sql)
 
     def get_main_statistics(self):
