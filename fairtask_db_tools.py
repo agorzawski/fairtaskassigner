@@ -412,8 +412,12 @@ class fairtaskDB:
     def get_top_buyers(self):
         return self.execute_get_sql('select buyer, count(buyer) count, sum(price) total_spent, max(buyer_rating) from all_list group by buyer order by count desc limit 5')
 
-    def get_top_candidates(self):
-        return self.execute_get_sql('select id, username, rating from user order by rating limit 5')
+    def get_top_candidates(self, limit=5):
+        return self.execute_get_sql('select id, username, rating from user order by rating limit %d'%limit)
+
+    def get_top_orders(self, limit=5):
+        sql = 'select buyer, date, sum(price) b, count(buyer) a from all_list group by date order by a desc, b desc limit %d ' % limit
+        return self.execute_get_sql(sql)
 
     def get_main_statistics(self):
         lastDateBuyer = self.execute_get_sql('select date,buyer from all_list group by date order by date desc limit 1')[0]
@@ -423,6 +427,9 @@ class fairtaskDB:
         onePlusBadges = self.execute_get_sql('select sum(effect) from (select * from user_badges join badges on badges.id=user_badges.badgeId where user_badges.valid=1 and effect = 1)')[0][0]
         oneMinusBadges = self.execute_get_sql('select sum(effect) from (select * from user_badges join badges on badges.id=user_badges.badgeId where user_badges.valid=1 and effect = -1)')[0][0]
         activeUsers = self.execute_get_sql('select count(id) from user where active>0 and id>0 ')[0][0]
+        consumed = self.execute_get_sql('select sum(product.size), sum(product.caffeine) from contract left join product on contract.product=product.id')
+        totalAmmount = consumed[0][0]
+        totalCaffeine = consumed[0][1]
         return {
             'lastDate': lastDateBuyer[0],
             'lastServant': lastDateBuyer[1],
@@ -433,6 +440,8 @@ class fairtaskDB:
             'oneMinusBadges': oneMinusBadges,
             'onePlusBadges': onePlusBadges,
             'activeUsers': activeUsers,
+            'totalAmmount': totalAmmount/1000,
+            'totalCaffeine': totalCaffeine/1000,
         }
 
     def get_dependecy_data(self):

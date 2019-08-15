@@ -169,6 +169,7 @@ def main():
         getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     adminsList = storage.get_admins()
     generalStats = storage.get_main_statistics()
+    topOrders = storage.get_top_orders()
     top3 = storage.get_top_buyers()
     candidates = storage.get_top_candidates()
     getAssignedBadges = storage.get_users_badges()
@@ -177,6 +178,7 @@ def main():
                            top3=top3,
                            todaysJobs=summaryToday,
                            generalStats=generalStats,
+                           topOrders=topOrders,                           
                            candidates=candidates,
                            adminsList=adminsList,
                            googleSession=googleSession,
