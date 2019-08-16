@@ -91,7 +91,7 @@ class fairtaskDB:
         if len(result) > 0 and result[0]:
             return self.get_product_details(result[0][0])
         else:
-            return (NON_SELECTED_VALUE, 'NOT FOUND')
+            return {'id':NON_SELECTED_VALUE, 'name':'NOT FOUND'}
 
     def get_scoring_from_badges(self, date=None):
         sqlDate = ''
