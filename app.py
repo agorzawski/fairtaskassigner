@@ -67,8 +67,13 @@ def getAccessToken():
 def getUserInfo(access_token):
     import urllib3
     http = urllib3.PoolManager()
-    res = http.request('GET', USER_INFO_URL+access_token)
-    userData = json.loads(res.data.decode('utf-8'))
+    try:
+        res = http.request('GET', USER_INFO_URL+access_token)
+        userData = json.loads(res.data.decode('utf-8'))
+    except urllib3.exceptions.MaxRetryError:
+        userData = {'email': 'test@local',
+                    'picture': 'static/lock.png'
+                    }
     return userData
 
 
@@ -161,7 +166,7 @@ def main():
                            top3=top3,
                            todaysJobs=summaryToday,
                            generalStats=generalStats,
-                           topOrders=topOrders,                           
+                           topOrders=topOrders,
                            candidates=candidates,
                            adminsList=adminsList,
                            googleSession=googleSession,
