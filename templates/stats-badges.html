@@ -1,0 +1,153 @@
+<div id='badgeshistory' class="container">
+  <hr class="my-3">
+     <h2> Badges Grant History </h2>
+     {% include 'totop.html' %}
+     <div class="table-responsive table-borderless">
+         <table class="table table-striped table-hover table-sm">
+             <thead>
+                 <tr>
+                     <th scope="col">Date (granted by) </th>
+                     <th scope="col">To Whom </th>
+                     <th scope="col">Badge</th>
+                     {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                     <th scope="col">  <p> {% include 'visible_badges.html' %} </p> </th>
+                     {% endif%}
+                 </tr>
+             </thead>
+             <tbody>
+             {% for lastEntry in grantedBadges.values() %}
+                {% if not lastEntry['valid'] %}
+                 <tr class="table-dark text-muted">
+                {% else %}
+                 <tr >
+                {% endif %}
+                     <th scope="row"> <small>{{ lastEntry['date'] }}</small> <span class="text-muted">(by {{ lastEntry['grantByUserName'] }})</span> </th>
+                     <td> {{ lastEntry['username'] }} </td>
+                     <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /><span class="text">{{ lastEntry['badgeName'] }} </span> </td>
+                     {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
+                      <td class="text-center">
+                        {% if lastEntry['valid'] %}
+                          <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                        {% else %}
+                          <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                        {% endif %}
+                       </td>
+                     {% endif %}
+                 </tr>
+             {% endfor %}
+             </tbody>
+         </table>
+     </div>
+ </div>
+
+ <div class="container">
+   <hr class="my-3">
+      <div>
+      <h2 id='Achievements'> Badges and Achievements</h2>
+      {% include 'totop.html' %}
+        <p class="text-default">Badges awarded by the system after each scoring updade, trigered after each registered job.</p>
+        <p class="text-primary"> Badges that can be awarded by the SytemAdmin or BadgeAdmin</p>
+      </div>
+      <div class="table-responsive table-borderless">
+          <table class="table table-striped table-hover table-sm">
+              <thead>
+                  <tr>
+                      <th scope="col">Name</th>
+                      <th scope="col">Badge</th>
+                      <th scope="col">Description</th>
+                      <th scope="col" class="text-left">Effect</th>
+                      <th scope="col" >Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+              {% for lastEntry in allBadges.values() %}
+                {% if lastEntry['adminawarded'] == 1 %}
+                  <tr class="table-default text-primary">
+                {% else %}
+                  <tr >
+                {% endif %}
+                      <th scope="row">{{ lastEntry['name'] }}</th>
+                      <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
+                      <td> {{ lastEntry['desc'] }} </td>
+                      <td class="text-right"> {%with valueToShow= lastEntry['effect']%}{%include 'badge-points.html'%}{%endwith %}</td>
+                      <td>
+                        <button type="button" class="btn btn-warning btn-sm modalBadgeEdit" tabindex="0"
+                             data-toggle="modal" data-target="#modalBadgeEdit"
+                             data-desc="{{lastEntry['desc']}}"
+                             data-name="{{lastEntry['name']}}"
+                             data-effect="{{lastEntry['effect']}}"
+                             data-img="{{lastEntry['img']}}"
+                             data-adminawarded={{lastEntry['adminawarded']}}>
+                             <img src="static/wrench.png" width="20" height="20"/></button>
+                      </td>
+                  </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+      </div>
+
+    <div class="modal fade" id="modalBadgeEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              <img src="static/award-badge.png" width="35" height="35" />
+              <img src="static/wrench.png" width="35" height="35" /> Edit Badge Details
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="editbadge" method="post">
+              <div class="form-group">
+                <label for="badge-name" class="col-form-label">Badge name:</label>
+                <input type="text" class="form-control" id="badge-name">
+              </div>
+              <div class="form-group">
+                <label for="badge-desc" class="col-form-label">Badge description:</label>
+                <input type="text" class="form-control" id="badge-desc">
+              </div>
+              <div class="form-group">
+                <label for="badge-effect" class="col-form-label">Badge effect:</label>
+                <input type="text" class="form-control" id="badge-effect">
+              </div>
+              <div class="form-group">
+                <label for="badge-icon" class="col-form-label">Badge icon path:</label>
+                <input type="text" class="form-control" id="badge-icon">
+              </div>
+              <div class="form-group">
+                <input type="checkbox" class="col-form-input" id="badge-adminawarded">
+                <label for="badge-adminawarded" class="col-form-label">Is adminawarded?</label>
+              </div>
+              <button type="submit" class="btn btn-danger">Save Badge Changes</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(function(){
+        $('.modalBadgeEdit').click(function(e){
+          e.preventDefault();
+          var button = $(e.delegateTarget);
+          var name = button.data('name');
+          var desc = button.data('desc');
+          var effect = button.data('effect');
+          var icon = button.data('img');
+          var checked = button.data('adminawarded');
+          var mymodal = $('#modalBadgeEdit');
+          mymodal.find('#badge-name').val(name);
+          mymodal.find('#badge-desc').val(desc);
+          mymodal.find('#badge-effect').val(effect);
+          mymodal.find('#badge-icon').val(icon);
+          mymodal.find('#badge-adminawarded').checked = !!checked ;
+          mymodal.modal('show');
+        });
+      })
+    </script>
+ </div>

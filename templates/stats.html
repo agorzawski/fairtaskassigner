@@ -26,181 +26,51 @@
           <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#Achievements'> <img src="static/trophee.png" width="35" height="35" /> Badges and Achievements</a></div>
           <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#products'> <img src="static/coffee.png" width="35" height="35" /> Products Descriptons</a></div>
         </div>
-        <!-- <li><a class="btn btn-light btn-outline" href='#statistics'> <img src="static/users.png" width="35" height="35" /> Users and statistics</a></li>
-        <li><a class="btn btn-light btn-outline" href='#badgeshistory'><img src="static/award-badge.png" width="35" height="35" /> Badges Grant History</a></li>
-        <li><a class="btn btn-light btn-outline" href='#debtTransfer'><img src="static/debt-collector.png" width="35" height="35" /> Debt Transfers History</a></li>
-        <li><a class="btn btn-light btn-outline" href='#Achievements'> <img src="static/trophee.png" width="35" height="35" /> Badges and Achievements</a></li>
-        <li><a class="btn btn-light btn-outline" href='#products'> <img src="static/coffee.png" width="35" height="35" /> Products Descriptons</a></li> -->
-
         <hr class="my-3">
         {% include 'game_desc.html' %}
       </div>
 
 
       <div class="container">
-        <hr class="my-3">
-            <div>
-              <h2 id='statistics'>Users and statistics: </h2>
-              {% include 'totop.html' %}
-              <p>
-                <li>All statistics caluclated exluding self->self serving unless specified otherwise. </li>
-                <li>* Value WITH THE badge modificators, raw is offered - consumed</li>
-                <li>** Coffee offered withing # servings</li>
-                <li>*** Value without selfbuyings (Total: including selfbuyings)</li>
-                <li><span class="badge badge-light text-muted">User temporary inactive</span></li>
-              </p>
-            </div>
-            <script>
-            $(document).ready(function() {
-                $('#dtBasicExample').DataTable({
-                  "searching": false,
-                  "pageLength": 20,
-                  "scrollX": false,
-                  "order": [[ 4, "desc" ]] // false to disable search (or any other option)
-                  });
-            } );
-            </script>
-            <!-- table table-striped table-hover table-sm -->
-            <div class="table-responsive table-borderless">
-                <table id="dtBasicExample" class="table table-striped table-sm" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th scope="col">name</th>
-                            <th scope="col" class="text-right">actual<br>score*</th>
-                            <th scope="col" class="text-right">raw score  </th>
-                            <th scope="col" class="text-right">#offered<br>**</th>
-                            <th scope="col" class="text-right">#servings</th>
-                            <th scope="col" class="text-right">#avg<br>/serving</th>
-                            <th scope="col" class="text-right">#consumed<br>***</th>
-                            <th scope="col" class="text-right">#total <br>consumed</th>
-                            <!-- {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %} -->
-                            <th scope="col" class="text-center">  <p> Action {% include 'visible_badges.html' %} </p> </th>
-                            <!-- {% endif%} -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for user in users.values() %}
-                        {% if not user['active'] %} <tr class="table-dark text-muted">
-                        {% else %} <tr >{% endif %}
-                            <th class="text-left">
-                              <badge title="{{ user['email'] }}">   {{ user['username'] }}
-                              {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
-                              <a class="btn btn-outline-dark btn-sm" href='/user?user={{user['id']}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
-                              {%endif%} {%if user['validated'] == 0 %}
-                              <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/> {% endif %}
-                              {%for badge in assignedBadges.values() %} {%if  badge['userId'] == user['id'] %}
-                                  <img src="{{ badge['img'] }}" width="25" height="25" title="{{ badge['name'] }}({{ badge['date'] }}, effect: {{badge['effect']}})"/>
-                                {% endif %} {% endfor %}
-                            </badge>
-                          </th>
-                            <td class="text-right"> {%with valueToShow= user['rating']%}{%include 'badge-points.html'%}{%endwith %}  </td>
-                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('offered', 0) - usersStats.get(user['username'], {False:0}).get('consumed', 0) }}</td>
-                            <td class="text-right"> {{ usersStats.get(user['username'], {False:0}).get('offered', 0) }} </td>
-                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
-                            <td class="text-right">
-                              {% if usersStats.get(user['username'], {False:0}).get('offered', 0) > 0 %}
-                               {{ '%.1f'|format(usersStats.get(user['username'], {False:0}).get('offered', 0) / usersStats.get(user['username'], {False:0}).get('served', 0) ) }}
-                              {% else %} 0 {% endif %}
-                            </td>
-                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) }} </td>
-                            <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) + usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
-                            <td class="text-center">
-                            {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                            {% if user['active'] == 0 %}
-                              <a class="btn btn-light btn-sm" href="modifyUser?userId={{user['id']}}&active=1"> <img src="static/refresh.png" width="25" height="25" /> </a>
-                            {% else %}
-                              <a class="btn btn-light btn-sm" href="modifyUser?userId={{user['id']}}&active=0"> <img src="static/lock.png" width="25" height="25" /> </a>
-                            {% endif %}
-                            {% endif %}
-                            {% if user['rating'] < 0  %}
-                            <button type="button" class="btn btn-warning btn-sm modalDebtTransfer" tabindex="0"
-                                data-toggle="modal" data-target="#modalDebtTransfer"
-                                data-link="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"
-                                data-label="{{user['rating']}} from {{user['username']}}"><img src="static/debt-collector.png" width="25" height="25"/></button>
-                            <!-- <a href="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"> <img src="static/debt-collector.png"  width="25" height="25" /> </a> -->
-                            {% endif %}
-                          </td>
-                        </tr>{% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div id='plots'>
-            {% include 'pie-charts.html' %}
-            {%with singleUser=False%}
-            {% include 'points-evolution.html' %}
-            {%endwith%}
-            {% include 'dependency-wheel.html' %}
-          </div>
+        {% include 'stats-users.html' %}
       </div>
 
-      <div class="modal fade" id="modalDebtTransfer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel"><img src="static/debt-collector.png" width="35" height="35" /> Debt Transfer </h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              Some (neutral but stigmatic) badges will be awarded by this action. Do you confirm to take over balance of
-              <h4><span class="badge badge-warning badge-lg debtTransferName"></span>?</h4>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
-              <a id='transferDebtLink' class="btn btn-danger transferDebtLink" href=''>Transfer the balance to <b>{{loggedUsernameEmail['username']}}</b></a>
-            </div>
-          </div>
-        </div>
+      <div class="container">
+        {% include 'stats-badges.html' %}
       </div>
-      <script>
-        $(function(){
-          $('.modalDebtTransfer').click(function(e){
-            e.preventDefault();
-            var button = $(e.delegateTarget);
-            var textToDisplay = button.data('label'); // Extract info from data-* attributes
-            var recipient = button.data('link');      // Extract info from data-* attributes
-            var mymodal = $('#modalDebtTransfer');
-            mymodal.find('.debtTransferName').text(textToDisplay);
-            document.getElementsByClassName("transferDebtLink")[0].setAttribute('href', recipient)
-            mymodal.modal('show');
-          });
-        })
-      </script>
 
-
-      <div id='badgeshistory' class="container">
+      <div class="container">
         <hr class="my-3">
-           <h2> Badges Grant History </h2>
+           <h2 id='debtTransfer'> Debt Transfer History </h2>
            {% include 'totop.html' %}
            <div class="table-responsive table-borderless">
                <table class="table table-striped table-hover table-sm">
                    <thead>
                        <tr>
-                           <th scope="col">Date (granted by) </th>
-                           <th scope="col">To Whom </th>
-                           <th scope="col">Badge</th>
-                           {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-                           <th scope="col">  <p> {% include 'visible_badges.html' %} </p> </th>
-                           {% endif%}
+                           <th scope="col">Date</th>
+                           <th scope="col">From</th>
+                           <th scope="col">To Whom</th>
+                           <th scope="col">Value</th>
+
                        </tr>
                    </thead>
                    <tbody>
-                   {% for lastEntry in grantedBadges.values() %}
+                   {% for lastEntry in transferHistory.values() %}
                       {% if not lastEntry['valid'] %}
                        <tr class="table-dark text-muted">
                       {% else %}
                        <tr >
                       {% endif %}
-                           <th scope="row"> <small>{{ lastEntry['date'] }}</small> <span class="text-muted">(by {{ lastEntry['grantByUserName'] }})</span> </th>
-                           <td> {{ lastEntry['username'] }} </td>
-                           <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /><span class="text">{{ lastEntry['badgeName'] }} </span> </td>
+                           <th scope="row"> <small>{{ lastEntry['date'] }}</small> </th>
+                           <td> <img src="static/debt-relief.png" width="25" height="25" />{{ lastEntry['fromUserName'] }} </td>
+                           <td> <img src="static/debt-collector.png" width="25" height="25" /><span class="text">{{ lastEntry['toUserName'] }} </span> </td>
+                           <td> {%with valueToShow= lastEntry['value']%}{%include 'badge-points.html'%}{%endwith %}</td>
                            {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                             <td class="text-center">
                               {% if lastEntry['valid'] %}
-                                <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                                <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
                               {% else %}
-                                <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
+                                <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                               {% endif %}
                              </td>
                            {% endif %}
@@ -210,86 +80,6 @@
                </table>
            </div>
        </div>
-
-
-       <div id='debtTransfer' class="container">
-         <hr class="my-3">
-            <h2> Debt Transfer History </h2>
-            {% include 'totop.html' %}
-            <div class="table-responsive table-borderless">
-                <table class="table table-striped table-hover table-sm">
-                    <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">From</th>
-                            <th scope="col">To Whom</th>
-                            <th scope="col">Value</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for lastEntry in transferHistory.values() %}
-                       {% if not lastEntry['valid'] %}
-                        <tr class="table-dark text-muted">
-                       {% else %}
-                        <tr >
-                       {% endif %}
-                            <th scope="row"> <small>{{ lastEntry['date'] }}</small> </th>
-                            <td> <img src="static/debt-relief.png" width="25" height="25" />{{ lastEntry['fromUserName'] }} </td>
-                            <td> <img src="static/debt-collector.png" width="25" height="25" /><span class="text">{{ lastEntry['toUserName'] }} </span> </td>
-                            <td> {%with valueToShow= lastEntry['value']%}{%include 'badge-points.html'%}{%endwith %}</td>
-                            {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
-                             <td class="text-center">
-                               {% if lastEntry['valid'] %}
-                                 <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
-                               {% else %}
-                                 <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
-                               {% endif %}
-                              </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-
-       <div class="container">
-         <hr class="my-3">
-            <div>
-            <h2 id='Achievements'> Badges and Achievements</h2>
-            {% include 'totop.html' %}
-              <p class="text-default">Badges awarded by the system after each scoring updade, trigered after each registered job.</p>
-              <p class="text-primary"> Badges that can be awarded by the SytemAdmin or BadgeAdmin</p>
-            </div>
-            <div class="table-responsive table-borderless">
-                <table class="table table-striped table-hover table-sm">
-                    <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Badge</th>
-                            <th scope="col">Description</th>
-                            <th scope="col" class="text-right">Effect</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for lastEntry in allBadges.values() %}
-                      {% if lastEntry['adminawarded'] == 1 %}
-                        <tr class="table-default text-primary">
-                      {% else %}
-                        <tr >
-                      {% endif %}
-                            <th scope="row">{{ lastEntry['name'] }}</th>
-                            <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
-                            <td> {{ lastEntry['desc'] }} </td>
-                            <td class="text-right"> {%with valueToShow= lastEntry['effect']%}{%include 'badge-points.html'%}{%endwith %}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
         <div id='products' class="container">
           <hr class="my-3">
