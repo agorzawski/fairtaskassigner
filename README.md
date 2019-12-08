@@ -8,6 +8,7 @@ It works based on google authentication token (uses only login and identity pict
 - admin edits for users, badges, jobs (DEV)
 - fixed colours for points
 - small fixes (list orders)
+- instance variable (header + version from git tag)
 
 *1.7*
 - products stats
@@ -79,6 +80,7 @@ export FN_GOOGLE_CLIENT_SECRET='YOUR_CLIENT_SECRET'
 export FN_FLASK_SECRET_KEY='whatever_key'
 export FN_REDIRECT_URI='REDIRECT_URL_YOU_SPECIFY_IN_GOOGLE'
 export FN_DB_TO_USE='db/YOUR_SQLite_PATH'
+export FN_INSTANCE_NAME='Some APP name'
 
 export FN_DEBUG=True              # if not set default False
 export FN_LISTEN_HOST_IP='any ip' # if not set default 127.0.0.1
