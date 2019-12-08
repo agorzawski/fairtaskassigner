@@ -105,8 +105,8 @@
                       <tr>
                           <td> <b>{{ lastEntry[0] }}</b> </td>
                           <td> {{ lastEntry[1] }} </td>
-                          <td> <span class="badge badge-{%if lastEntry[2] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry[2] }}</span> </td>
-                          <td> <span class="badge badge-{%if lastEntry[5] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry[5] }}</span> </td>
+                          <td> {%with valueToShow= lastEntry[2]%}{%include 'badge-points.html'%}{%endwith %} </td>
+                          <td> {%with valueToShow= lastEntry[5]%}{%include 'badge-points.html'%}{%endwith %} </td>
                           <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}"> <img src="static/delete.jpg"  width="25" height="25" /> </a> </td>
                       </tr>
                   {% endfor %}

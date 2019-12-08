@@ -1,0 +1,12 @@
+{% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) %}
+<hr>
+<h3>Admin view for the instance</h3>
+<h5> FN_INSTANCE_NAME: {{instance['name']}}</h5>
+<h5> {{instance['ip']}}:{{instance['port']}}</h5>
+<p>
+  ver: {{instance['ver']}} <br>
+  FN_ADMIN_EMAIL: {{instance['admin']}} <br>
+  FN_DB_TO_USE: {{instance['db']}} <br>
+</p>
+<hr>
+{%endif%}

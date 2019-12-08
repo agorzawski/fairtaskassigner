@@ -25,7 +25,7 @@
             <div class="timeline-body">
               <p><small class="text-muted"><i class="glyphicon glyphicon-time">Total order value: {{ '%.1f'| format(eventsTimeLine.get(date).get('total', 0)|float) }} CHF </i> </small></p>
               <ul>
-  {% for id in eventsTimeLine[date].keys() %} {% if id !=  'total' %} <li>
+  {% for id in eventsTimeLine[date].keys() %} {% if id !=  'total' and id != 'all' %} <li>
             {% if loggedUsernameEmail['username'] == eventsTimeLine[date][id]['who'] %}<span class="badge badge-warning"><b> {{eventsTimeLine[date][id]['who']}} </b></span> to
             {% else %} <span><b> {{eventsTimeLine[date][id]['who']}} </b></span> to {% endif %}
             {% if loggedUsernameEmail['username'] == eventsTimeLine[date][id]['towhom'] %}<span class="badge badge-warning">{{eventsTimeLine[date][id]['towhom']}}</span>

@@ -17,6 +17,16 @@ DEBUG = os.environ.get("FN_DEBUG", default=False)
 HOST_PORT = os.environ.get("FN_HOST_PORT", default='8040')
 LISTEN_HOST_IP = os.environ.get("FN_LISTEN_HOST_IP", default='127.0.0.1')
 ADMIN_EMAIL = os.environ.get("FN_ADMIN_EMAIL", default=False)
+INSTANCE_NAME = os.environ.get("FN_INSTANCE_NAME", default='Coffee Tracker')
+INSTANCE = {'name': INSTANCE_NAME,
+            
+            'ver': '1.8.0', #add tag get from git version
+
+            'ip': LISTEN_HOST_IP,
+            'port': HOST_PORT,
+            'admin': ADMIN_EMAIL,
+            'db': os.environ.get("FN_DB_TO_USE", default=False),
+            }
 
 # You must configure these 3 first values from Google APIs console
 # https://code.google.com/apis/console
@@ -180,6 +190,7 @@ def main():
     getAssignedBadges = storage.get_users_badges()
     summaryToday = storage.get_bucket()
     return render_template('index.html',
+                           instance=INSTANCE,
                            top3=top3,
                            todaysJobs=summaryToday,
                            generalStats=generalStats,
@@ -211,6 +222,7 @@ def addJobs():
     summaryToday = storage.get_bucket()
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     return render_template('addjobs.html',
+                           instance=INSTANCE,
                            todaysJobs=summaryToday,
                            eventsTimeLine=eventsTimeLine,
                            loggedUserBadges=getLoggedUserBadges,
@@ -245,6 +257,7 @@ def stats():
     productsUse = storage.get_products_summary()
     dependencyWheelData = storage.get_dependecy_data()
     return render_template('stats.html',
+                           instance=INSTANCE,
                            users=users,
                            notValidatedUsers=notValidatedUsers,
                            products=products,
@@ -282,6 +295,7 @@ def showSignUp():
     badgesToGrant = storage.get_all_badges(badgeUniqe=True,
                                            adminBadges=adminBadges)
     return render_template('signup.html',
+                           instance=INSTANCE,
                            users=users,
                            googleSession=True,
                            notValidatedUsers=notValidatedUsers,
@@ -330,6 +344,7 @@ def user():
     products = storage.get_products()
     productsUse = storage.get_products_summary(userId=userIdToShow)
     return render_template('user.html',
+                           instance=INSTANCE,
                            userNameToShow=userNameToShow,
                            loggedUsernameEmail=loggedUsernameEmail,
                            googleSession=True,
@@ -358,6 +373,7 @@ def jobedit():
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     jobToEdit = storage.get_job_summary(jobdate)
     return render_template('jobedit.html',
+                           instance=INSTANCE,
                            loggedUsernameEmail=loggedUsernameEmail,
                            googleSession=True,
                            users=users,

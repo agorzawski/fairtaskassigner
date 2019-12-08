@@ -50,8 +50,8 @@
                         <tr>
                             <td> <b>{{ lastEntry[0] }}</b> </td>
                             <td> <b>{{ lastEntry[1] }}</b> </td>
-                            <td> <span class="badge badge-{%if lastEntry[2] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry[2] }}</span> </td>
-                            <td> <span class="badge badge-{%if lastEntry[5] >= 0%}success{%else%}danger{%endif%}">{{ lastEntry[5] }}</span> </td>
+                            <td> {%with valueToShow= lastEntry[2]%}{%include 'badge-points.html'%}{%endwith %} </td>
+                            <td> {%with valueToShow= lastEntry[5]%}{%include 'badge-points.html'%}{%endwith %} </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -89,7 +89,7 @@
                                   {% endif %}
                                 {% endfor %}
                               </th>
-                              <td class="text-right"> <span class="badge badge-{%if topper[2] >= 0%}success{%else%}danger{%endif%}">{{'%d'| format(topper[2]|float)}}</span></td>
+                              <td class="text-right"> {%with valueToShow= topper[2]%}{%include 'badge-points.html'%}{%endwith %}</td>
                           </tr>
                       {% endfor %}
                       </tbody>
@@ -115,7 +115,7 @@
                               <th scope="row">{{ topper[0] }}</th>
                               <td class="text-right"> {{'%d'| format(topper[1]|float)}} </td>
                               <td class="text-right"> {{'%0.1f'| format(topper[2]|float)}} </td>
-                              <td class="text-right"> <span class="badge badge-{%if topper[3] >= 0%}success{%else%}danger{%endif%}">{{'%d'| format(topper[3]|float)}}</span></td>
+                              <td class="text-right">{%with valueToShow= topper[3]%}{%include 'badge-points.html'%}{%endwith %}</td>
                           </tr>
                       {% endfor %}
                       </tbody>
