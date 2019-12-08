@@ -323,9 +323,7 @@ class fairtaskDB:
         if onlyNotValidated:
             sql = 'select * from user where validated=0 %s %s %s order by username' % (extraSql, onlyRealSql, addSql)
 
-        print(sql)
         data = self.execute_get_sql(sql)
-        print(data)
         toReturn = {}
         for one in data:
             toReturn[one[0]] = {'id': one[0],
