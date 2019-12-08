@@ -19,7 +19,7 @@ LISTEN_HOST_IP = os.environ.get("FN_LISTEN_HOST_IP", default='127.0.0.1')
 ADMIN_EMAIL = os.environ.get("FN_ADMIN_EMAIL", default=False)
 INSTANCE_NAME = os.environ.get("FN_INSTANCE_NAME", default='Coffee Tracker')
 INSTANCE = {'name': INSTANCE_NAME,
-            
+
             'ver': '1.8.0', #add tag get from git version
 
             'ip': LISTEN_HOST_IP,
@@ -240,7 +240,7 @@ def stats():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
     loggedUsernameEmail = getLoggedUserDetails()
-    users = storage.get_users()
+    users = storage.get_users(onlyReal=False)
     products = storage.get_products()
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
     adminsList = storage.get_admins()
@@ -336,6 +336,7 @@ def user():
             return redirect(url_for('main'))
 
     adminsList = storage.get_admins()
+    users = storage.get_users(onlyReal=False)
     getLoggedUserBadges = storage.get_users_badges(userId=userIdToShow)
     allJobs = storage.get_jobs_summary(withUser=userNameToShow)
     badgesTimeline = storage.get_badge_grant_history(withUser=userNameToShow)
@@ -345,7 +346,9 @@ def user():
     productsUse = storage.get_products_summary(userId=userIdToShow)
     return render_template('user.html',
                            instance=INSTANCE,
+                           users = users,
                            userNameToShow=userNameToShow,
+                           userIdToShow=userIdToShow,
                            loggedUsernameEmail=loggedUsernameEmail,
                            googleSession=True,
                            adminsList=adminsList,

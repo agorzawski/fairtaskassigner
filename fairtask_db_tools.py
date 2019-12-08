@@ -302,15 +302,30 @@ class fairtaskDB:
         else:
             raise ValueError('No Product with that ID ', id)
 
-    def get_users(self, onlyNotValidated=False, active=None):
-        # TODO move to dict
+    def get_users(self, onlyNotValidated=False, active=None, onlyReal=True):
+        onlyRealSql = ''
+        if onlyReal:
+            onlyRealSql = ' id > 0 '
+
         addSql = ''
         if active is not None:
             addSql = ' and active=%d'%active
-        sql = 'select * from user where id > 0 %s order by username' % addSql
+
+        extraSql = ' and '
+        if len(addSql)==0 and len(onlyRealSql)==0:
+            extraSql = ''
+
+        extraSql2 = ' where '
+        if len(addSql)==0 and len(onlyRealSql)==0:
+            extraSql2 = ''
+
+        sql = 'select * from user %s %s %s order by username' % (extraSql2, onlyRealSql, addSql)
         if onlyNotValidated:
-            sql = 'select * from user where validated=0 and id > 0 %s order by username' % addSql
+            sql = 'select * from user where validated=0 %s %s %s order by username' % (extraSql, onlyRealSql, addSql)
+
+        print(sql)
         data = self.execute_get_sql(sql)
+        print(data)
         toReturn = {}
         for one in data:
             toReturn[one[0]] = {'id': one[0],

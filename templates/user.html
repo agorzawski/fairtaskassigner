@@ -12,7 +12,7 @@
       </div>
 
       <div class="jumbotron">
-        {% include 'instance_info.html'%}  
+        {% include 'instance_info.html'%}
         <h1>{{userNameToShow}} details (draft)</h1>
 
         <div div class="alert alert-warning alert-dismissible fade show message_flash" role="alert">This is a prototype of this page. Some disagreement may arise if browsing <b>different</b> users!
@@ -29,6 +29,9 @@
         {% for badge in loggedUserBadges.values() %}
         <p>On {{badge['date']}}  <a class="dropdown-item" href="#"><img src="{{badge['img']}}" width=25 height=25 /> <b>{{badge['name']}}</b> ({{badge['desc']}}, effect {{badge['effect']}}) </a></p>
         {% endfor %}
+        <h4>Added by: </h4>
+        <p>ID:   {{users[userIdToShow]['creator']}}<br></p>
+        <p>USER: {{users[users[userIdToShow]['creator']]['username']}} </p>
       </div>
 
       <div class="well">
