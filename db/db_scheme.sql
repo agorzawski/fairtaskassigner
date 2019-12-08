@@ -9,12 +9,16 @@ CREATE TABLE "badges" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 
 CREATE TABLE "user" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
   `email` TEXT NOT NULL, `username` TEXT NOT NULL, `rating` INTEGER NOT NULL,
-  `creator` INTEGER NOT NULL, `validated` INTEGER NOT NULL )
+  `creator` INTEGER NOT NULL, `validated` INTEGER NOT NULL,
+  `added` TEXT NOT NULL, `active` INTEGER NOT NULL )
+INSERT INTO user values (-9,'','SystemApp', 0, -9, 1, '', 1)
+INSERT INTO user values (-666,'','SelfAdded', 0, -9, 1, '', 1)
 
 CREATE TABLE "product" ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
   `name` TEXT NOT NULL, `price` REAL NOT NULL, `size` REAL, `caffeine` REAL )
 
 CREATE TABLE "contract_temp" ( `to_whom` INTEGER NOT NULL, `product` INTEGER NOT NULL )
+
 CREATE TABLE "contract" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, `buyer`
   INTEGER NOT NULL, `to_whom` INTEGER NOT NULL, `product` INTEGER NOT NULL, `date` INTEGER NOT NULL, `creator` INTEGER NOT NULL )
 
