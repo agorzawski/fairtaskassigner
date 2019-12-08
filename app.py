@@ -9,6 +9,9 @@ import fairtask_utils
 from flask import Flask, render_template, request, json, redirect, url_for, session, flash, get_flashed_messages, make_response
 from flask_oauth import OAuth
 import os
+import pytz
+from pytz import timezone
+
 
 DEBUG = os.environ.get("FN_DEBUG", default=False)
 HOST_PORT = os.environ.get("FN_HOST_PORT", default='8040')
@@ -33,9 +36,23 @@ HOUR_IN_SECONDS = 3600
 NON_EXISTING_ID = -666
 NON_SELECTED_VALUE = -1
 
+
+def datetimefilter(value,
+                   format="%Y-%m-%d %H:%M:%S",
+                   tz=pytz.timezone('Europe/Paris')):
+    from datetime import datetime
+    value = datetime.strptime(value, format).astimezone(tz=pytz.timezone('UTC'))
+    print(value)
+    local_dt = value.astimezone(tz)
+    print(local_dt)
+    return local_dt.strftime(format)
+
+
 app = Flask(__name__)
 app.debug = DEBUG
 app.secret_key = 'development key'
+app.jinja_env.filters['datetimefilter'] = datetimefilter
+
 storage = fairtaskDB(allowCommit=True)
 oauth = OAuth()
 google = oauth.remote_app('google',
@@ -324,6 +341,32 @@ def user():
                            eventsTimeLine=eventsTimeLine,)
 
 
+@app.route('/jobedit', methods=['GET'])
+def jobedit():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    loggedUsernameEmail = getLoggedUserDetails()
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+
+    jobdate = request.args.get('date', -1)
+    users = storage.get_users(active=1)
+    products = storage.get_products()
+    adminsList = storage.get_admins()
+    getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
+    jobToEdit = storage.get_job_summary(jobdate)
+    return render_template('jobedit.html',
+                           loggedUsernameEmail=loggedUsernameEmail,
+                           googleSession=True,
+                           users=users,
+                           products=products,
+                           jobToEdit=jobToEdit,
+                           adminsList=adminsList,
+                           loggedUserBadges=getLoggedUserBadges,)
+
+
 @app.route('/signUp', methods=['POST'])
 def signUp():
     if not isLoginValid():
@@ -483,6 +526,35 @@ def removeBucketItem():
         storage.remove_item_in_bucket(towhom, what)
         flash('Removed one entry form the bucket')
     return redirect(url_for('addJobs'))
+
+
+@app.route('/editUser', methods=['POST'])
+def editUser():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    print("=======[DEV]========")
+    print("------------------")
+    print(request.form)
+    print("------------------")
+    return redirect(url_for('stats'))
+
+@app.route('/editBadge', methods=['POST'])
+def editBadge():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    print("=======[DEV]========")
+    print("------------------")
+    print(request.form)
+    print("------------------")
+    return redirect(url_for('stats'))
 
 
 @app.route('/modifyUser', methods=['GET'])

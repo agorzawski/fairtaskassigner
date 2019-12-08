@@ -1,0 +1,229 @@
+<hr class="my-3">
+    <div>
+      <h2 id='statistics'>Users and statistics: </h2>
+      {% include 'totop.html' %}
+      <p>
+        <li>All statistics caluclated exluding self->self serving unless specified otherwise. </li>
+        <li>* Value WITH THE badge modificators, raw is offered - consumed</li>
+        <li>** Coffee offered withing # servings</li>
+        <li>*** Value without selfbuyings (Total: including selfbuyings)</li>
+        <li><span class="badge badge-light text-muted">User temporary inactive</span></li>
+      </p>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $('#dtBasicExample').DataTable({
+          "searching": false,
+          "pageLength": 20,
+          "scrollX": false,
+          "order": [[ 4, "desc" ]] // false to disable search (or any other option)
+          });
+    } );
+    </script>
+    <!-- table table-striped table-hover table-sm -->
+    <div class="table-responsive table-borderless">
+        <table id="dtBasicExample" class="table table-striped table-sm" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th scope="col">name {% include 'visible_badges.html' %}</th>
+                    <th scope="col" class="text-right">actual<br>score*</th>
+                    <th scope="col" class="text-right">raw score  </th>
+                    <th scope="col" class="text-right">#offered<br>**</th>
+                    <th scope="col" class="text-right">#servings</th>
+                    <th scope="col" class="text-right">#avg<br>/serving</th>
+                    <th scope="col" class="text-right">#consumed<br>***</th>
+                    <th scope="col" class="text-right">#total <br>consumed</th>
+                    <!-- {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %} -->
+                    <th scope="col" class="text-center"> Action </th>
+                    <!-- {% endif%} -->
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users.values() %}
+                {% if not user['active'] %} <tr class="table-dark text-muted">
+                {% else %} <tr >{% endif %}
+                    <th class="text-left">
+                      <badge title="{{ user['email'] }}">   {{ user['username'] }}
+                      {%if user['validated'] == 0 %}
+                      <img src="static/exclamation-alert.png" width="25" height="25" title="NOT VALIDATED!"/> {% endif %}
+                      {%for badge in assignedBadges.values() %} {%if  badge['userId'] == user['id'] %}
+                          <img src="{{ badge['img'] }}" width="25" height="25" title="{{ badge['name'] }}({{ badge['date'] }}, effect: {{badge['effect']}})"/>
+                        {% endif %} {% endfor %}
+                        <br>
+                        {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
+                        <small>AdminPanel:</small>
+                        <a class="btn btn-warning btn-sm" href='/user?user={{user['id']}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
+                        <button type="button" class="btn btn-warning btn-sm modalUserEdit" tabindex="0"
+                             data-toggle="modal" data-target="#modalUserEdit"
+                             data-id="{{user['id']}}"
+                             data-name="{{user['username']}}"
+                             data-email="{{user['email']}}"
+                             data-active={{user['active']}}
+                             data-validated={{user['validated']}}
+                             data-creator="{{user['creator']}}"
+                             ><img src="static/wrench.png" width="15" height="15"/></button>
+                        {%endif%}
+                        {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                        {% if user['active'] == 0 %}
+                          <a class="btn btn-success btn-sm" href="modifyUser?userId={{user['id']}}&active=1"> <img src="static/refresh.png" width="15" height="15" /> </a>
+                        {% else %}
+                          <a class="btn btn-danger btn-sm" href="modifyUser?userId={{user['id']}}&active=0"> <img src="static/lock.png" width="15" height="15" /> </a>
+                        {% endif %}
+                        {% endif %}
+                    </badge>
+                  </th>
+                    <td class="text-right"> {%with valueToShow= user['rating']%}{%include 'badge-points.html'%}{%endwith %}  </td>
+                    <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('offered', 0) - usersStats.get(user['username'], {False:0}).get('consumed', 0) }}</td>
+                    <td class="text-right"> {{ usersStats.get(user['username'], {False:0}).get('offered', 0) }} </td>
+                    <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
+                    <td class="text-right">
+                      {% if usersStats.get(user['username'], {False:0}).get('offered', 0) > 0 %}
+                       {{ '%.1f'|format(usersStats.get(user['username'], {False:0}).get('offered', 0) / usersStats.get(user['username'], {False:0}).get('served', 0) ) }}
+                      {% else %} 0 {% endif %}
+                    </td>
+                    <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) }} </td>
+                    <td class="text-right">{{ usersStats.get(user['username'], {False:0}).get('consumed', 0) + usersStats.get(user['username'], {False:0}).get('served', 0) }}</td>
+                    <td class="text-center">
+                    {% if user['rating'] < 0  %}
+                    <button type="button" class="btn btn-primary btn-sm modalDebtTransfer" tabindex="0"
+                        data-toggle="modal" data-target="#modalDebtTransfer"
+                        data-link="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"
+                        data-label="{{user['rating']}} from {{user['username']}}"><img src="static/debt-collector.png" width="25" height="25"/></button>
+                    <!-- <a href="transferDebt?fromUserId={{user['id']}}&toUserId={{loggedUsernameEmail['id']}}"> <img src="static/debt-collector.png"  width="25" height="25" /> </a> -->
+                    {% endif %}
+
+                  </td>
+                </tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="modal fade" id="modalUserEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              <img src="static/users.png" width="35" height="35" />
+              <img src="static/wrench.png" width="35" height="35" /> Edit User's Details
+              </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id='user-data-to-submit'>
+              <div class="form-group">
+                <label for="user-id" class="col-form-label">User id:</label>
+                <input type="text" class="form-control" id="user-id" readonly>
+              </div>
+              <div class="form-group">
+                <label for="user-name" class="col-form-label">User name:</label>
+                <input type="text" class="form-control" id="user-name">
+              </div>
+              <div class="form-group">
+                <label for="user-email" class="col-form-label">User email:</label>
+                <input type="text" class="form-control" id="user-email" readonly>
+              </div>
+              <div class="form-group">
+                <label for="user-creator" class="col-form-label">User's creator:</label>
+                <input type="text" class="form-control" id="user-creator" readonly>
+              </div>
+              <div class="form-group">
+                <input type="checkbox" class="col-form-input" id="user-validated">
+                <label for="user-validated" class="col-form-label">Is validated?</label>
+              </div>
+              <div class="form-group">
+                <input type="checkbox" class="col-form-input" id="user-active">
+                <label for="user-active" class="col-form-label">Is active?</label>
+              </div>
+              <input type="submit" value="Save changes" class="btn btn-danger"/>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(function(){
+       $('#modalUserEdit').on('submit', function(e){
+            e.preventDefault();
+            $.ajax({
+                url: "/editUser",
+                data: $('#user-data-to-submit').serialize(),
+                type: "POST",
+                success: function(data){
+                    alert("Not yet implemented! Thanks for trying.")
+                    location.reload();
+                }
+            });
+       });
+    });
+
+      $(function(){
+        $('.modalUserEdit').click(function(e){
+          e.preventDefault();
+          var button = $(e.delegateTarget);
+          var id = button.data('id');
+          var name = button.data('name');
+          var email = button.data('email');
+          var creator = button.data('creator');
+          var active = button.data('active');
+          var validated = button.data('validated');
+          var mymodal = $('#modalUserEdit');
+          mymodal.find('#user-id').val(id);
+          mymodal.find('#user-name').val(name);
+          mymodal.find('#user-email').val(email);
+          mymodal.find('#user-creator').val(creator);
+          mymodal.find('input#user-active')[0].checked = !!active;
+          mymodal.find('input#user-validated')[0].checked = !!validated;
+          mymodal.modal('show');
+        });
+      });
+    </script>
+
+
+    <div class="modal fade" id="modalDebtTransfer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"><img src="static/debt-collector.png" width="35" height="35" /> Debt Transfer </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Some (neutral but stigmatic) badges will be awarded by this action. Do you confirm to take over balance of
+            <h4><span class="badge badge-warning badge-lg debtTransferName"></span>?</h4>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+            <a id='transferDebtLink' class="btn btn-danger transferDebtLink" href=''>Transfer the balance to <b>{{loggedUsernameEmail['username']}}</b></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(function(){
+        $('.modalDebtTransfer').click(function(e){
+          e.preventDefault();
+          var button = $(e.delegateTarget);
+          var textToDisplay = button.data('label'); // Extract info from data-* attributes
+          var recipient = button.data('link');      // Extract info from data-* attributes
+          var mymodal = $('#modalDebtTransfer');
+          mymodal.find('.debtTransferName').text(textToDisplay);
+          document.getElementsByClassName("transferDebtLink")[0].setAttribute('href', recipient)
+          mymodal.modal('show');
+        });
+      })
+    </script>
+
+    <div id='plots'>
+    {% include 'pie-charts.html' %}
+    {%with singleUser=False%}
+    {% include 'points-evolution.html' %}
+    {%endwith%}
+    {% include 'dependency-wheel.html' %}
+    </div>

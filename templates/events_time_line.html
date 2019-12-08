@@ -8,7 +8,18 @@
           <div class="timeline-badge dark"> </div>
           <div class="timeline-panel">
             <div class="timeline-heading">
-              <h4 class="timeline-title">Action on {{ date }}</h4>
+              <h3 class="timeline-title">Action on {{ date }}
+                {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
+                <a class="btn btn-outline-warning btn-sm" href="/jobedit?date={{date}}"> <img src="static/search.png" width="15" height="15"/> </a>
+
+                <button type="button" class="btn btn-warning btn-sm modalJobEdit" tabindex="0"
+                     data-toggle="modal" data-target="#modalJobEdit"
+                     data-date="{{date}}"
+                     ><img src="static/wrench.png" width="15" height="15"/>
+                 </button>
+
+                {% endif %}
+              </h3>
 
             </div>
             <div class="timeline-body">
@@ -29,3 +40,45 @@
         {% endfor %}
     </ul>
 </div>
+
+
+<div class="modal fade" id="modalJobEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          <img src="static/coffee.png" width="35" height="35" />
+          <img src="static/wrench.png" width="35" height="35" /> Edit Job's Details
+          </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="editUser" method="post">
+          <div class="form-group">
+            <label for="job-date" class="col-form-label">When</label>
+            <input type="text" class="form-control" id="job-date" readonly>
+          </div>
+
+            <button type="submit" class="btn btn-danger">Save Job Changes</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(function(){
+    $('.modalJobEdit').click(function(e){
+      e.preventDefault();
+      var button = $(e.delegateTarget);
+      var date = button.data('date');
+      var mymodal = $('#modalJobEdit');
+      mymodal.find('#job-date').val(date);
+      mymodal.modal('show');
+    });
+  })
+</script>

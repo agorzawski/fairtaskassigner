@@ -61,6 +61,59 @@
       </div>
 
       {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+
+      <div class="container">
+               <hr class="my-3">
+               <h4> Add product </h4>
+               {% include 'totop.html' %}
+               <p>  {% include 'visible_badges.html' %} </p>
+               <br>
+               <form class="form-signin">
+               <div class="form-group">
+                 <label for="productName">name:</label>
+                 <input name="productName" id="productName"
+                   class="form-control" placeholder="What name to use" required autofocus>
+               </div>
+               <div class="form-group">
+               <label for="productPrice">price [chf]:</label>
+                 <input  name="productPrice" id="productPrice"
+                   class="form-control" placeholder= "0.0" required autofocus>
+               </div>
+               <div class="form-group">
+               <label for="productSize">size [mL]:</label>
+                 <input name="productSize" id="productSize"
+                   class="form-control" placeholder= "100.0" required autofocus>
+               </div>
+               <div class="form-group">
+               <label for="productCoffeine">coffeine [mg]:</label>
+                 <input name="productCoffeine" id="productCoffeine"
+                   class="form-control" placeholder= "30.0" required autofocus>
+               </div>
+
+               <br>
+               <button id="addProduct" class="btn btn-lg btn-success btn-block" type="button">Add product</button>
+               <script>
+                 $(function() {
+                     $('#addProduct').click(function() {
+                         $.ajax({
+                             url: '/addProduct',
+                             data: $('form').serialize(),
+                             type: 'POST',
+                             success: function(response) {
+                                 location.reload();
+                                 console.log(response);
+                             },
+                             error: function(error) {
+                                 console.log(error);
+                             }
+                         });
+                     });
+                   }
+                 );
+               </script>
+               </form>
+       </div>
+
       <div class="container">
               <hr class="my-3">
                <h4> GrantBadges</h4>
@@ -110,62 +163,6 @@
 
        </div>
        {% endif %}
-
-
-       {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
-       <div class="container">
-                <hr class="my-3">
-                <h4> Add product </h4>
-                {% include 'totop.html' %}
-                <p>  {% include 'visible_badges.html' %} </p>
-                <br>
-                <form class="form-signin">
-                <div class="form-group">
-                  <label for="productName">name:</label>
-                  <input name="productName" id="productName"
-                    class="form-control" placeholder="What name to use" required autofocus>
-                </div>
-                <div class="form-group">
-                <label for="productPrice">price [chf]:</label>
-                  <input  name="productPrice" id="productPrice"
-                    class="form-control" placeholder= "0.0" required autofocus>
-                </div>
-                <div class="form-group">
-                <label for="productSize">size [mL]:</label>
-                  <input name="productSize" id="productSize"
-                    class="form-control" placeholder= "100.0" required autofocus>
-                </div>
-                <div class="form-group">
-                <label for="productCoffeine">coffeine [mg]:</label>
-                  <input name="productCoffeine" id="productCoffeine"
-                    class="form-control" placeholder= "30.0" required autofocus>
-                </div>
-
-                <br>
-                <button id="addProduct" class="btn btn-lg btn-success btn-block" type="button">Add product</button>
-                <script>
-                  $(function() {
-                      $('#addProduct').click(function() {
-                          $.ajax({
-                              url: '/addProduct',
-                              data: $('form').serialize(),
-                              type: 'POST',
-                              success: function(response) {
-                                  location.reload();
-                                  console.log(response);
-                              },
-                              error: function(error) {
-                                  console.log(error);
-                              }
-                          });
-                      });
-                    }
-                  );
-                </script>
-                </form>
-
-        </div>
-        {% endif %}
 
       <footer class="footer">
       {% include 'footer.html' %}
