@@ -4,6 +4,11 @@ It is a simple web server application that allows to track the activities (e.g. 
 
 It works based on google authentication token (uses only login and identity picture!).
 
+*1.8*
+- admin edits for users, badges, jobs (DEV)
+- fixed colours for points
+- small fixes (list orders)
+
 *1.7*
 - products stats
 - debt transfer (on demand form any user at negative balance)

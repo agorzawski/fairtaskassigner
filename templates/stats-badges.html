@@ -99,7 +99,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form action="editbadge" method="post">
+            <form id="badge-data-to-submit" action="editbadge" method="post">
               <div class="form-group">
                 <label for="badge-name" class="col-form-label">Badge name:</label>
                 <input type="text" class="form-control" id="badge-name">
@@ -120,7 +120,7 @@
                 <input type="checkbox" class="col-form-input" id="badge-adminawarded">
                 <label for="badge-adminawarded" class="col-form-label">Is adminawarded?</label>
               </div>
-              <button type="submit" class="btn btn-danger">Save Badge Changes</button>
+              <input type="submit" value="Save changes" class="btn btn-danger"/>
             </form>
           </div>
           <div class="modal-footer">
@@ -131,6 +131,22 @@
       </div>
     </div>
     <script>
+
+    $(function(){
+       $('#modalBadgeEdit').on('submit', function(e){
+            e.preventDefault();
+            $.ajax({
+                url: "/editBadge",
+                data: $('#badge-data-to-submit').serialize(),
+                type: "POST",
+                success: function(data){
+                    alert("Not yet implemented! Thanks for trying.")
+                    location.reload();
+                }
+            });
+       });
+    });
+
       $(function(){
         $('.modalBadgeEdit').click(function(e){
           e.preventDefault();

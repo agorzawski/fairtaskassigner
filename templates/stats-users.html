@@ -112,7 +112,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form action="editUser" method="post">
+            <form id='user-data-to-submit'>
               <div class="form-group">
                 <label for="user-id" class="col-form-label">User id:</label>
                 <input type="text" class="form-control" id="user-id" readonly>
@@ -137,7 +137,7 @@
                 <input type="checkbox" class="col-form-input" id="user-active">
                 <label for="user-active" class="col-form-label">Is active?</label>
               </div>
-                <button type="submit" class="btn btn-danger">Save User Changes</button>
+              <input type="submit" value="Save changes" class="btn btn-danger"/>
             </form>
           </div>
           <div class="modal-footer">
@@ -147,6 +147,21 @@
       </div>
     </div>
     <script>
+    $(function(){
+       $('#modalUserEdit').on('submit', function(e){
+            e.preventDefault();
+            $.ajax({
+                url: "/editUser",
+                data: $('#user-data-to-submit').serialize(),
+                type: "POST",
+                success: function(data){
+                    alert("Not yet implemented! Thanks for trying.")
+                    location.reload();
+                }
+            });
+       });
+    });
+
       $(function(){
         $('.modalUserEdit').click(function(e){
           e.preventDefault();
@@ -162,11 +177,11 @@
           mymodal.find('#user-name').val(name);
           mymodal.find('#user-email').val(email);
           mymodal.find('#user-creator').val(creator);
-          mymodal.find('#user-active').checked = !!checked;
-          mymodal.find('#user-validated').checked = !!validated;
+          mymodal.find('input#user-active')[0].checked = !!active;
+          mymodal.find('input#user-validated')[0].checked = !!validated;
           mymodal.modal('show');
         });
-      })
+      });
     </script>
 
 

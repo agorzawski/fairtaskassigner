@@ -178,7 +178,7 @@ def main():
                            top3=top3,
                            todaysJobs=summaryToday,
                            generalStats=generalStats,
-                           topOrders=topOrders,                           
+                           topOrders=topOrders,
                            candidates=candidates,
                            adminsList=adminsList,
                            googleSession=googleSession,
@@ -521,6 +521,35 @@ def removeBucketItem():
         storage.remove_item_in_bucket(towhom, what)
         flash('Removed one entry form the bucket')
     return redirect(url_for('addJobs'))
+
+
+@app.route('/editUser', methods=['POST'])
+def editUser():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    print("=======[DEV]========")
+    print("------------------")
+    print(request.form)
+    print("------------------")
+    return redirect(url_for('stats'))
+
+@app.route('/editBadge', methods=['POST'])
+def editBadge():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    print("=======[DEV]========")
+    print("------------------")
+    print(request.form)
+    print("------------------")
+    return redirect(url_for('stats'))
 
 
 @app.route('/modifyUser', methods=['GET'])
