@@ -18,10 +18,10 @@ HOST_PORT = os.environ.get("FN_HOST_PORT", default='8040')
 LISTEN_HOST_IP = os.environ.get("FN_LISTEN_HOST_IP", default='127.0.0.1')
 ADMIN_EMAIL = os.environ.get("FN_ADMIN_EMAIL", default=False)
 INSTANCE_NAME = os.environ.get("FN_INSTANCE_NAME", default='Coffee Tracker')
+stream = os.popen('git describe --tags')
+GIT_LAST_TAG = stream.read()
 INSTANCE = {'name': INSTANCE_NAME,
-
-            'ver': '1.8.0', #add tag get from git version
-
+            'ver': GIT_LAST_TAG,
             'ip': LISTEN_HOST_IP,
             'port': HOST_PORT,
             'admin': ADMIN_EMAIL,
