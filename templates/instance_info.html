@@ -1,6 +1,6 @@
 {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) %}
-<hr>
 <h3>Admin view for the instance</h3>
+<hr>
 <h5> FN_INSTANCE_NAME: {{instance['name']}}</h5>
 <h5> {{instance['ip']}}:{{instance['port']}}</h5>
 <p>
@@ -8,5 +8,13 @@
   FN_ADMIN_EMAIL: {{instance['admin']}} <br>
   FN_DB_TO_USE: {{instance['db']}} <br>
 </p>
+
+<a href='/calculateScoring' class="btn btn-outline-danger btn-block">
+  Refresh badges & scoring <img src="static/delete.jpg" width=20 height=20 /> <img src="static/refresh.png" width=20 height=20 />
+</a>
+<a href='/applyInflation' class="btn btn-outline-danger btn-block">
+  Apply inflation (-1 for all active) <img src="static/inflation.png" width=20 height=20 /> <img src="static/refresh.png" width=20 height=20 />
+</a>
+
 <hr>
 {%endif%}
