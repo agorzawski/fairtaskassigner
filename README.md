@@ -1,5 +1,5 @@
 # FairTaskAssigner
-[![Latest changes badge][changelog-badge]][changelog]
+[![Latest changes badge][changelog-badge]][CHANGELOG.md]
 
 It is a simple web server application that allows to track the activities (e.g. coffee servings) within the group of friends. It provides many features of tracking points and queue for next servers.
 
@@ -9,7 +9,7 @@ It is a simple web server application that allows to track the activities (e.g. 
 
 ![Who buys whom graph](doc/who-buys-whom.png)
 
-![Queue for next order indication](/doc/ranking-evolution.png)
+![Queue for next order indication](doc/queue.png)
 
 It works based on google authentication token (uses only login and identity picture!).
 
