@@ -35,7 +35,7 @@ Highcharts.chart('containerPlot', {
     name: 'Users',
     colorByPoint: true,
     data: [
-    {% for user in users.values() %} {% if usersStats.get(user['username'], {False:0}).get('offered', 0) > 0 %} {name: '{{user['username']}}', y: {{ usersStats.get(user['username'], {False:0}).get('offered', 0) }}},{%endif%}
+    {% for user in users.values() if user['id'] > 0 %} {% if usersStats.get(user['username'], {False:0}).get('offered', 0) > 0 %} {name: '{{user['username']}}', y: {{ usersStats.get(user['username'], {False:0}).get('offered', 0) }}},{%endif%}
     {% endfor %}
   ] }]
 });
@@ -70,7 +70,7 @@ Highcharts.chart('containerPlotTotal', {
     name: 'Users',
     colorByPoint: true,
     data: [
-    {% for user in users.values() %} {name: '{{user['username']}}', y: {{ usersStats.get(user['username'], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}},
+    {% for user in users.values() if user['id'] > 0 %} {name: '{{user['username']}}', y: {{ usersStats.get(user['username'], {False:0}).get('consumed', 0) + usersStats.get(user[2], {False:0}).get('served', 0) }}},
     {% endfor %}
   ]}]
 });
