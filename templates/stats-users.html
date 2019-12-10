@@ -232,5 +232,13 @@
     {%with singleUser=False%}
     {% include 'points-evolution.html' %}
     {%endwith%}
+
+    {%with dataToPlot=dependencyWheelData, dependencyWheelId="onePlot", title="Who buys whom"%}
     {% include 'dependency-wheel.html' %}
+    {%endwith%}
+
+    {%with dataToPlot=dependencyMapFixed, dependencyWheelId="otherPlot", title="Who with whom drinks coffee"%}
+    {% include 'dependency-wheel.html' %}
+    {%endwith%}
+
     </div>

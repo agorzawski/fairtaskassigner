@@ -11,12 +11,7 @@
      {% for badge in loggedUserBadges.values() %}
        <a class="dropdown-item" href="#"><img src="{{badge['img']}}" width=25 height=25 /> <b>{{badge['name']}}</b> ({{badge['desc']}}, effect {{badge['effect']}}) </a>
      {% endfor %}
-     {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-     <div class="dropdown-divider"></div>
-     <a href='/calculateScoring' class="btn btn-outline-danger btn-block">
-       Refresh badges & scoring <img src="static/delete.jpg" width=20 height=20 /> <img src="static/refresh.png" width=20 height=20 />
-     </a>
-     {% endif %}
+
      <div class="dropdown-divider"></div>
      {% include 'quick_add.html'%}
      <div class="dropdown-divider"></div>

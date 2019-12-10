@@ -1,14 +1,13 @@
-<!--  Requires a dict of users -> [(t1,v1)]-->
-<div id="dependencyWheel"></div>
+<div id="{{dependencyWheelId}}"></div>
 <script>
-Highcharts.chart('dependencyWheel', {
+Highcharts.chart('{{dependencyWheelId}}', {
     title: {
-        text: 'Serving Dependency Wheel'
+        text: '{{title}}'
     },
     series: [{
         keys: ['from', 'to', 'weight'],
       data: [
-        {% for oneData in dependencyWheelData%} [ '{{oneData[0]}}', '{{oneData[1]}}', {{oneData[2]}} ] ,
+        {% for oneData in dataToPlot%} [ '{{oneData[0]}}', '{{oneData[1]}}', {{oneData[2]}} ] ,
         {%endfor%}
         ],
         type: 'dependencywheel',

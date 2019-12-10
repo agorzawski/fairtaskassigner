@@ -20,8 +20,10 @@ ADMIN_EMAIL = os.environ.get("FN_ADMIN_EMAIL", default=False)
 INSTANCE_NAME = os.environ.get("FN_INSTANCE_NAME", default='Coffee Tracker')
 stream = os.popen('git describe --tags')
 GIT_LAST_TAG = stream.read()
+stream = os.popen('git rev-parse --abbrev-ref HEAD')
+GIT_BRANCH = stream.read()
 INSTANCE = {'name': INSTANCE_NAME,
-            'ver': GIT_LAST_TAG,
+            'ver': GIT_LAST_TAG+'/'+GIT_BRANCH,
             'ip': LISTEN_HOST_IP,
             'port': HOST_PORT,
             'admin': ADMIN_EMAIL,
@@ -256,6 +258,10 @@ def stats():
     transferHistory = storage.get_debt_transfer_history()
     productsUse = storage.get_products_summary()
     dependencyWheelData = storage.get_dependecy_data()
+    dependencyMapData = fairtask_utils.compute_who_with_whom(storage=storage)
+    dependencyMapFixed = []
+    for one in dependencyMapData.keys():
+        dependencyMapFixed.append((users[one[0]]['username'], users[one[1]]['username'], dependencyMapData[one] ))
     return render_template('stats.html',
                            instance=INSTANCE,
                            users=users,
@@ -273,6 +279,7 @@ def stats():
                            productsUse=productsUse,
                            transferHistory=transferHistory,
                            dependencyWheelData=dependencyWheelData,
+                           dependencyMapFixed=dependencyMapFixed,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -283,7 +290,7 @@ def showSignUp():
         return rememberTheInitialRequest(redirect(url_for('login')),
                                          request.endpoint)
     loggedUsernameEmail = getLoggedUserDetails()
-    users = storage.get_users()
+    users = storage.get_users(active=1)
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     getAllBadges = storage.get_all_badges(badgeUniqe=True)
@@ -561,6 +568,7 @@ def editUser():
     print("------------------")
     return redirect(url_for('stats'))
 
+
 @app.route('/editBadge', methods=['POST'])
 def editBadge():
     if not isLoginValid():
@@ -690,6 +698,23 @@ def calculateScoring():
     return redirect(url_for('stats'))
 
 
+@app.route('/applyInflation')
+def applyInflation():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+
+    date = storage.get_last_transaction(n=1)[0]
+    badgesToAdd = badges.get_inflation_badges(date=date[0], storage=storage)
+    for oneBadge in badgesToAdd:
+        storage.insert_user_badges(*oneBadge)
+    flash('Inflation badges applied!')
+    return redirect(url_for('stats'))
+
+
 def addUserBadgesForDebtTransfer(fromUserId, toUserId, date=None):
     storage.insert_user_badges(toUserId,
                                badges.BAGDE_ID_FOR_ACCEPTING_DEBT,
@@ -697,6 +722,7 @@ def addUserBadgesForDebtTransfer(fromUserId, toUserId, date=None):
     storage.insert_user_badges(fromUserId,
                                badges.BAGDE_ID_FOR_SELLING_DEBT,
                                date, badges.SYSTEM_APP_ID, valid=1)
+
 
 if __name__ == "__main__":
     import logging

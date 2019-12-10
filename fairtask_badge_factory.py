@@ -1,3 +1,9 @@
+'''
+Each Bagde shoud:
+- have a name that starts with _badge_ to be considered in the automatic badge run
+- answer for question find(atDate, userId, earlierDate=<if aplicable>)
+- return a dict with {userId:1}
+'''
 
 class Abstract_Badge:
     _id = -1
