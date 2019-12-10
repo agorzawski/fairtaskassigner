@@ -464,7 +464,7 @@ class fairtaskDB:
     def get_points_evolution(self, specificUser=None):
         dateToUserPoints = {}
         users = {}
-        for user in self.get_users().values():
+        for user in self.get_users(onlyReal=True).values():
             users[user['id']] = user['username']
         for a in self.get_last_transaction():
             dateAndTime = a[0]
