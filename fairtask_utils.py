@@ -1,3 +1,4 @@
+import itertools
 
 def combineEvents(allJobs, badgesTimeline):
     toReturn = []
@@ -41,3 +42,48 @@ def combineEvents(allJobs, badgesTimeline):
         lastDateYYMMDD = dateYYMMDD
 
     return dictToReturn
+
+
+def compute_who_with_whom(storage):
+    uniqePairs = list(itertools.combinations([u['id'] for u in storage.get_users().values()], 2))
+    toReturn = {}
+    for one in uniqePairs:
+        toReturn[one]=0
+    #print(toReturn)
+    #print(len(uniqePairs))
+    data = storage.execute_get_sql('select date, buyer, to_whom from contract where buyer != to_whom')
+    lastDate=data[0][0]
+    tmpJob = []
+    for one in data:
+        #print(one[0])
+        if lastDate == one[0]:
+            tmpJob.append(one[1])
+            tmpJob.append(one[2])
+            continue
+
+        fromJob = extract(uniqePairs, set(tmpJob))
+        #print(fromJob)
+        for oneResult in fromJob.keys():
+            toReturn[oneResult] += fromJob[oneResult]
+
+        tmpJob = []
+        tmpJob.append(one[1])
+        tmpJob.append(one[2])
+        lastDate = one[0]
+
+    toReturnNonZeros = {}
+    for one in toReturn.keys():
+        if toReturn[one] > 0:
+            toReturnNonZeros[one] = toReturn[one]
+    #print(toReturnNonZeros)
+    return toReturnNonZeros
+
+def extract(uniqePairs, tmpJobSingle):
+    tmpJob = list(itertools.combinations(tmpJobSingle, 2))
+    tmpToReturn = {}
+    for one in tmpJob:
+        if one in uniqePairs:
+            tmpToReturn[one] = 1
+        else:
+            tmpToReturn[(one[1], one[0])] = 1
+    return tmpToReturn

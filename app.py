@@ -258,6 +258,10 @@ def stats():
     transferHistory = storage.get_debt_transfer_history()
     productsUse = storage.get_products_summary()
     dependencyWheelData = storage.get_dependecy_data()
+    dependencyMapData = fairtask_utils.compute_who_with_whom(storage=storage)
+    dependencyMapFixed = []
+    for one in dependencyMapData.keys():
+        dependencyMapFixed.append((users[one[0]]['username'], users[one[1]]['username'], dependencyMapData[one] ))
     return render_template('stats.html',
                            instance=INSTANCE,
                            users=users,
@@ -275,6 +279,7 @@ def stats():
                            productsUse=productsUse,
                            transferHistory=transferHistory,
                            dependencyWheelData=dependencyWheelData,
+                           dependencyMapFixed=dependencyMapFixed,
                            invalidId=NON_EXISTING_ID,
                            nonSelectedId=NON_SELECTED_VALUE)
 
@@ -563,6 +568,7 @@ def editUser():
     print("------------------")
     return redirect(url_for('stats'))
 
+
 @app.route('/editBadge', methods=['POST'])
 def editBadge():
     if not isLoginValid():
@@ -700,13 +706,14 @@ def applyInflation():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-        
+
     date = storage.get_last_transaction(n=1)[0]
     badgesToAdd = badges.get_inflation_badges(date=date[0], storage=storage)
     for oneBadge in badgesToAdd:
         storage.insert_user_badges(*oneBadge)
     flash('Inflation badges applied!')
     return redirect(url_for('stats'))
+
 
 def addUserBadgesForDebtTransfer(fromUserId, toUserId, date=None):
     storage.insert_user_badges(toUserId,
@@ -715,6 +722,7 @@ def addUserBadgesForDebtTransfer(fromUserId, toUserId, date=None):
     storage.insert_user_badges(fromUserId,
                                badges.BAGDE_ID_FOR_SELLING_DEBT,
                                date, badges.SYSTEM_APP_ID, valid=1)
+
 
 if __name__ == "__main__":
     import logging
