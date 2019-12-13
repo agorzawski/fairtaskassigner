@@ -631,6 +631,29 @@ def transferDebt():
     return redirect(url_for('stats'))
 
 
+@app.route('/modifyTransfer', methods=['GET'])
+def modifyTransfer():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+
+    try:
+        transferId = int(request.args.get('transferId', -1))
+        valid = int(request.args.get('valid', 0))
+    except ValueError:
+        flash('Error in submited vaules for badge modification!')
+        return redirect(url_for('stats'))
+    if transferId > 0 and (valid == 1 or valid == 0):
+        storage.remove_debt_transfer(transferId, valid)
+        flash('Modified Badge!')
+    else:
+        flash('Error in submited vaules for badge modification!')
+    return redirect(url_for('stats'))
+
+
 @app.route('/modifyBadge', methods=['GET'])
 def modifyBadge():
     if not isLoginValid():
