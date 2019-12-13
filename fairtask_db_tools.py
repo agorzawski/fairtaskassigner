@@ -511,6 +511,11 @@ class fairtaskDB:
         self.execute_sql('insert into rating_transfer (value, from_user, to_user, date, valid) values (%d, %d, %d, CURRENT_TIMESTAMP,1)' % (rating, fromUserId, toUserId),
                          commit=True)
 
+    def remove_debt_transfer(self, transferId, valid):
+        sql = 'update rating_transfer set valid=%d where id=%d' % (valid,
+                                                                   transferId)
+        self.execute_sql(sql, commit=True)
+
     def get_debt_transfer_history(self):
         history = {}
         data = self.execute_get_sql('select a.id, from_user, a.username, to_user, user.username, date, value, valid from (select * from rating_transfer left join user on user.id= from_user) a  left join user on a.to_user=user.id')
