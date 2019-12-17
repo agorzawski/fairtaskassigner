@@ -1,0 +1,39 @@
+{%if activeRemove %}
+<script>
+$(document).ready(function() {
+    $('#dtBasicView').DataTable({
+      "searching": false,
+      "pageLength": 20,
+      "scrollX": false,
+      "order": [[ 1, "desc" ]] // false to disable search (or any other option)
+      });
+} );
+</script>
+{%endif%}
+<div class="table-responsive table-borderless">
+    <table id="dtBasicView" class="table table-striped table-sm" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th scope="col">Whom</th>
+                <th scope="col">What</th>
+                {%if activeRemove %}<th scope="col">Local<br>rating</th>{%endif%}
+                <th scope="col">Global<br>rating</th>
+                {%if activeRemove %}<th scope="col">Action</th>{%endif%}
+            </tr>
+        </thead>
+        <tbody>
+        {% for lastEntry in todaysJobs %}
+            <tr>
+                <td> <b>{{ lastEntry[0] }}</b> </td>
+                <td> {{ lastEntry[1] }} </td>
+                {%if activeRemove %}<td> {%with valueToShow= lastEntry[2]%}{%include 'badge-points.html'%}{%endwith %} </td>{%endif%}
+                <td> {%with valueToShow= lastEntry[5]%}{%include 'badge-points.html'%}{%endwith %} </td>
+                {%if activeRemove %}
+                <td>  <a href="removeBucketItem?towhom={{lastEntry[3]}}&what={{lastEntry[4]}}">
+                  <img src="static/delete.jpg"  width="25" height="25" /> </a> </td>{%endif%}
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

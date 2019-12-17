@@ -8,6 +8,7 @@
 - graph for who with whom
 - -1 admin button for all active (inflation)
 - reorganiezed README and CHANGELOG plus some screenshots of the graphs in the doc
+- sorting orders table
 
 *1.7*
 - products stats
