@@ -153,7 +153,7 @@ class fairtaskDB:
         self.execute_sql(sql, commit=True)
 
     def get_bucket(self):
-        dataBucket = self.execute_get_sql('select username, what, rating, user.id, whatId from (select to_whom whom, name what, product.id whatId from contract_temp join product on product.id = product) join user on user.id=whom')
+        dataBucket = self.execute_get_sql('select username, what, rating, user.id, whatId from (select to_whom whom, name what, product.id whatId from contract_temp join product on product.id = product) join user on user.id=whom order by what')
         # (whom, what, rating) with origanl scorings
         if dataBucket:
             dataBucketSimple = self.execute_get_sql('select to_whom from contract_temp')
