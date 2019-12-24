@@ -1,5 +1,6 @@
 import itertools
 
+
 def combineEvents(allJobs, badgesTimeline):
     toReturn = []
     for oneJob in allJobs:
@@ -8,7 +9,8 @@ def combineEvents(allJobs, badgesTimeline):
         toReturn.append((oneBadge['date'],
                          oneBadge['grantByUserName'],
                          oneBadge['username'],
-                         "<img src=\'%s\'/ width=\"25\", height=\"25\"> %s " % (oneBadge['img'], oneBadge['badgeName']),0))
+                         "<img src=\'%s\'/ width=\"25\", height=\"25\"> %s " %
+                         (oneBadge['img'], oneBadge['badgeName']), 0))
     sortedToReturn = sorted(toReturn, key=lambda x: x[0], reverse=True)
 
     dictToReturn = {}
@@ -38,48 +40,63 @@ def combineEvents(allJobs, badgesTimeline):
                                                 'who': one[1],
                                                 'towhom': one[2],
                                                 'what': one[3],
-        }
+                                                }
         lastDateYYMMDD = dateYYMMDD
 
     return dictToReturn
 
 
 def compute_who_with_whom(storage):
-    uniqePairs = list(itertools.combinations([u['id'] for u in storage.get_users().values()], 2))
+    uniqePairs = getUniqeParisOfUsers([u['id'] for u in storage.get_users().
+                                       values()])
+    data = storage.execute_get_sql('select date, buyer, to_whom from contract\
+                                    where buyer != to_whom')
+    return compute_who_with_whom_alghoritm(uniqePairs, data)
+
+
+def getUniqeParisOfUsers(usersList, subsets=2):
+    return list(itertools.combinations(usersList, subsets))
+
+
+def compute_who_with_whom_alghoritm(uniqePairs, whenWhoToWhom, verbose=False):
+    '''
+    Unique pairs of users ids combinations
+    whenWhoToWhom - list of all transcactions
+    '''
     toReturn = {}
     for one in uniqePairs:
-        toReturn[one]=0
-    #print(toReturn)
-    #print(len(uniqePairs))
-    data = storage.execute_get_sql('select date, buyer, to_whom from contract where buyer != to_whom')
-    lastDate=data[0][0]
-    tmpJob = []
-    for one in data:
-        #print(one[0])
+        toReturn[one] = 0
+    lastDate = whenWhoToWhom[0][0]
+    tmpJobPresent = []
+    for i, one in enumerate(whenWhoToWhom):
         if lastDate == one[0]:
-            tmpJob.append(one[1])
-            tmpJob.append(one[2])
-            continue
-
-        fromJob = extract(uniqePairs, set(tmpJob))
-        #print(fromJob)
+            if verbose:
+                print('when: ', one[0])
+            tmpJobPresent.append(one[1])
+            tmpJobPresent.append(one[2])
+            if i < len(whenWhoToWhom) - 1:
+                continue
+        fromJob = extractAndCountForOneJob(uniqePairs, set(tmpJobPresent))
+        if verbose:
+            print('From one job: ', fromJob)
         for oneResult in fromJob.keys():
             toReturn[oneResult] += fromJob[oneResult]
 
-        tmpJob = []
-        tmpJob.append(one[1])
-        tmpJob.append(one[2])
+        tmpJobPresent = []
+        tmpJobPresent.append(one[1])
+        tmpJobPresent.append(one[2])
         lastDate = one[0]
-
     toReturnNonZeros = {}
     for one in toReturn.keys():
         if toReturn[one] > 0:
             toReturnNonZeros[one] = toReturn[one]
-    #print(toReturnNonZeros)
+    if verbose:
+        print('Nonzero meet: ', toReturnNonZeros)
     return toReturnNonZeros
 
-def extract(uniqePairs, tmpJobSingle):
-    tmpJob = list(itertools.combinations(tmpJobSingle, 2))
+
+def extractAndCountForOneJob(uniqePairs, tmpJobSingle):
+    tmpJob = getUniqeParisOfUsers(tmpJobSingle)
     tmpToReturn = {}
     for one in tmpJob:
         if one in uniqePairs:

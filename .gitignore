@@ -3,5 +3,6 @@
 *.pyc
 *.log
 *test.py
+*test_data.py
 *temp*.*
 pidfile
