@@ -9,6 +9,7 @@
 - -1 admin button for all active (inflation)
 - reorganiezed README and CHANGELOG plus some screenshots of the graphs in the doc
 - sorting orders table
+- /api/stats & /api/elements exposed for external use
 
 *1.7*
 - products stats

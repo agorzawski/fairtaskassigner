@@ -6,7 +6,8 @@ and storage connector.
 from fairtask_db_tools import fairtaskDB
 import fairtask_badges as badges
 import fairtask_utils
-from flask import Flask, render_template, request, json, redirect, url_for, session, flash, get_flashed_messages, make_response
+from flask import Flask, render_template, request, json, jsonify
+from flask import redirect, url_for, session, flash, make_response
 from flask_oauth import OAuth
 import os
 import pytz
@@ -751,6 +752,24 @@ def applyInflation():
         storage.insert_user_badges(*oneBadge)
     flash('Inflation badges applied!')
     return redirect(url_for('stats'))
+
+
+@app.route('/api/stats', methods=['GET'])
+def get_tasks():
+    stats = storage.get_main_statistics()
+    return jsonify({'stats': stats,
+                    'tasks': 'NOT YET implemented',
+                    'badgesHistory': 'NOT YET implemented', })
+
+
+@app.route('/api/elements', methods=['GET'])
+def get_elements():
+    users = list(storage.get_users().values())
+    products = list(storage.get_products().values())
+    badges = list(storage.get_all_badges().values())
+    return jsonify({'users': users,
+                    'products': products,
+                    'badges': badges})
 
 
 def addUserBadgesForDebtTransfer(fromUserId, toUserId, date=None):
