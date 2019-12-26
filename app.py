@@ -562,7 +562,7 @@ def editUser():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    print("=======[DEV]========")
+    print("=======[DEV USER]========")
     print("------------------")
     print(request.form)
     print("------------------")
@@ -577,7 +577,22 @@ def editBadge():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    print("=======[DEV]========")
+    print("=======[DEV BADGE]========")
+    print("------------------")
+    print(request.form)
+    print("------------------")
+    return redirect(url_for('stats'))
+
+
+@app.route('/editProduct', methods=['POST'])
+def editProduct():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+    print("=======[DEV Product]========")
     print("------------------")
     print(request.form)
     print("------------------")

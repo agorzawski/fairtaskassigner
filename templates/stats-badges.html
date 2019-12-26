@@ -56,7 +56,9 @@
                       <th scope="col">Badge</th>
                       <th scope="col">Description</th>
                       <th scope="col" class="text-left">Effect</th>
+                      {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                       <th scope="col" >Action</th>
+                      {% endif %}
                   </tr>
               </thead>
               <tbody>
@@ -70,6 +72,7 @@
                       <td> <img src="{{ lastEntry['img'] }}" width="25" height="25" /> </td>
                       <td> {{ lastEntry['desc'] }} </td>
                       <td class="text-right"> {%with valueToShow= lastEntry['effect']%}{%include 'badge-points.html'%}{%endwith %}</td>
+                      {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                       <td>
                         <button type="button" class="btn btn-warning btn-sm modalBadgeEdit" tabindex="0"
                              data-toggle="modal" data-target="#modalBadgeEdit"
@@ -80,6 +83,7 @@
                              data-adminawarded={{lastEntry['adminawarded']}}>
                              <img src="static/wrench.png" width="20" height="20"/></button>
                       </td>
+                      {% endif %}
                   </tr>
               {% endfor %}
               </tbody>
@@ -99,7 +103,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id="badge-data-to-submit" action="editbadge" method="post">
+            <form id="badge-data-to-submit" action="/editBadge" method="post">
               <div class="form-group">
                 <label for="badge-name" class="col-form-label">Badge name:</label>
                 <input type="text" class="form-control" id="badge-name">
@@ -120,7 +124,7 @@
                 <input type="checkbox" class="col-form-input" id="badge-adminawarded">
                 <label for="badge-adminawarded" class="col-form-label">Is adminawarded?</label>
               </div>
-              <input type="submit" value="Save changes" class="btn btn-danger"/>
+              <input id="badge-data-to-submit-btn" type="submit" value="Save changes" class="btn btn-danger"/>
             </form>
           </div>
           <div class="modal-footer">
@@ -133,12 +137,34 @@
     <script>
 
     $(function(){
-       $('#modalBadgeEdit').on('submit', function(e){
+      $('.modalBadgeEdit').click(function(e){
+        e.preventDefault();
+        var button = $(e.delegateTarget);
+        var name = button.data('name');
+        var desc = button.data('desc');
+        var effect = button.data('effect');
+        var icon = button.data('img');
+        var checked = button.data('adminawarded');
+        var mymodal = $('#modalBadgeEdit');
+        mymodal.find('#badge-name').val(name);
+        mymodal.find('#badge-desc').val(desc);
+        mymodal.find('#badge-effect').val(effect);
+        mymodal.find('#badge-icon').val(icon);
+        mymodal.find('#badge-adminawarded').checked = !!checked ;
+        mymodal.modal('show');
+      });
+    })
+
+    $(function(){
+       $('#badge-data-to-submit').on('submit', function(e){
             e.preventDefault();
+            console.log('TEST');
+            console.log($('.badge-data-to-submit'));
             $.ajax({
                 url: "/editBadge",
-                data: $('#badge-data-to-submit').serialize(),
                 type: "POST",
+                data: $('.badge-data-to-submit').serialize(),
+
                 success: function(data){
                     alert("Not yet implemented! Thanks for trying.")
                     location.reload();
@@ -147,23 +173,6 @@
        });
     });
 
-      $(function(){
-        $('.modalBadgeEdit').click(function(e){
-          e.preventDefault();
-          var button = $(e.delegateTarget);
-          var name = button.data('name');
-          var desc = button.data('desc');
-          var effect = button.data('effect');
-          var icon = button.data('img');
-          var checked = button.data('adminawarded');
-          var mymodal = $('#modalBadgeEdit');
-          mymodal.find('#badge-name').val(name);
-          mymodal.find('#badge-desc').val(desc);
-          mymodal.find('#badge-effect').val(effect);
-          mymodal.find('#badge-icon').val(icon);
-          mymodal.find('#badge-adminawarded').checked = !!checked ;
-          mymodal.modal('show');
-        });
-      })
+
     </script>
  </div>
