@@ -53,7 +53,7 @@
                         {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() %}
                         <small>AdminPanel:</small>
                         <a class="btn btn-warning btn-sm" href='/user?user={{user['id']}}'> <img src="static/search.png" width="15" height="15" title="NOT VALIDATED!"/> </a>
-                        <button type="button" class="btn btn-warning btn-sm modalUserEdit" tabindex="0"
+                        <button type="button" class="btn btn-warning btn-sm userEdit" tabindex="0"
                              data-toggle="modal" data-target="#modalUserEdit"
                              data-id="{{user['id']}}"
                              data-name="{{user['username']}}"
@@ -113,36 +113,37 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id='user-data-to-submit'>
+            <form id='user-change-to-submit' action="editUser" method="post">
               <div class="form-group">
                 <label for="user-id" class="col-form-label">User id:</label>
-                <input type="text" class="form-control" id="user-id" readonly>
+                <input type="text" class="form-control" id="user-id" name="user-id" readonly>
               </div>
               <div class="form-group">
                 <label for="user-name" class="col-form-label">User name:</label>
-                <input type="text" class="form-control" id="user-name">
+                <input type="text" class="form-control" id="user-name" name='user-name'>
               </div>
               <div class="form-group">
                 <label for="user-email" class="col-form-label">User email:</label>
-                <input type="text" class="form-control" id="user-email" readonly>
+                <input type="text" class="form-control" id="user-email" name="user-email" readonly>
               </div>
               <div class="form-group">
                 <label for="user-creator" class="col-form-label">User's creator ID:</label>
-                <input type="text" class="form-control" id="user-creator" readonly>
+                <input type="text" class="form-control" id="user-creator" name="user-creator" readonly>
               </div>
               <div class="form-group">
                 <label for="user-creator-name" class="col-form-label">User's creator name:</label>
-                <input type="text" class="form-control" id="user-creator-name" readonly>
+                <input type="text" class="form-control" id="user-creator-name" name="user-creator-name" readonly>
               </div>
               <div class="form-group">
-                <input type="checkbox" class="col-form-input" id="user-validated">
+                <input type="checkbox" class="col-form-input" id="user-validated" name="user-validated">
                 <label for="user-validated" class="col-form-label">Is validated?</label>
               </div>
               <div class="form-group">
-                <input type="checkbox" class="col-form-input" id="user-active">
+                <input type="checkbox" class="col-form-input" id="user-active" name="user-active">
                 <label for="user-active" class="col-form-label">Is active?</label>
               </div>
-              <input type="submit" value="Save changes" class="btn btn-danger"/>
+
+              <button type="submit" class="btn btn-danger">Save changes</button>
             </form>
           </div>
           <div class="modal-footer">
@@ -151,24 +152,25 @@
         </div>
       </div>
     </div>
+
     <script>
-    $(function(){
-       $('#modalUserEdit').on('submit', function(e){
-            e.preventDefault();
-            $.ajax({
-                url: "/editUser",
-                data: $('#user-data-to-submit').serialize(),
-                type: "POST",
-                success: function(data){
-                    alert("Not yet implemented! Thanks for trying.")
-                    location.reload();
-                }
-            });
-       });
-    });
+      $(function(){
+         $('#user-change-to-submit').on('submit', function(e){
+              e.preventDefault();
+              $.ajax({
+                  url: '/editUser',
+                  data: $('#user-change-to-submit').serialize(),
+                  type: 'POST',
+                  success: function(data){
+                      alert("Not yet implemented! Thanks for trying.")
+                      location.reload();
+                  }
+              });
+         });
+      });
 
       $(function(){
-        $('.modalUserEdit').click(function(e){
+        $('.userEdit').click(function(e){
           e.preventDefault();
           var button = $(e.delegateTarget);
           var id = button.data('id');

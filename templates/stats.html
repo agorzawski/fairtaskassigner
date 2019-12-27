@@ -68,7 +68,7 @@
                            {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                             <td class="text-center">
                               {% if lastEntry['valid'] %}
-                                <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                                <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.png"  width="25" height="25" /> </a>
                               {% else %}
                                 <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                               {% endif %}

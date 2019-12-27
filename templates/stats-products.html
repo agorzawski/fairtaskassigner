@@ -24,7 +24,7 @@
                  <td> {{'%0.1f'| format(products[id]['caffeine']|float)}}</td>
                  {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                  <td>
-                   <button type="button" class="btn btn-warning btn-sm modalProductEdit" tabindex="0"
+                   <button type="button" class="btn btn-warning btn-sm modalProductEditON" tabindex="0"
                         data-toggle="modal" data-target="#modalProductEdit"
 
                         data-name="{{products[id]['name']}}"
@@ -38,7 +38,6 @@
          {% endfor %}
          </tbody>
      </table>
-
 
 
      <div class="modal fade" id="modalProductEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -57,22 +56,22 @@
              <form id="product-data-to-submit" action="/editProduct" method="post">
                <div class="form-group">
                  <label for="product-name" class="col-form-label">Product name:</label>
-                 <input type="text" class="form-control" id="product-name">
+                 <input type="text" class="form-control" id="product-name" name="product-name">
                </div>
                <div class="form-group">
                  <label for="product-price" class="col-form-label">Product price:</label>
-                 <input type="text" class="form-control" id="product-price">
+                 <input type="text" class="form-control" id="product-price" name="product-price">
                </div>
                <div class="form-group">
                  <label for="product-caffeine" class="col-form-label">Product caffeine[mg]:</label>
-                 <input type="text" class="form-control" id="product-caffeine">
+                 <input type="text" class="form-control" id="product-caffeine" name="product-caffeine">
                </div>
                <div class="form-group">
                  <label for="product-size" class="col-form-label">Product size [ml]:</label>
-                 <input type="text" class="form-control" id="product-size">
+                 <input type="text" class="form-control" id="product-size" name="product-size">
                </div>
 
-               <input id="product-data-to-submit-btn" type="submit" value="Save changes" class="btn btn-danger"/>
+               <button type="submit" class="btn btn-danger">Save Job Changes</button>
              </form>
            </div>
            <div class="modal-footer">
@@ -84,7 +83,7 @@
      </div>
      <script>
      $(function(){
-       $('.modalProductEdit').click(function(e){
+       $('.modalProductEditON').click(function(e){
          e.preventDefault();
          var button = $(e.delegateTarget);
          var name = button.data('name');
@@ -107,7 +106,7 @@
              $.ajax({
                  url: "/editProduct",
                  type: "POST",
-                 data: $('.product-data-to-submit').serialize(),
+                 data: $('#product-data-to-submit').serialize(),
 
                  success: function(data){
                      alert("Not yet implemented! Thanks for trying.")

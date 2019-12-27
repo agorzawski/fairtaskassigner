@@ -27,7 +27,7 @@
                      {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
                       <td class="text-center">
                         {% if lastEntry['valid'] %}
-                          <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
+                          <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=0"> <img src="static/delete.png"  width="25" height="25" /> </a>
                         {% else %}
                           <a class="btn btn-light btn-sm" href="modifyBadge?grantId={{lastEntry['grantId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
                         {% endif %}
@@ -74,9 +74,10 @@
                       <td class="text-right"> {%with valueToShow= lastEntry['effect']%}{%include 'badge-points.html'%}{%endwith %}</td>
                       {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
                       <td>
-                        <button type="button" class="btn btn-warning btn-sm modalBadgeEdit" tabindex="0"
+                        <button type="button" class="btn btn-warning btn-sm modalBadgeEditBTN" tabindex="0"
                              data-toggle="modal" data-target="#modalBadgeEdit"
                              data-desc="{{lastEntry['desc']}}"
+                             data-id="{{lastEntry['id']}}"
                              data-name="{{lastEntry['name']}}"
                              data-effect="{{lastEntry['effect']}}"
                              data-img="{{lastEntry['img']}}"
@@ -105,26 +106,31 @@
           <div class="modal-body">
             <form id="badge-data-to-submit" action="/editBadge" method="post">
               <div class="form-group">
+                <label for="badge-id" class="col-form-label">Badge id:</label>
+                <input type="text" class="form-control" id="badge-id" name="badge-id" readonly>
+              </div>
+              <div class="form-group">
                 <label for="badge-name" class="col-form-label">Badge name:</label>
-                <input type="text" class="form-control" id="badge-name">
+                <input type="text" class="form-control" id="badge-name" name="badge-name">
               </div>
               <div class="form-group">
                 <label for="badge-desc" class="col-form-label">Badge description:</label>
-                <input type="text" class="form-control" id="badge-desc">
+                <input type="text" class="form-control" id="badge-desc" name="badge-desc">
               </div>
               <div class="form-group">
                 <label for="badge-effect" class="col-form-label">Badge effect:</label>
-                <input type="text" class="form-control" id="badge-effect">
+                <input type="text" class="form-control" id="badge-effect" name="badge-effect">
               </div>
               <div class="form-group">
                 <label for="badge-icon" class="col-form-label">Badge icon path:</label>
-                <input type="text" class="form-control" id="badge-icon">
+                <input type="text" class="form-control" id="badge-icon" name="badge-icon">
               </div>
               <div class="form-group">
-                <input type="checkbox" class="col-form-input" id="badge-adminawarded">
+                <input type="checkbox" class="col-form-input" id="badge-adminawarded" name="badge-adminawarded">
                 <label for="badge-adminawarded" class="col-form-label">Is adminawarded?</label>
               </div>
-              <input id="badge-data-to-submit-btn" type="submit" value="Save changes" class="btn btn-danger"/>
+
+              <button type="submit" class="btn btn-danger">Save changes</button>
             </form>
           </div>
           <div class="modal-footer">
@@ -137,16 +143,18 @@
     <script>
 
     $(function(){
-      $('.modalBadgeEdit').click(function(e){
+      $('.modalBadgeEditBTN').click(function(e){
         e.preventDefault();
         var button = $(e.delegateTarget);
         var name = button.data('name');
+        var id = button.data('id');
         var desc = button.data('desc');
         var effect = button.data('effect');
         var icon = button.data('img');
         var checked = button.data('adminawarded');
         var mymodal = $('#modalBadgeEdit');
         mymodal.find('#badge-name').val(name);
+        mymodal.find('#badge-id').val(id);
         mymodal.find('#badge-desc').val(desc);
         mymodal.find('#badge-effect').val(effect);
         mymodal.find('#badge-icon').val(icon);
@@ -158,13 +166,10 @@
     $(function(){
        $('#badge-data-to-submit').on('submit', function(e){
             e.preventDefault();
-            console.log('TEST');
-            console.log($('.badge-data-to-submit'));
             $.ajax({
                 url: "/editBadge",
                 type: "POST",
-                data: $('.badge-data-to-submit').serialize(),
-
+                data: $('#badge-data-to-submit').serialize(),
                 success: function(data){
                     alert("Not yet implemented! Thanks for trying.")
                     location.reload();
