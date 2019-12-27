@@ -563,10 +563,20 @@ def editUser():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    print("=======[DEV USER]========")
-    print("------------------")
-    print(request.form)
-    print("------------------")
+    # TODO to be merged with the /modifyUser (below)
+    validated = 0
+    active = None
+    if request.form.get('user-validated') == 'on':
+        validated = 1
+    if request.form.get('user-active') == 'on':
+        active = 1
+
+    storage.update_user(request.form.get('user-id'),
+                        request.form.get('user-email'),
+                        request.form.get('user-creator'),
+                        name=request.form.get('user-name'),
+                        active=active, validated=validated)
+
     return redirect(url_for('stats'))
 
 
@@ -578,10 +588,16 @@ def editBadge():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    print("=======[DEV BADGE]========")
-    print("------------------")
-    print(request.form)
-    print("------------------")
+
+    adminawarded = 0
+    if request.form.get('badge-adminawarded') == 'on':
+        adminawarded = 1
+    storage.update_badge(request.form.get('badge-id'),
+                         request.form.get('badge-name'),
+                         request.form.get('badge-desc'),
+                         request.form.get('badge-effect'),
+                         request.form.get('badge-icon'),
+                         adminawarded=adminawarded)
     return redirect(url_for('stats'))
 
 
@@ -593,11 +609,57 @@ def editProduct():
     if not isAnAdmin():
         flash('You Need to be AN ADMIN for this action!', 'error')
         return redirect(url_for('main'))
-    print("=======[DEV Product]========")
-    print("------------------")
-    print(request.form)
-    print("------------------")
+
+    storage.update_product(request.form.get('product-id'),
+                           request.form.get('product-name'),
+                           request.form.get('product-price'),
+                           request.form.get('product-size'),
+                           request.form.get('product-caffeine'))
+
     return redirect(url_for('stats'))
+
+
+@app.route('/modifyJob', methods=['POST'])
+def modifyJob():
+    if not isLoginValid():
+        return rememberTheInitialRequest(redirect(url_for('login')),
+                                         request.endpoint)
+    if not isAnAdmin():
+        flash('You Need to be AN ADMIN for this action!', 'error')
+        return redirect(url_for('main'))
+
+    if request.form.get('action') == '' or\
+       request.form.get('job-who') is None or\
+       request.form.get('job-whom') is None or\
+       request.form.get('job-what') is None or\
+       request.form.get('job-creator') is None or\
+       request.form.get('job-date') is None:
+                flash("Cannot proceed! Incorrect access or incomplete form!")
+                return redirect(url_for('main'))
+
+    if request.form.get('action') == 'modify':
+        storage.update_transaction(request.form.get('job-date'),
+                                   request.form.get('job-who'),
+                                   request.form.get('job-whom'),
+                                   request.form.get('job-what'),
+                                   commit=True)
+
+    if request.form.get('action') == 'delete':
+        storage.remove_job_entry(request.form.get('job-date'),
+                                 request.form.get('job-who'),
+                                 request.form.get('job-whom'),
+                                 request.form.get('job-what'),
+                                 commit=True)
+
+    if request.form.get('action') == 'add':
+        storage.add_transaction(request.form.get('job-who'),
+                                request.form.get('job-whom'),
+                                request.form.get('job-what'),
+                                request.form.get('job-creator'),
+                                date=request.form.get('job-date'),
+                                commit=True)
+
+    return redirect(url_for('main'))
 
 
 @app.route('/modifyUser', methods=['GET'])

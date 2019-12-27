@@ -26,7 +26,7 @@
                  <td>
                    <button type="button" class="btn btn-warning btn-sm modalProductEditON" tabindex="0"
                         data-toggle="modal" data-target="#modalProductEdit"
-
+                        data-id="{{products[id]['id']}}"
                         data-name="{{products[id]['name']}}"
                         data-price="{{products[id]['price']}}"
                         data-size="{{products[id]['size']}}"
@@ -54,6 +54,10 @@
            </div>
            <div class="modal-body">
              <form id="product-data-to-submit" action="/editProduct" method="post">
+               <div class="form-group">
+                 <label for="product-id" class="col-form-label">Product id:</label>
+                 <input type="text" class="form-control" id="product-id" name="product-id" readonly>
+               </div>
                <div class="form-group">
                  <label for="product-name" class="col-form-label">Product name:</label>
                  <input type="text" class="form-control" id="product-name" name="product-name">
@@ -87,11 +91,13 @@
          e.preventDefault();
          var button = $(e.delegateTarget);
          var name = button.data('name');
+         var id = button.data('id');
          var price = button.data('price');
          var caffeine = button.data('caffeine');
          var size = button.data('size');
 
          var mymodal = $('#modalProductEdit');
+         mymodal.find('#product-id').val(id);
          mymodal.find('#product-name').val(name);
          mymodal.find('#product-price').val(price);
          mymodal.find('#product-caffeine').val(caffeine);
@@ -109,7 +115,6 @@
                  data: $('#product-data-to-submit').serialize(),
 
                  success: function(data){
-                     alert("Not yet implemented! Thanks for trying.")
                      location.reload();
                  }
              });

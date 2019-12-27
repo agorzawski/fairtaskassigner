@@ -1,7 +1,7 @@
 # Changelog
 
 *1.8*
-- admin edits for users, badges, jobs (DEV)
+- admin edits for users, badges, jobs
 - fixed colours for points
 - small fixes (list orders)
 - instance variable (header + version from git tag)

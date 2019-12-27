@@ -158,7 +158,7 @@
         mymodal.find('#badge-desc').val(desc);
         mymodal.find('#badge-effect').val(effect);
         mymodal.find('#badge-icon').val(icon);
-        mymodal.find('#badge-adminawarded').checked = !!checked ;
+        mymodal.find('input#badge-adminawarded')[0].checked = !!checked ;
         mymodal.modal('show');
       });
     })
@@ -171,13 +171,11 @@
                 type: "POST",
                 data: $('#badge-data-to-submit').serialize(),
                 success: function(data){
-                    alert("Not yet implemented! Thanks for trying.")
                     location.reload();
                 }
             });
        });
     });
-
 
     </script>
  </div>
