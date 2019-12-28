@@ -638,7 +638,7 @@ def modifyJob():
                 return redirect(url_for('main'))
 
     if request.form.get('action') == 'modify':
-        storage.update_transaction(request.form.get('job-date'),
+        storage.update_transaction(request.form.get('job-id'),
                                    request.form.get('job-who'),
                                    request.form.get('job-whom'),
                                    request.form.get('job-what'),

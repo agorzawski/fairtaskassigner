@@ -90,13 +90,13 @@ class fairtaskDB:
             self.calculate_actal_scoring(commit=commit)
             return True
 
-    def update_transaction(self, date, who, whom, what, commit=False):
+    def update_transaction(self, id, who, whom, what, commit=False):
         if who == NON_SELECTED_VALUE or whom == NON_SELECTED_VALUE or what == NON_SELECTED_VALUE:
             raise ValueError('Cannot save transaction for an unspecified person or goods!')
-        #
-        # sql = 'update contract set to_whom=%s, product=%s, buyer=%s where'
-        # self.execute_sql(sql, commit=commit)
-        print('NOT IMPLEMENTED!')
+
+        sql = 'update contract set to_whom=%s, product=%s, buyer=%s where id=%s' %\
+                    (whom, what, who, id)
+        self.execute_sql(sql, commit=commit)
 
     def remove_job_entry(self, date, who, whom, what, commit=False):
         sql = 'delete from contract where date=\'%s\' and buyer=%s and to_whom=%s and product=%s' %(date, who, whom, what)
@@ -436,7 +436,8 @@ class fairtaskDB:
         data = self.execute_get_sql(sql)
         toReturn = {'date': jobDate, 'jobs': []}
         for one in data:
-            toReturn['jobs'].append({'who': one[1],
+            toReturn['jobs'].append({'id': one[0],
+                                     'who': one[1],
                                      'to_whom': one[2],
                                      'what': one[3],
                                      'creator': one[5],
@@ -444,7 +445,7 @@ class fairtaskDB:
         return toReturn
 
     def get_jobs_summary(self, today=False, buffer_seconds=3*3600, withUser=None):
-        sqlOnUser=''
+        sqlOnUser = ''
         if withUser is not None:
             sqlOnUser = ' where (buyer like \'%s\' or to_whom like \'%s\') '%(withUser, withUser)
         if today:
