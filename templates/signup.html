@@ -47,21 +47,33 @@
                       type: 'POST',
                       success: function(response) {
                           location.reload();
-                          console.log(response);
                       },
-                      error: function(error) {
-                          console.log(error);
-                      }
                   });
               });
             }
           );
         </script>
       </form>
+      <br>
+      <hr class="my-3">
+      <h2>Quick edit buddy (only active)</h2>
+      {% for user in users.values() %}
+      <button type="button" class="btn btn-warning btn-sm userEdit" tabindex="0"
+           data-toggle="modal" data-target="#modalUserEdit"
+           data-id="{{user['id']}}"
+           data-name="{{user['username']}}"
+           data-email="{{user['email']}}"
+           data-active={{user['active']}}
+           data-validated={{user['validated']}}
+           data-creator="{{user['creator']}}"
+           data-creator-name="{{users.get(user['creator'], {'username': 'N/A'})['username']}}"
+           ><img src="static/wrench.png" width="15" height="15"/>{{user['username']}}</button>
+      {% endfor %}
+
       </div>
+      {% include 'stats-users-edit.html'%}
 
       {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
-
       <div class="container">
                <hr class="my-3">
                <h4> Add product </h4>
@@ -101,17 +113,15 @@
                              type: 'POST',
                              success: function(response) {
                                  location.reload();
-                                 console.log(response);
                              },
-                             error: function(error) {
-                                 console.log(error);
-                             }
                          });
                      });
                    }
                  );
                </script>
                </form>
+
+        {% include 'stats-products.html' %}
        </div>
 
       <div class="container">
@@ -149,11 +159,7 @@
                              type: 'POST',
                              success: function(response) {
                                  location.reload();
-                                 console.log(response);
                              },
-                             error: function(error) {
-                                 console.log(error);
-                             }
                          });
                      });
                    }

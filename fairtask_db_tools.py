@@ -84,8 +84,8 @@ class fairtaskDB:
         else:
             dateSql = 'CURRENT_TIMESTAMP'
             if date is not None:
-                dateSql = date
-            sql = 'insert into contract (buyer, to_whom, product, date, creator) values (%s, %s, %s, \'%s\', %s)' % (who, whom, what, dateSql, creator)
+                dateSql = '\'%s\'' % date
+            sql = 'insert into contract (buyer, to_whom, product, date, creator) values (%s, %s, %s, %s, %s)' % (who, whom, what, dateSql, creator)
             self.execute_sql(sql, commit=commit)
             self.calculate_actal_scoring(commit=commit)
             return True

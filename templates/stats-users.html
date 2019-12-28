@@ -61,7 +61,7 @@
                              data-active={{user['active']}}
                              data-validated={{user['validated']}}
                              data-creator="{{user['creator']}}"
-                             data-creator-name="{{users[user['creator']]['username']}}"
+                             data-creator-name="{{users.get(user['creator'], {'username': 'N/A'})['username']}}"
                              ><img src="static/wrench.png" width="15" height="15"/></button>
                         {%endif%}
                         {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
@@ -99,99 +99,7 @@
         </table>
     </div>
 
-
-    <div class="modal fade" id="modalUserEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              <img src="static/users.png" width="35" height="35" />
-              <img src="static/wrench.png" width="35" height="35" /> Edit User's Details
-              </h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form id='user-change-to-submit' action="editUser" method="post">
-              <div class="form-group">
-                <label for="user-id" class="col-form-label">User id:</label>
-                <input type="text" class="form-control" id="user-id" name="user-id" readonly>
-              </div>
-              <div class="form-group">
-                <label for="user-name" class="col-form-label">User name:</label>
-                <input type="text" class="form-control" id="user-name" name='user-name'>
-              </div>
-              <div class="form-group">
-                <label for="user-email" class="col-form-label">User email:</label>
-                <input type="text" class="form-control" id="user-email" name="user-email" readonly>
-              </div>
-              <div class="form-group">
-                <label for="user-creator" class="col-form-label">User's creator ID:</label>
-                <input type="text" class="form-control" id="user-creator" name="user-creator" readonly>
-              </div>
-              <div class="form-group">
-                <label for="user-creator-name" class="col-form-label">User's creator name:</label>
-                <input type="text" class="form-control" id="user-creator-name" name="user-creator-name" readonly>
-              </div>
-              <div class="form-group">
-                <input type="checkbox" class="col-form-input" id="user-validated" name="user-validated">
-                <label for="user-validated" class="col-form-label">Is validated?</label>
-              </div>
-              <div class="form-group">
-                <input type="checkbox" class="col-form-input" id="user-active" name="user-active">
-                <label for="user-active" class="col-form-label">Is active?</label>
-              </div>
-
-              <button type="submit" class="btn btn-danger">Save changes</button>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      $(function(){
-         $('#user-change-to-submit').on('submit', function(e){
-              e.preventDefault();
-              $.ajax({
-                  url: '/editUser',
-                  data: $('#user-change-to-submit').serialize(),
-                  type: 'POST',
-                  success: function(data){
-                      location.reload();
-                  }
-              });
-         });
-      });
-
-      $(function(){
-        $('.userEdit').click(function(e){
-          e.preventDefault();
-          var button = $(e.delegateTarget);
-          var id = button.data('id');
-          var name = button.data('name');
-          var email = button.data('email');
-          var creator = button.data('creator');
-          var creatorName = button.data('creator-name');
-          var active = button.data('active');
-          var validated = button.data('validated');
-          var mymodal = $('#modalUserEdit');
-          mymodal.find('#user-id').val(id);
-          mymodal.find('#user-name').val(name);
-          mymodal.find('#user-email').val(email);
-          mymodal.find('#user-creator').val(creator);
-          mymodal.find('#user-creator-name').val(creatorName);
-          mymodal.find('input#user-active')[0].checked = !!active;
-          mymodal.find('input#user-validated')[0].checked = !!validated;
-          mymodal.modal('show');
-        });
-      });
-    </script>
-
+    {% include 'stats-users-edit.html'%}
 
     <div class="modal fade" id="modalDebtTransfer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
