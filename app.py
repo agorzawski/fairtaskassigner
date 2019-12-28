@@ -295,6 +295,8 @@ def showSignUp():
     notValidatedUsers = storage.get_users(onlyNotValidated=True)
     getLoggedUserBadges = storage.get_users_badges(userId=loggedUsernameEmail['id'])
     getAllBadges = storage.get_all_badges(badgeUniqe=True)
+    products = storage.get_products()
+    productsUse = storage.get_products_summary()
     adminsList = storage.get_admins()
     adminBadges = False
     if loggedUsernameEmail['email'] in adminsList['admin'].keys():
@@ -306,6 +308,8 @@ def showSignUp():
                            instance=INSTANCE,
                            users=users,
                            googleSession=True,
+                           products=products,
+                           productsUse=productsUse,
                            notValidatedUsers=notValidatedUsers,
                            loggedUserBadges=getLoggedUserBadges,
                            loggedUsernameEmail=loggedUsernameEmail,

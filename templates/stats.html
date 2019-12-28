@@ -24,7 +24,7 @@
         <h5> Items used in the game:</h5>
         <div class="row">
           <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#Achievements'> <img src="static/trophee.png" width="35" height="35" /> Badges and Achievements</a></div>
-          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#products'> <img src="static/coffee.png" width="35" height="35" /> Products Descriptons</a></div>
+          <div class="col-sm-4"><a class="btn btn-light btn-outline" href='#products'> <img src="static/coffee.png" width="35" height="35" /> Product consumption</a></div>
         </div>
         <hr class="my-3">
         {% include 'game_desc.html' %}
@@ -43,9 +43,11 @@
         {% include 'stats-debt-transfer-history.html' %}
       </div>
 
-      {% include 'stats-products.html' %}
+      <div  class="container">
+        {% include 'bar-chart.html' %}
+      </div>
 
-      <footer class="footer">
+      <footer id='products' class="footer">
       {% include 'footer.html' %}
       </footer>
 
