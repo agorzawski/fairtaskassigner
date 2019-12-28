@@ -40,75 +40,10 @@
       </div>
 
       <div class="container">
-        <hr class="my-3">
-           <h2 id='debtTransfer'> Debt Transfer History </h2>
-           {% include 'totop.html' %}
-           <div class="table-responsive table-borderless">
-               <table class="table table-striped table-hover table-sm">
-                   <thead>
-                       <tr>
-                           <th scope="col">Date</th>
-                           <th scope="col">From</th>
-                           <th scope="col">To Whom</th>
-                           <th scope="col">Value</th>
+        {% include 'stats-debt-transfer-history.html' %}
+      </div>
 
-                       </tr>
-                   </thead>
-                   <tbody>
-                   {% for lastEntry in transferHistory.values() %}
-                      {% if not lastEntry['valid'] %}
-                       <tr class="table-dark text-muted">
-                      {% else %}
-                       <tr >
-                      {% endif %}
-                           <th scope="row"> <small>{{ lastEntry['date'] }}</small> </th>
-                           <td> <img src="static/debt-relief.png" width="25" height="25" />{{ lastEntry['fromUserName'] }} </td>
-                           <td> <img src="static/debt-collector.png" width="25" height="25" /><span class="text">{{ lastEntry['toUserName'] }} </span> </td>
-                           <td> {%with valueToShow= lastEntry['value']%}{%include 'badge-points.html'%}{%endwith %}</td>
-                           {% if (loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() ) and lastEntry['badgeId'] != 7 %}
-                            <td class="text-center">
-                              {% if lastEntry['valid'] %}
-                                <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=0"> <img src="static/delete.jpg"  width="25" height="25" /> </a>
-                              {% else %}
-                                <a class="btn btn-light btn-sm" href="modifyTransfer?transferId={{lastEntry['transferId']}}&valid=1"> <img src="static/refresh.png"  width="25" height="25" /> </a>
-                              {% endif %}
-                             </td>
-                           {% endif %}
-                       </tr>
-                   {% endfor %}
-                   </tbody>
-               </table>
-           </div>
-       </div>
-
-        <div id='products' class="container">
-          <hr class="my-3">
-           <h2>Products: </h2>
-           {% include 'totop.html' %}
-           <div class="table-responsive">
-               <table class="table table-striped table-hover table-sm">
-                   <thead>
-                       <tr>
-                           <th scope="col">Name</th>
-                           <th scope="col">Price [CHF] </th>
-                           <th scope="col">Size [ml] </th>
-                           <th scope="col">Caffeine [mg] </th>
-                       </tr>
-                   </thead>
-                   <tbody>
-                   {% for id in products %}
-                       <tr >
-                           <th scope="row"> {{ products[id]['name'] }} </th>
-                           <td> {{'%0.1f'| format(products[id]['price']|float)}}</td>
-                           <td> {{'%0.1f'| format(products[id]['size']|float)}}</td>
-                           <td> {{'%0.1f'| format(products[id]['caffeine']|float)}}</td>
-                       </tr>
-                   {% endfor %}
-                   </tbody>
-               </table>
-           </div>
-         </div>
-         {% include 'bar-chart.html' %}
+      {% include 'stats-products.html' %}
 
       <footer class="footer">
       {% include 'footer.html' %}

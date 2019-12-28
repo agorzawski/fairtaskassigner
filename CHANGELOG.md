@@ -1,7 +1,7 @@
 # Changelog
 
 *1.8*
-- admin edits for users, badges, jobs (DEV)
+- admin edits for users, badges, jobs
 - fixed colours for points
 - small fixes (list orders)
 - instance variable (header + version from git tag)
@@ -9,6 +9,7 @@
 - -1 admin button for all active (inflation)
 - reorganiezed README and CHANGELOG plus some screenshots of the graphs in the doc
 - sorting orders table
+- /api/stats & /api/elements exposed for external use
 
 *1.7*
 - products stats

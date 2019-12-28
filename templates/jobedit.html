@@ -28,89 +28,190 @@
 
         {% include 'common_alerts.html' %}
         <h4>Job details:</h4>
-
-
-        <form class="form-signin">
-          <table class="table table-striped table-hover table-sm">
-              <thead>
-                  <tr>
-                      <th scope="col">When</th>
-                      <th scope="col">Who</th>
-                      <th scope="col">To Whom</th>
-                      <th scope="col">What</th>
-                      <th scope="col">registred by</th>
-                  </tr>
-              </thead>
-              <tbody>
-
-
-          {% for oneJob in jobToEdit['jobs'] %}
-              <tr >
-              <td>
-                <input type="name" name="productName" id="productName"
-                  class="form-control" value="{{oneJob['date']|datetimefilter}}" required autofocus disabled>
-              </td>
-             <td>
-               <select type="name" name="whoName" id="whoName" class="form-control" required autofocus disabled>
-                 {% with whoActive = oneJob['who'] %}
-                 {% include 'userselectoptions.html' %}
-                 {% endwith %}
-               </select>
-             </td>
-
-             <td>
-               <select type="name" name="towhomName" id="towhomName" class="form-control" required autofocus disabled>
-                 {% with whoActive = oneJob['to_whom'] %}
-                 {% include 'userselectoptions.html' %}
-                 {% endwith %}
-               </select>
-             </td>
-
-                <td>
-              <select type="name" name="inputProduct" id="inputProduct" class="form-control" placeholder="To whom (name)" required autofocus>
-                <option value=-1>What to buy (product)</option>
-                {% for product in products %}
-                  <option value={{product[0]}}>{{product[1]}} ({{product[2]}} CHF)</option>
-                {% endfor %}
-              </select>
-            </td>
-
-             <td>
-               <select type="name" name="finalzeName" id="finalzeName" class="form-control" required autofocus disabled>
-                 {% with whoActive = oneJob['creator'] %}
-                 {% include 'userselectoptions.html' %}
-                 {% endwith %}
-               </select>
-             </td>
-
-
+        <table class="table table-striped table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">When</th>
+                <th scope="col">Who</th>
+                <th scope="col">To Whom</th>
+                <th scope="col">What</th>
+                <th scope="col">registred by</th>
+                {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                <th scope="col">Action</th>
+                {% endif %}
             </tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        <button id="modifyJob" class="btn btn-lg btn-warning btn-block" type="button">Save changes</button>
+        </thead>
+        <tbody>
+        {% for oneJob in jobToEdit['jobs'] %}
+        <tr>
+           <td>
+            {{oneJob['date']}}
+           </td>
+           <td>
+             {{users[oneJob['who']]['username']}}
+           </td>
+           <td>
+             {{users[oneJob['to_whom']]['username']}}
+           </td>
+           <td>
+              {{products[oneJob['what']]['name']}}
+           </td>
+           <td>
+              {{users[oneJob['creator']]['username']}}
+           </td>
+           {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+           <td>
+             <button type="button" class="btn btn-warning btn-sm modalJobAdd" tabindex="0"
+                  data-toggle="modal" data-target="#modalJobEdit"
+                  data-id="{{oneJob['id']}}"
+                  data-date="{{oneJob['date']}}"
+                  data-who="{{oneJob['who']}}"
+                  data-towhom={{oneJob['to_whom']}}
+                  data-what="{{oneJob['what']}}"
+                  data-creator={{oneJob['creator']}}
+                  data-delete="True">
+                  <img src="static/wrench.png" width="20" height="20"/> <img src="static/delete.png" width="20" height="20"/></button>
+
+
+           </td>
+           {% endif %}
+
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="modal fade" id="modalJobEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">
+                <img src="static/coffee.png" width="35" height="35" />
+                <img src="static/wrench.png" width="35" height="35" /> Edit Job's Details
+                </h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <form id='modified-job-to-submit' action="modifyJob" method="post">
+                <div class="form-group">
+                  <label for="job-id" class="col-form-label">Id</label>
+                  <input type="text" class="form-control" name="job-id" id="job-id" readonly>
+                </div>
+                
+                <div class="form-group">
+                  <label for="job-date" class="col-form-label">When</label>
+                  <input type="text" class="form-control" name="job-date" id="job-date" readonly>
+                </div>
+
+                <div class="form-group">
+                  <label for="job-who" class="col-form-label">Who</label>
+                  <select type="name" name="job-who" id="job-who" class="form-control" required autofocus>
+                    {% with whoActive = 1 %}
+                    {% include 'userselectoptions.html' %}
+                    {% endwith %}
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="job-whom" class="col-form-label">To whom</label>
+                  <select type="name" name="job-whom" id="job-whom" class="form-control" required autofocus>
+                    {% with whoActive = 1 %}
+                    {% include 'userselectoptions.html' %}
+                    {% endwith %}
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="job-what" class="col-form-label">What</label>
+                  <select type="name" name="job-what" id="job-what" class="form-control"  required autofocus>
+                    <option value=-1>What to buy (product)</option>
+                    {% for id in products %}
+                      <option value={{id}}>{{products[id]['name']}} ({{products[id]['price']}} CHF)</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="job-creator" class="col-form-label">Registered by</label>
+                  <select type="name" name="job-creator" id="job-creator" class="form-control" required autofocus readonly>
+                    {% with whoActive = 1 %}
+                    {% include 'userselectoptions.html' %}
+                    {% endwith %}
+                  </select>
+                </div>
+
+                <button id='button-job-modify' name='action' value='modify' type="submit" class="btn btn-danger">
+                  Save Job Changes</button>
+                <button id='button-job-delete' name='action' value='delete' type="submit" class="btn btn-danger" disabled>
+                  <img src="static/delete.png" width="20" height="20"/>Delete Job</button>
+              </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <button type="button" class="btn btn-warning btn-sm modalJobAdd" tabindex="0"
+             data-toggle="modal" data-target="#modalJobEdit"
+             data-date="{{jobToEdit['jobs'][0]['date']}}"
+             data-who="{{jobToEdit['jobs'][0]['who']}}"
+             data-creator="{{loggedUsernameEmail['id']}}"
+             data-delete="False"
+             data-action="add">
+             <img src="static/wrench.png" width="20" height="20"/>Add another order within this job</button>
+
         <script>
           $(function() {
-              $('#modifyJob').click(function() {
+              $('#button-job-modify').on('submit', function(e) {
+                  e.preventDefault();
                   $.ajax({
-                      url: '/modifyJob',
-                      data: $('form').serialize(),
+                      url: 'modifyJob',
+                      data: $('#modified-job-to-submit').serialize(),
                       type: 'POST',
                       success: function(response) {
                           location.reload();
-                          console.log(response);
                       },
-                      error: function(error) {
-                          console.log(error);
-                      }
                   });
               });
             }
           );
-        </script>
-        </form>
 
-      </div>
+          $(function(){
+            $('.modalJobAdd').click(function(e){
+              e.preventDefault();
+              var button = $(e.delegateTarget);
+              var date = button.data('date');
+              var id = button.data('id');
+              var creator = button.data('creator');
+              var toWhom = button.data('towhom');
+              var what = button.data('what');
+              var who = button.data('who');
+              var deleteButton = button.data('delete');
+              var addJob = button.data('action')
+              var mymodal = $('#modalJobEdit');
+              if (deleteButton == 'True'){
+                document.getElementById("button-job-delete").disabled = false;
+              }
+              console.log(addJob);
+              if (addJob == 'add') {
+                document.getElementById("button-job-modify").value = addJob;
+              }
+              mymodal.find('#job-id').val(id);
+              mymodal.find('#job-date').val(date);
+              mymodal.find('#job-who').val(who);
+              mymodal.find('#job-creator').val(creator);
+              mymodal.find('#job-whom').val(toWhom);
+              mymodal.find('#job-what').val(what);
+              mymodal.modal('show');
+            });
+          })
+        </script>
 
       <footer class="footer">
       {% include 'footer.html' %}

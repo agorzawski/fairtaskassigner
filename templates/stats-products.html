@@ -1,0 +1,128 @@
+<div id='products' class="container">
+  <hr class="my-3">
+  <h2>Products: </h2>
+  {% include 'totop.html' %}
+  <div class="table-responsive">
+     <table class="table table-striped table-hover table-sm">
+         <thead>
+             <tr>
+                 <th scope="col">Name</th>
+                 <th scope="col">Price [CHF] </th>
+                 <th scope="col">Size [ml] </th>
+                 <th scope="col">Caffeine [mg] </th>
+                 {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                 <th scope="col" >Action</th>
+                 {% endif %}
+             </tr>
+         </thead>
+         <tbody>
+         {% for id in products %}
+             <tr >
+                 <th scope="row"> {{ products[id]['name'] }} </th>
+                 <td> {{'%0.1f'| format(products[id]['price']|float)}}</td>
+                 <td> {{'%0.1f'| format(products[id]['size']|float)}}</td>
+                 <td> {{'%0.1f'| format(products[id]['caffeine']|float)}}</td>
+                 {% if loggedUsernameEmail['email'] in adminsList['admin'].keys() or loggedUsernameEmail['email'] in adminsList['badgeadmin'].keys() %}
+                 <td>
+                   <button type="button" class="btn btn-warning btn-sm modalProductEditON" tabindex="0"
+                        data-toggle="modal" data-target="#modalProductEdit"
+                        data-id="{{products[id]['id']}}"
+                        data-name="{{products[id]['name']}}"
+                        data-price="{{products[id]['price']}}"
+                        data-size="{{products[id]['size']}}"
+                        data-caffeine={{products[id]['caffeine']}}>
+                        <img src="static/wrench.png" width="20" height="20"/></button>
+                 </td>
+                 {% endif %}
+             </tr>
+         {% endfor %}
+         </tbody>
+     </table>
+
+
+     <div class="modal fade" id="modalProductEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+       <div class="modal-dialog" role="document">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h5 class="modal-title" id="exampleModalLabel">
+               <img src="static/coffee.png" width="35" height="35" />
+               <img src="static/wrench.png" width="35" height="35" /> Edit Product Details
+             </h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+             </button>
+           </div>
+           <div class="modal-body">
+             <form id="product-data-to-submit" action="/editProduct" method="post">
+               <div class="form-group">
+                 <label for="product-id" class="col-form-label">Product id:</label>
+                 <input type="text" class="form-control" id="product-id" name="product-id" readonly>
+               </div>
+               <div class="form-group">
+                 <label for="product-name" class="col-form-label">Product name:</label>
+                 <input type="text" class="form-control" id="product-name" name="product-name">
+               </div>
+               <div class="form-group">
+                 <label for="product-price" class="col-form-label">Product price:</label>
+                 <input type="text" class="form-control" id="product-price" name="product-price">
+               </div>
+               <div class="form-group">
+                 <label for="product-caffeine" class="col-form-label">Product caffeine[mg]:</label>
+                 <input type="text" class="form-control" id="product-caffeine" name="product-caffeine">
+               </div>
+               <div class="form-group">
+                 <label for="product-size" class="col-form-label">Product size [ml]:</label>
+                 <input type="text" class="form-control" id="product-size" name="product-size">
+               </div>
+
+               <button type="submit" class="btn btn-danger">Save Job Changes</button>
+             </form>
+           </div>
+           <div class="modal-footer">
+             <button type="button" class="btn btn-light" data-dismiss="modal">Cancel and forget</button>
+
+           </div>
+         </div>
+       </div>
+     </div>
+     <script>
+     $(function(){
+       $('.modalProductEditON').click(function(e){
+         e.preventDefault();
+         var button = $(e.delegateTarget);
+         var name = button.data('name');
+         var id = button.data('id');
+         var price = button.data('price');
+         var caffeine = button.data('caffeine');
+         var size = button.data('size');
+
+         var mymodal = $('#modalProductEdit');
+         mymodal.find('#product-id').val(id);
+         mymodal.find('#product-name').val(name);
+         mymodal.find('#product-price').val(price);
+         mymodal.find('#product-caffeine').val(caffeine);
+         mymodal.find('#product-size').val(size);
+         mymodal.modal('show');
+       });
+     })
+
+     $(function(){
+        $('#product-data-to-submit').on('submit', function(e){
+             e.preventDefault();
+             $.ajax({
+                 url: "/editProduct",
+                 type: "POST",
+                 data: $('#product-data-to-submit').serialize(),
+
+                 success: function(data){
+                     location.reload();
+                 }
+             });
+        });
+     });
+     </script>
+
+   </div>
+ </div>
+
+ {% include 'bar-chart.html' %}
